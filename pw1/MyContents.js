@@ -44,8 +44,10 @@ class MyContents  {
         
         this.boxMesh.position.y = this.boxDisplacement.y;
                 
-        this.boxMesh.rotation.x = Math.PI / 6;
+        this.boxMesh.rotateX( Math.PI / 6 ); 
 
+        this.boxMesh.rotateX( Math.PI / 6 ); 
+    
         this.boxMesh.scale.set(3,2,1);    
         
     }
