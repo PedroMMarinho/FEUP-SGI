@@ -39,8 +39,10 @@ class MyContents  {
         // Create a Cube Mesh with basic material
         let box = new THREE.BoxGeometry(  this.boxMeshSize,  this.boxMeshSize,  this.boxMeshSize );
         this.boxMesh = new THREE.Mesh( box, boxMaterial );
-        this.boxMesh.rotation.x = -Math.PI / 2;
         this.boxMesh.position.y = this.boxDisplacement.y;
+        this.boxMesh.rotation.x = Math.PI / 6;
+        this.boxMesh.scale.set(3,2,1);
+        
     }
 
     /**
