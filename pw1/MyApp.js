@@ -72,6 +72,11 @@ class MyApp  {
         perspective1.position.set(10,10,3)
         this.cameras['Perspective'] = perspective1
 
+		// Persp 2
+		const perspective2 = new THREE.PerspectiveCamera( 135, aspect, 0.1, 1000);
+		perspective2.position.set(10, 10, 3);
+		this.cameras['Perspective2'] = perspective2;
+
         // defines the frustum size for the orthographic cameras
         const left = -this.frustumSize / 2 * aspect
         const right = this.frustumSize /2 * aspect 
