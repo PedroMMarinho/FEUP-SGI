@@ -39,9 +39,14 @@ class MyContents  {
         // Create a Cube Mesh with basic material
         let box = new THREE.BoxGeometry(  this.boxMeshSize,  this.boxMeshSize,  this.boxMeshSize );
         this.boxMesh = new THREE.Mesh( box, boxMaterial );
+
+        // PW1-A: Invert order of rotation, scale and position to see the difference
+        
         this.boxMesh.position.y = this.boxDisplacement.y;
+                
         this.boxMesh.rotation.x = Math.PI / 6;
-        this.boxMesh.scale.set(3,2,1);
+
+        this.boxMesh.scale.set(3,2,1);    
         
     }
 
