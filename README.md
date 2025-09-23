@@ -13,10 +13,25 @@
 
 ### [PW1 - ThreeJS Basics](pw1)
 
-- (items briefly describing main strong points)
-- Scene
-  - (Brief description of the created scene)
-  - (relative link to the scene)
+#### Task A
+
+**Questions**
+- Did you observe any differences when changing the order of the lines manipulating the transformations ?
+
+**Surprisingly** there are no differences. If we reverse the order of the transformations we will get the same result. This happens because **Mesh objects**, internally , have a fixed transformation order. In this case it behaves like this:  
+
+- **Scale → Rotation → Position**
+
+The following images show no difference at all after changing the order of the lines of code.
+
+Rotation of 30º then scale:
+
+![Pw1-A-1](pw1/assets/PW1-A.png)
+
+Scale then rotation of 30º:
+
+![Pw1-A-2](pw1/assets/PW1-A.png)
+
 
 -----
 
