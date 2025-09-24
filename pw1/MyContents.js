@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { MyAxis } from './MyAxis.js';
+import { MyTable } from './MyTable.js';
 
 /**
  *  This class contains the contents of out application
@@ -20,6 +21,8 @@ class MyContents  {
         this.boxEnabled = true
         this.lastBoxEnabled = null
         this.boxDisplacement = new THREE.Vector3(0,2,0)
+        
+        this.tableObj = null
 
         // plane related attributes
         this.diffusePlaneColor = "#00ffff"
@@ -41,6 +44,32 @@ class MyContents  {
         this.boxMesh = new THREE.Mesh( box, boxMaterial );
         this.boxMesh.rotation.x = -Math.PI / 2;
         this.boxMesh.position.y = this.boxDisplacement.y;
+    }
+    /**
+     * builds the walls around the scene
+     */
+    buildWalls() {
+        let wallsMaterial = new THREE.MeshPhongMaterial({ color: "#f3140c", 
+        specular: "#000000", emissive: "#000000", shininess: 90 })
+
+        // Create the walls
+        let wall = new THREE.PlaneGeometry( 10, 5 );
+        this.wallMesh1 = new THREE.Mesh( wall, wallsMaterial );
+        this.wallMesh1.position.set(0,2.5,-5)
+        this.app.scene.add( this.wallMesh1 );
+        
+        this.wallMesh2 = new THREE.Mesh( wall, wallsMaterial );
+        this.wallMesh2.position.set(-5,2.5,0)
+        this.wallMesh2.rotateY( Math.PI / 2 );
+        this.app.scene.add( this.wallMesh2 );
+        this.wallMesh3 = new THREE.Mesh( wall, wallsMaterial );
+        this.wallMesh3.position.set(5,2.5,0)
+        this.wallMesh3.rotateY( -Math.PI / 2 );
+        this.app.scene.add( this.wallMesh3 );
+        this.wallMesh4 = new THREE.Mesh( wall, wallsMaterial );
+        this.wallMesh4.position.set(0,2.5,5)
+        this.wallMesh4.rotateY( Math.PI );
+        this.app.scene.add( this.wallMesh4 );
     }
 
     /**
@@ -70,6 +99,11 @@ class MyContents  {
         this.app.scene.add( ambientLight );
 
         this.buildBox()
+
+        this.buildWalls()
+
+        this.tableObj = new MyTable(this.app,2,3,3,'#123456');
+        this.app.scene.add(this.tableObj);
         
         // Create a Plane Mesh with basic material
         
