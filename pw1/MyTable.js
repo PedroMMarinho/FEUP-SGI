@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { MyApp } from './MyApp.js';
-import { MyAxis } from './MyAxis.js';
+import { MyBowlOfSoup } from './MyBowlOfSoup.js';
 
 export class MyTable extends THREE.Object3D  {
 
@@ -21,6 +21,8 @@ export class MyTable extends THREE.Object3D  {
         this.zzLength = zzLength; 
         this.color = color; 
         this.legOffset = 0.2; 
+
+        this.soup = null;
 
         // create table top 
         const tableMaterial = new THREE.MeshPhongMaterial({color: this.color,specular: "#000000", emissive: "#000000", shininess: 90 });
@@ -44,6 +46,11 @@ export class MyTable extends THREE.Object3D  {
         this.add(legMesh2);
         this.add(legMesh3);
         this.add(legMesh4);
+
+        // add bowl of soup
+        this.soup = new MyBowlOfSoup(this.app);
+        this.soup.position.set(0,this.height + this.soup.radius,0);
+        this.add(this.soup);
 
 
 

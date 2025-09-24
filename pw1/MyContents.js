@@ -102,7 +102,7 @@ class MyContents  {
 
         this.buildWalls()
 
-        this.tableObj = new MyTable(this.app,2,3,3,'#123456');
+        this.tableObj = new MyTable(this.app,2,3,3,'#561212');
         this.app.scene.add(this.tableObj);
         
         // Create a Plane Mesh with basic material
