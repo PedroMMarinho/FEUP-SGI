@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { MyApp } from './MyApp.js';
 import { MyBowlOfSoup } from './MyBowlOfSoup.js';
+import { MyChair } from './MyChair.js';
 
 export class MyTable extends THREE.Object3D  {
 
@@ -52,8 +53,21 @@ export class MyTable extends THREE.Object3D  {
         this.soup.position.set(0,this.height + this.soup.radius,0);
         this.add(this.soup);
 
-
-
+        // Add chairs around the table
+        const chairHeight = this.height * (3/5);
+        const chairxxLength = this.xxLength / 2;
+        const chairzzLength = this.zzLength / 2;
+        const chairColor = "#7777ff";
+        const chair1 = new MyChair(this.app, chairHeight, chairxxLength, chairzzLength, chairColor);
+        const chair2 = new MyChair(this.app, chairHeight, chairxxLength, chairzzLength, chairColor);
+        
+        chair1.position.set(-(this.xxLength/2 + 1), 0, 0);
+        chair1.rotation.y = Math.PI / 2;
+        chair2.position.set((this.xxLength/2 + 1), 0, 0);
+        chair2.rotation.y = -Math.PI / 2;
+        
+        this.add(chair1);
+        this.add(chair2);
 
 
 
