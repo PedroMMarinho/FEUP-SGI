@@ -105,6 +105,20 @@ class MyApp  {
         orthoFront.position.set(0,0, this.frustumSize /4) 
         orthoFront.lookAt( new THREE.Vector3(0,0,0) );
         this.cameras['Front'] = orthoFront
+
+        // camera back view 
+        const backView = new THREE.OrthographicCamera( left, right, top, bottom, near, far);
+        backView.up = new THREE.Vector3(0,1,0);
+        backView.position.set(0,0, -this.frustumSize /4);
+        backView.lookAt( new THREE.Vector3(0,0,0) );
+        this.cameras['Back'] = backView;
+
+        // camera right view
+        const rightView = new THREE.OrthographicCamera( left, right, top, bottom, near, far);
+        rightView.up = new THREE.Vector3(0,1,0);
+        rightView.position.set(this.frustumSize /4,0,0);
+        rightView.lookAt( new THREE.Vector3(0,0,0) );
+        this.cameras['Right'] = rightView;
     }
 
     /**
