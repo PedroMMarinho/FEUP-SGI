@@ -22,7 +22,9 @@ class MyContents  {
         this.lastBoxEnabled = null
         this.boxDisplacement = new THREE.Vector3(0,2,0)
         
-        this.tableObj = null
+        this.tableObj = null;
+
+        this.tableEnabled = false
 
         // plane related attributes
         this.diffusePlaneColor = "#00ffff"
@@ -103,7 +105,6 @@ class MyContents  {
         this.buildWalls()
 
         this.tableObj = new MyTable(this.app,2,3,3,'#561212');
-        this.app.scene.add(this.tableObj);
         
         // Create a Plane Mesh with basic material
         
@@ -168,6 +169,14 @@ class MyContents  {
             }
         }
     }
+    updateTableIfRequired() {
+        if (this.tableEnabled ) {
+            this.app.scene.add(this.tableObj);
+        }
+        else {
+            this.app.scene.remove(this.tableObj);
+        }
+    }
 
     /**
      * updates the contents
@@ -177,6 +186,8 @@ class MyContents  {
     update() {
         // check if box mesh needs to be updated
         this.updateBoxIfRequired()
+
+        this.updateTableIfRequired()
 
         // sets the box mesh position based on the displacement vector
         this.boxMesh.position.x = this.boxDisplacement.x

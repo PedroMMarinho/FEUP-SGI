@@ -38,6 +38,9 @@ class MyGuiInterface  {
         boxFolder.add(this.contents.boxDisplacement, 'y', -5, 5)
         boxFolder.add(this.contents.boxDisplacement, 'z', -5, 5)
         boxFolder.open()
+
+        const tableFolder = this.datgui.addFolder( 'Table' );
+        tableFolder.add(this.contents, 'tableEnabled', true).name("enabled");
         
         const data = {  
             'diffuse color': this.contents.diffusePlaneColor,
