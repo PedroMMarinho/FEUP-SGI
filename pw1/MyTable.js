@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { MyApp } from './MyApp.js';
 import { MyBowlOfSoup } from './MyBowlOfSoup.js';
 import { MyChair } from './MyChair.js';
+import { MySpoon } from './MySpoon.js';
 
 export class MyTable extends THREE.Object3D  {
 
@@ -69,7 +70,21 @@ export class MyTable extends THREE.Object3D  {
         this.add(chair1);
         this.add(chair2);
 
+        // Add two spoons on the table
+        const spoonHeight = 0.1;
+        const spoonxxLength = 0.1;
+        const spoonzzLength = 0.8;
+        const spoonColor = "#ffff00";
+        const spoon1 = new MySpoon(this.app, spoonHeight, spoonxxLength, spoonzzLength, spoonColor);
+        const spoon2 = new MySpoon(this.app, spoonHeight, spoonxxLength, spoonzzLength, spoonColor);
 
+        spoon1.position.set(-xxLength/4 - spoonxxLength/2,this.height + 0.2,zzLength/4);
+        spoon2.position.set(xxLength/4 + spoonxxLength/2,this.height + 0.2,-zzLength/4);
+        spoon1.rotation.z = -Math.PI /2 ;
+        spoon1.rotation.y = -Math.PI;
+        spoon2.rotation.z = -Math.PI / 2;
+        this.add(spoon1);
+        this.add(spoon2);
 
 
 
