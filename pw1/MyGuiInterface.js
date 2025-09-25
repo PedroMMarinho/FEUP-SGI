@@ -70,7 +70,7 @@ class MyGuiInterface  {
 
         const pointLightFolder = this.datgui.addFolder( ' Point Light' );
         pointLightFolder.add(this.contents.pointLightPosition, 'x', -10, 10).name("x coord").onChange( (value) => { this.contents.updatePointLightPosition(value, null, null) } );
-        pointLightFolder.add(this.contents.pointLightPosition, 'y', 0, 10).name("y coord").onChange( (value) => { this.contents.updatePointLightPosition(null, value, null) } );
+        pointLightFolder.add(this.contents.pointLightPosition, 'y', -20, 10).name("y coord").onChange( (value) => { this.contents.updatePointLightPosition(null, value, null) } );
         pointLightFolder.add(this.contents.pointLightPosition, 'z', -10, 10).name("z coord").onChange( (value) => { this.contents.updatePointLightPosition(null, null, value) } );
         pointLightFolder.addColor( pointData, 'point color' ).name("light color").onChange( (value) => { this.contents.updatePointLightColor(value) } );
 
