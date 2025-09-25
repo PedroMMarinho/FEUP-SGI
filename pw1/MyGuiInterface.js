@@ -63,6 +63,25 @@ class MyGuiInterface  {
         // note that we are using a property from the app 
         cameraFolder.add(this.app.activeCamera.position, 'x', 0, 10).name("x coord")
         cameraFolder.open()
+
+        const pointData = {
+            'point color': this.contents.pointLightColor
+        }
+
+        const pointLightFolder = this.datgui.addFolder( ' Point Light' );
+        pointLightFolder.add(this.contents.pointLightPosition, 'x', -10, 10).name("x coord").onChange( (value) => { this.contents.updatePointLightPosition(value, null, null) } );
+        pointLightFolder.add(this.contents.pointLightPosition, 'y', 0, 10).name("y coord").onChange( (value) => { this.contents.updatePointLightPosition(null, value, null) } );
+        pointLightFolder.add(this.contents.pointLightPosition, 'z', -10, 10).name("z coord").onChange( (value) => { this.contents.updatePointLightPosition(null, null, value) } );
+        pointLightFolder.addColor( pointData, 'point color' ).name("light color").onChange( (value) => { this.contents.updatePointLightColor(value) } );
+
+        const ambientData = {
+            'ambient color': this.contents.ambientLightColor
+        }
+
+        const ambientLightFolder = this.datgui.addFolder( ' Ambient Light' );
+        ambientLightFolder.addColor( ambientData, 'ambient color' ).name("light color").onChange( (value) => { this.contents.updateAmbientLightColor(value) } );
+
+
     }
 }
 
