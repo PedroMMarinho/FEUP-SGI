@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { MyAxis } from './MyAxis.js';
+import { MyTable } from './MyTable.js';
 
 /**
  *  This class contains the contents of out application
@@ -17,9 +18,13 @@ class MyContents  {
         // box related attributes
         this.boxMesh = null
         this.boxMeshSize = 1.0
-        this.boxEnabled = true
+        this.boxEnabled = false;
         this.lastBoxEnabled = null
         this.boxDisplacement = new THREE.Vector3(0,2,0)
+        
+        this.tableObj = null;
+
+        this.tableEnabled = true;
 
         // plane related attributes
         this.diffusePlaneColor = "#00ffff"
@@ -39,8 +44,43 @@ class MyContents  {
         // Create a Cube Mesh with basic material
         let box = new THREE.BoxGeometry(  this.boxMeshSize,  this.boxMeshSize,  this.boxMeshSize );
         this.boxMesh = new THREE.Mesh( box, boxMaterial );
-        this.boxMesh.rotation.x = -Math.PI / 2;
+
+        // PW1-A: Invert order of rotation, scale and position to see the difference
+        
         this.boxMesh.position.y = this.boxDisplacement.y;
+                
+        this.boxMesh.rotateX( Math.PI / 6 ); 
+
+        this.boxMesh.rotateX( Math.PI / 6 ); 
+    
+        this.boxMesh.scale.set(3,2,1);    
+        
+    }
+    /**
+     * builds the walls around the scene
+     */
+    buildWalls() {
+        let wallsMaterial = new THREE.MeshPhongMaterial({ color: "#f3140c", 
+        specular: "#000000", emissive: "#000000", shininess: 90 })
+
+        // Create the walls
+        let wall = new THREE.PlaneGeometry( 10, 5 );
+        this.wallMesh1 = new THREE.Mesh( wall, wallsMaterial );
+        this.wallMesh1.position.set(0,2.5,-5)
+        this.app.scene.add( this.wallMesh1 );
+        
+        this.wallMesh2 = new THREE.Mesh( wall, wallsMaterial );
+        this.wallMesh2.position.set(-5,2.5,0)
+        this.wallMesh2.rotateY( Math.PI / 2 );
+        this.app.scene.add( this.wallMesh2 );
+        this.wallMesh3 = new THREE.Mesh( wall, wallsMaterial );
+        this.wallMesh3.position.set(5,2.5,0)
+        this.wallMesh3.rotateY( -Math.PI / 2 );
+        this.app.scene.add( this.wallMesh3 );
+        this.wallMesh4 = new THREE.Mesh( wall, wallsMaterial );
+        this.wallMesh4.position.set(0,2.5,5)
+        this.wallMesh4.rotateY( Math.PI );
+        this.app.scene.add( this.wallMesh4 );
     }
 
     /**
@@ -70,6 +110,10 @@ class MyContents  {
         this.app.scene.add( ambientLight );
 
         this.buildBox()
+
+        this.buildWalls()
+
+        this.tableObj = new MyTable(this.app,2,3,3,'#561212');
         
         // Create a Plane Mesh with basic material
         
@@ -134,6 +178,14 @@ class MyContents  {
             }
         }
     }
+    updateTableIfRequired() {
+        if (this.tableEnabled ) {
+            this.app.scene.add(this.tableObj);
+        }
+        else {
+            this.app.scene.remove(this.tableObj);
+        }
+    }
 
     /**
      * updates the contents
@@ -143,6 +195,8 @@ class MyContents  {
     update() {
         // check if box mesh needs to be updated
         this.updateBoxIfRequired()
+
+        this.updateTableIfRequired()
 
         // sets the box mesh position based on the displacement vector
         this.boxMesh.position.x = this.boxDisplacement.x
