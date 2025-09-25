@@ -22,10 +22,13 @@ class MyContents {
         this.lastBoxEnabled = null
         this.boxDisplacement = new THREE.Vector3(0, 2, 0)
 
-        this.tableObj = null;
+        // table related attributes
 
+        this.tableObj = null;
         this.tableEnabled = true;
         this.lastTableEnabled = null;
+
+        // walls related attributes
 
         this.wallsEnabled = true;
         this.lastWallsEnabled = null;
@@ -33,6 +36,12 @@ class MyContents {
         this.wallMesh2 = null;
         this.wallMesh3 = null;
         this.wallMesh4 = null;
+
+        // light related attributes
+        this.pointLightPosition = new THREE.Vector3(0, 20, 0);
+        this.pointLightColor = "#ffffff";
+
+        this.ambientLightColor = "#555555";
 
         // plane related attributes
         this.diffusePlaneColor = "#00ffff"
@@ -110,18 +119,18 @@ class MyContents {
         }
 
         // add a point light on top of the model
-        const pointLight = new THREE.PointLight(0xffffff, 500, 0);
-        pointLight.position.set(0, 20, 0);
-        this.app.scene.add(pointLight);
+       this.pointLight = new THREE.PointLight(this.pointLightColor, 500, 0);
+        this.pointLight.position.set(this.pointLightPosition.x, this.pointLightPosition.y, this.pointLightPosition.z);
+        this.app.scene.add(this.pointLight);
 
         // add a point light helper for the previous point light
         const sphereSize = 0.5;
-        const pointLightHelper = new THREE.PointLightHelper(pointLight, sphereSize);
-        this.app.scene.add(pointLightHelper);
+        this.pointLightHelper = new THREE.PointLightHelper(this.pointLight, sphereSize);
+        this.app.scene.add(this.pointLightHelper);
 
         // add an ambient light
-        const ambientLight = new THREE.AmbientLight(0x555555);
-        this.app.scene.add(ambientLight);
+        this.ambientLight = new THREE.AmbientLight(this.ambientLightColor);
+        this.app.scene.add(this.ambientLight);
 
         this.buildBox()
 
@@ -220,6 +229,21 @@ class MyContents {
                 this.app.scene.remove(this.wallMesh4);
             }
         }
+    }
+    updatePointLightPosition(x, y, z) {
+        if (x !== null) this.pointLightPosition.x = x;
+        if (y !== null) this.pointLightPosition.y = y;
+        if (z !== null) this.pointLightPosition.z = z;
+        this.pointLight.position.set(this.pointLightPosition.x, this.pointLightPosition.y, this.pointLightPosition.z);
+    }
+    updatePointLightColor(color) {
+        this.pointLightColor = color;
+        this.pointLight.color.set(this.pointLightColor);
+    }
+    updateAmbientLightColor(color) {
+        this.ambientLightColor = color;
+        this.ambientLight.color.set(this.ambientLightColor);
+
     }
 
     /**
