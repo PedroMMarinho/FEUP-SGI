@@ -115,3 +115,17 @@ Yes — the main unexpected behavior was that the **SpotLightHelper** did not al
 ##### Question 2
 
 Yes — the helper correctly represented the spotlight’s position, angle, and target direction, as long as `spotHelper.update()` was called after each change. This confirms that the helper is reliable for visual debugging, but it needs manual updating when modifying dynamic properties such as position, target, angle, or distance.
+
+
+#### Task E
+
+**Questions?** 
+
+1. Were you able to see changes in real time of the wrap mode? What was necessary for those changes to happen?
+
+
+##### Question 1
+
+
+Yes, I was able to see the changes in real time when switching between the different wrap modes. The only thing I had to keep in mind was setting the `needsUpdate` attribute of the texture object to `true` after changing its wrap mode. This forces Three.js to re-upload the texture parameters to the GPU, so the updates become visible immediately in the scene.
+
