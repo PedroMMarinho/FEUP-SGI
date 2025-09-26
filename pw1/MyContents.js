@@ -50,6 +50,27 @@ class MyContents {
         this.directionalLightPosition = new THREE.Vector3(0, 10, 0);
         this.directionalLightTarget = new THREE.Vector3(0, 0, 0);
 
+        // Spot Light
+        this.spotLightColor = 0xffffff;
+        this.spotLightIntensity = 15;
+        this.spotLight = new THREE.SpotLight(
+            this.spotLightColor,
+            this.spotLightIntensity,
+            14,                
+            THREE.MathUtils.degToRad(20), 
+            0,                 
+            0                  
+        );
+        this.spotLight.position.set(5, 10, 2);
+        this.spotLight.target.position.set(1, 0, 1);
+        this.app.scene.add(this.spotLight);
+        this.app.scene.add(this.spotLight.target);
+
+        // SpotLight Helper
+        this.spotHelper = new THREE.SpotLightHelper(this.spotLight);
+        this.app.scene.add(this.spotHelper);
+
+
         // plane related attributes
         this.diffusePlaneColor = "#00ffff"
         this.specularPlaneColor = "#777777"
@@ -309,6 +330,53 @@ class MyContents {
     );
 
     this.directionalLightHelper.update();
+    }
+
+    updateDirectionalLightVisibility(value) {
+        this.directionalLight.visible = value;
+        this.directionalLightHelper.visible = value;
+    }
+
+    updateSpotLightColor(value) {
+        this.spotLight.color.set(value);
+    }
+
+    updateSpotLightIntensity(value) {
+        this.spotLight.intensity = value;
+    }
+
+    updateSpotLightDistance(value) {
+        this.spotLight.distance = value;
+        this.spotHelper.update();
+    }
+
+    updateSpotLightAngle(value) {
+        this.spotLight.angle = THREE.MathUtils.degToRad(value);
+        this.spotHelper.update();
+    }
+
+    updateSpotLightPenumbra(value) {
+        this.spotLight.penumbra = value;
+        this.spotHelper.update();
+    }
+
+    updateSpotLightDecay(value) {
+        this.spotLight.decay = value;
+    }
+
+    updateSpotLightPositionY(value) {
+        this.spotLight.position.y = value;
+        this.spotHelper.update();
+    }
+
+    updateSpotLightTargetY(value) {
+        this.spotLight.target.position.y = value;
+        this.spotHelper.update();
+    }
+
+    updateSpotLightVisibility(value) {
+        this.spotLight.visible = value;
+        this.spotHelper.visible = value;
     }
 
 
