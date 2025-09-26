@@ -100,10 +100,15 @@ class MyContents {
 
 
         this.newWallTexture = new THREE.TextureLoader().load('textures/window.jpg');
-        this.wallWrapModeS = THREE.ClampToEdgeWrapping;
-        this.wallWrapModeT = THREE.ClampToEdgeWrapping;
-        this.newWallTexture.wrapS = this.wallWrapModeS;
-        this.newWallTexture.wrapT = this.wallWrapModeT;
+        this.newWallTexture.rotation = Math.PI;
+        // inside MyContents constructor
+        this.wallParams = {
+            wrapS: THREE.ClampToEdgeWrapping,
+            wrapT: THREE.ClampToEdgeWrapping
+        };
+
+        this.newWallTexture.wrapS = this.wallParams.wrapS;
+        this.newWallTexture.wrapT = this.wallParams.wrapT;
         this.newWallTexture.repeat.set(2,2);
         this.newWallTexture.center.set(0.5, 0.5);
         this.newWallTexture.offset.set(0,0);
@@ -410,7 +415,6 @@ class MyContents {
 
 
     updateWallTextureWrapS(value) {
-        console.log(value);
         this.newWallTexture.wrapS = value;
         this.newWallTexture.needsUpdate = true;
     }

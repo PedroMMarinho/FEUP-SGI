@@ -44,9 +44,22 @@ class MyGuiInterface {
 
         const wallsFolder = this.datgui.addFolder('Walls');
         wallsFolder.add(this.contents, 'wallsEnabled', true).name("enabled");
+        
+        wallsFolder.add(this.contents.wallParams, 'wrapS', {
+            ClampToEdgeWrapping: THREE.ClampToEdgeWrapping,
+            RepeatWrapping: THREE.RepeatWrapping,
+            MirroredRepeatWrapping: THREE.MirroredRepeatWrapping
+        }).name("wrap S").onChange((value) => {
+            this.contents.updateWallTextureWrapS(value);
+        });
 
-        wallsFolder.add(this.contents.wallWrapModeS, 'wallWrapModeS', { ClampToEdgeWrapping: THREE.ClampToEdgeWrapping, RepeatWrapping: THREE.RepeatWrapping, MirroredRepeatWrapping: THREE.MirroredRepeatWrapping }).name("wrap S").onChange((value) => { this.contents.updateWallTextureWrapS(value) });
-        wallsFolder.add(this.contents.wallWrapModeT, 'wallWrapModeT', { ClampToEdgeWrapping: THREE.ClampToEdgeWrapping, RepeatWrapping: THREE.RepeatWrapping, MirroredRepeatWrapping: THREE.MirroredRepeatWrapping }).name("wrap T").onChange((value) => { this.contents.updateWallTextureWrapT(value) });
+        wallsFolder.add(this.contents.wallParams, 'wrapT', {
+            ClampToEdgeWrapping: THREE.ClampToEdgeWrapping,
+            RepeatWrapping: THREE.RepeatWrapping,
+            MirroredRepeatWrapping: THREE.MirroredRepeatWrapping
+        }).name("wrap T").onChange((value) => {
+            this.contents.updateWallTextureWrapT(value);
+        });
 
         const data = {
             'diffuse color': this.contents.diffusePlaneColor,
