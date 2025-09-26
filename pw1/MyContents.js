@@ -15,6 +15,10 @@ class MyContents {
         this.app = app
         this.axis = null
 
+        this.planeWidth = 10;
+        this.planeHeight = 10;
+
+
         // box related attributes
         this.boxMesh = null
         this.boxMeshSize = 1.0
@@ -43,7 +47,7 @@ class MyContents {
         //this.pointLightColor = "#ffffff";
 
         this.ambientLightColor = "#444444";
-        this.ambientLightIntensity = 1.0;
+        this.ambientLightIntensity = 20.0;
 
         this.directionalLightColor = "#ffffff";
         this.directionalLightIntensity = 1.0;
@@ -75,10 +79,34 @@ class MyContents {
         this.diffusePlaneColor = "#00ffff"
         this.specularPlaneColor = "#777777"
         this.planeShininess = 30
+
+
+        this.planeTexture = new THREE.TextureLoader().load('textures/floor.png');
+        this.planeTexture.wrapS = THREE.RepeatWrapping;
+        this.planeTexture.wrapT = THREE.RepeatWrapping;
+        this.planeTexture.repeat.set(this.planeWidth, this.planeHeight);
+
+
         this.planeMaterial = new THREE.MeshPhongMaterial({
             color: this.diffusePlaneColor,
-            specular: this.specularPlaneColor, emissive: "#000000", shininess: this.planeShininess
+            specular: this.specularPlaneColor, emissive: "#000000", shininess: this.planeShininess,
+            map: this.planeTexture
         })
+
+        this.wallTexture = new THREE.TextureLoader().load('textures/floor.png');
+        this.wallTexture.wrapS = THREE.MirroredRepeatWrapping;
+        this.wallTexture.wrapT = THREE.MirroredRepeatWrapping;
+        this.wallTexture.repeat.set(this.planeWidth, this.planeHeight);
+
+
+        this.newWallTexture = new THREE.TextureLoader().load('textures/window.jpg');
+        this.wallWrapModeS = THREE.ClampToEdgeWrapping;
+        this.wallWrapModeT = THREE.ClampToEdgeWrapping;
+        this.newWallTexture.wrapS = this.wallWrapModeS;
+        this.newWallTexture.wrapT = this.wallWrapModeT;
+        this.newWallTexture.repeat.set(2,2);
+        this.newWallTexture.center.set(0.5, 0.5);
+        this.newWallTexture.offset.set(0,0);
     }
 
     /**
@@ -110,26 +138,27 @@ class MyContents {
      */
     buildWalls() {
         let wallsMaterial = new THREE.MeshPhongMaterial({
-            color: "#f3140c",
-            specular: "#000000", emissive: "#000000", shininess: 90
+            color: "#7f7f7f",
+            specular: "#000000", emissive: "#000000", shininess: 90,
+            map: this.newWallTexture
         })
 
         // Create the walls
-        let wall = new THREE.PlaneGeometry(10, 5);
+        let wall = new THREE.PlaneGeometry(10, 10);
         this.wallMesh1 = new THREE.Mesh(wall, wallsMaterial);
-        this.wallMesh1.position.set(0, 2.5, -5)
+        this.wallMesh1.position.set(0, 5, -5)
         this.app.scene.add(this.wallMesh1);
 
         this.wallMesh2 = new THREE.Mesh(wall, wallsMaterial);
-        this.wallMesh2.position.set(-5, 2.5, 0)
+        this.wallMesh2.position.set(-5, 5, 0)
         this.wallMesh2.rotateY(Math.PI / 2);
         this.app.scene.add(this.wallMesh2);
         this.wallMesh3 = new THREE.Mesh(wall, wallsMaterial);
-        this.wallMesh3.position.set(5, 2.5, 0)
+        this.wallMesh3.position.set(5, 5, 0)
         this.wallMesh3.rotateY(-Math.PI / 2);
         this.app.scene.add(this.wallMesh3);
         this.wallMesh4 = new THREE.Mesh(wall, wallsMaterial);
-        this.wallMesh4.position.set(0, 2.5, 5)
+        this.wallMesh4.position.set(0, 5, 5)
         this.wallMesh4.rotateY(Math.PI);
         this.app.scene.add(this.wallMesh4);
     }
@@ -189,7 +218,7 @@ class MyContents {
 
         // Create a Plane Mesh with basic material
 
-        let plane = new THREE.PlaneGeometry(10, 10);
+        let plane = new THREE.PlaneGeometry(this.planeWidth, this.planeHeight);
         this.planeMesh = new THREE.Mesh(plane, this.planeMaterial);
         this.planeMesh.rotation.x = -Math.PI / 2;
         this.planeMesh.position.y = -0;
@@ -379,6 +408,17 @@ class MyContents {
         this.spotHelper.visible = value;
     }
 
+
+    updateWallTextureWrapS(value) {
+        console.log(value);
+        this.newWallTexture.wrapS = value;
+        this.newWallTexture.needsUpdate = true;
+    }
+    
+    updateWallTextureWrapT(value) {
+        this.newWallTexture.wrapT = value;
+        this.newWallTexture.needsUpdate = true;
+    }
 
     /**
      * updates the contents
