@@ -1,7 +1,7 @@
 import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 import { MyApp } from './MyApp.js';
 import { MyContents } from './MyContents.js';
-
+import * as THREE from 'three';
 /**
     This class customizes the gui interface for the app
 */
@@ -87,12 +87,15 @@ class MyGuiInterface {
 
         const directionalLightData = {
             'color': this.contents.directionalLightColor,
-            'intensity': this.contents.directionalLightIntensity
+            'intensity': this.contents.directionalLightIntensity,
+            visible: this.contents.directionalLight.visible
+
         }
 
         const directionalLightFolder = this.datgui.addFolder('Directional Light');
         directionalLightFolder.addColor(directionalLightData, 'color').name("color").onChange((value) => { this.contents.updateDirectionalLightColor(value) });
         directionalLightFolder.add(directionalLightData, 'intensity', 0, 20.0).name("intensity").onChange((value) => { this.contents.updateDirectionalLightIntensity(value) });
+        directionalLightFolder.add(directionalLightData, 'visible').name("visible").onChange((v) => this.contents.updateDirectionalLightVisibility(v));
 
         const directionalPositionFolder = directionalLightFolder.addFolder('Light Position');
         directionalPositionFolder.add(this.contents.directionalLight.position, 'x', -10, 10).name("x coord").onChange((value) => { this.contents.updateDirectionalLightPosition(value, null, null) });
@@ -104,6 +107,30 @@ class MyGuiInterface {
         directionalTargetFolder.add(this.contents.directionalLightTargetObj.position, 'y', -10, 10).name("y coord").onChange((value) => { this.contents.updateDirectionalLightTarget(null, value, null) });
         directionalTargetFolder.add(this.contents.directionalLightTargetObj.position, 'z', -10, 10).name("z coord").onChange((value) => { this.contents.updateDirectionalLightTarget(null, null, value) });
 
+
+        const spotData = {
+            color: this.contents.spotLightColor,
+            intensity: this.contents.spotLightIntensity,
+            distance: this.contents.spotLight.distance,
+            angle: THREE.MathUtils.radToDeg(this.contents.spotLight.angle),
+            penumbra: this.contents.spotLight.penumbra,
+            decay: this.contents.spotLight.decay,
+            posY: this.contents.spotLight.position.y,
+            targetY: this.contents.spotLight.target.position.y,
+            visible: this.contents.spotLight.visible
+        };
+
+        const spotFolder = this.datgui.addFolder('Spot Light');
+
+        spotFolder.addColor(spotData, 'color').name("color").onChange((v) => this.contents.updateSpotLightColor(v));
+        spotFolder.add(spotData, 'intensity', 0, 50).name("intensity").onChange((v) => this.contents.updateSpotLightIntensity(v));
+        spotFolder.add(spotData, 'distance', 0, 50).name("distance").onChange((v) => this.contents.updateSpotLightDistance(v));
+        spotFolder.add(spotData, 'angle', 0, 90).name("angle (°)").onChange((v) => this.contents.updateSpotLightAngle(v));
+        spotFolder.add(spotData, 'penumbra', 0, 1).step(0.01).name("penumbra").onChange((v) => this.contents.updateSpotLightPenumbra(v));
+        spotFolder.add(spotData, 'decay', 0, 5).step(0.1).name("decay").onChange((v) => this.contents.updateSpotLightDecay(v));
+        spotFolder.add(spotData, 'posY', -20, 20).name("Y position").onChange((v) => this.contents.updateSpotLightPositionY(v));
+        spotFolder.add(spotData, 'targetY', -20, 20).name("Y target").onChange((v) => this.contents.updateSpotLightTargetY(v));
+        spotFolder.add(spotData, 'visible').name("visible").onChange((v) => this.contents.updateSpotLightVisibility(v));
 
     }
 }
