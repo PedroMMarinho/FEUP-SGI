@@ -38,10 +38,17 @@ class MyContents {
         this.wallMesh4 = null;
 
         // light related attributes
-        this.pointLightPosition = new THREE.Vector3(0, 20, 0);
-        this.pointLightColor = "#ffffff";
 
-        this.ambientLightColor = "#555555";
+        //this.pointLightPosition = new THREE.Vector3(0, 20, 0);
+        //this.pointLightColor = "#ffffff";
+
+        this.ambientLightColor = "#444444";
+        this.ambientLightIntensity = 1.0;
+
+        this.directionalLightColor = "#ffffff";
+        this.directionalLightIntensity = 1.0;
+        this.directionalLightPosition = new THREE.Vector3(0, 10, 0);
+        this.directionalLightTarget = new THREE.Vector3(0, 0, 0);
 
         // plane related attributes
         this.diffusePlaneColor = "#00ffff"
@@ -119,18 +126,39 @@ class MyContents {
         }
 
         // add a point light on top of the model
-       this.pointLight = new THREE.PointLight(this.pointLightColor, 500, 0);
-        this.pointLight.position.set(this.pointLightPosition.x, this.pointLightPosition.y, this.pointLightPosition.z);
-        this.app.scene.add(this.pointLight);
+        //this.pointLight = new THREE.PointLight(this.pointLightColor, 500, 0);
+        //this.pointLight.position.set(this.pointLightPosition.x, this.pointLightPosition.y, this.pointLightPosition.z);
+        //this.app.scene.add(this.pointLight);
 
         // add a point light helper for the previous point light
-        const sphereSize = 0.5;
-        this.pointLightHelper = new THREE.PointLightHelper(this.pointLight, sphereSize);
-        this.app.scene.add(this.pointLightHelper);
+        //const sphereSize = 0.5;
+        //this.pointLightHelper = new THREE.PointLightHelper(this.pointLight, sphereSize);
+        //this.app.scene.add(this.pointLightHelper);
 
         // add an ambient light
-        this.ambientLight = new THREE.AmbientLight(this.ambientLightColor);
+        this.ambientLight = new THREE.AmbientLight(this.ambientLightColor,this.ambientLightIntensity);
         this.app.scene.add(this.ambientLight);
+
+        // add directional light
+        this.directionalLight = new THREE.DirectionalLight(this.directionalLightColor, this.directionalLightIntensity);
+        this.directionalLight.position.set(this.directionalLightPosition.x, this.directionalLightPosition.y, this.directionalLight.z);
+        
+        // create target object
+        this.directionalLightTargetObj = new THREE.Object3D();
+        this.directionalLightTargetObj.position.set(
+            this.directionalLightTarget.x,
+            this.directionalLightTarget.y,
+            this.directionalLightTarget.z
+        );
+        this.app.scene.add(this.directionalLightTargetObj);
+        this.directionalLight.target = this.directionalLightTargetObj;
+
+        // add new directional light source
+        this.app.scene.add(this.directionalLight);
+
+
+        this.directionalLightHelper = new THREE.DirectionalLightHelper(this.directionalLight);
+        this.app.scene.add(this.directionalLightHelper);
 
         this.buildBox()
 
@@ -245,6 +273,44 @@ class MyContents {
         this.ambientLight.color.set(this.ambientLightColor);
 
     }
+    
+    updateAmbientLightIntensity(value) {
+    this.ambientLightIntensity = value;
+    this.ambientLight.intensity = value;    
+    }
+
+
+    updateDirectionalLightColor(color){
+        this.directionalLightColor = color;
+        this.directionalLight.color.set(this.directionalLightColor);
+
+    }
+    updateDirectionalLightIntensity(value){
+        this.directionalLightIntensity = value;
+        this.directionalLight.intensity = value;
+    }
+
+    updateDirectionalLightPosition(x,y,z){
+         if (x !== null) this.directionalLightPosition.x = x;
+        if (y !== null) this.directionalLightPosition.y = y;
+        if (z !== null) this.directionalLightPosition.z = z;
+        this.directionalLight.position.set(this.directionalLightPosition.x, this.directionalLightPosition.y, this.directionalLightPosition.z);
+    }
+
+    updateDirectionalLightTarget(x, y, z) {
+    if (x !== null) this.directionalLightTarget.x = x;
+    if (y !== null) this.directionalLightTarget.y = y;
+    if (z !== null) this.directionalLightTarget.z = z;
+
+    this.directionalLightTargetObj.position.set(
+        this.directionalLightTarget.x,
+        this.directionalLightTarget.y,
+        this.directionalLightTarget.z
+    );
+
+    this.directionalLightHelper.update();
+    }
+
 
     /**
      * updates the contents
