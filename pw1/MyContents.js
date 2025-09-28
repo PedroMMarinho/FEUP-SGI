@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { MyAxis } from './MyAxis.js';
 import { PokerTable } from './objects/PokerTable.js';
+import { PokerChip, PokerChipValue } from './objects/PokerChip.js';
 
 /**
  *  This class contains the contents of out application
@@ -15,11 +16,13 @@ class MyContents {
         this.app = app
         this.axis = new MyAxis(this);
         this.pokerTable = new PokerTable(0, 0, 0);
+        this.pokerChip = new PokerChip(0, 7, 0, 0, PokerChipValue.TWENTY_FIVE);
     }
 
     initObjects() {
         this.app.scene.add(this.axis);
         this.app.scene.add(this.pokerTable);
+        this.app.scene.add(this.pokerChip);
     }
 
     initLights() {
@@ -47,11 +50,14 @@ class MyContents {
         this.pokerFeel = new THREE.TextureLoader().load('textures/pokerFeel.jpg');
         this.pokerFeel.wrapS = THREE.RepeatWrapping;
         this.pokerFeel.wrapT = THREE.RepeatWrapping;
+        this.pokerFeel.rotation = -Math.PI / 2;
+        this.pokerFeel.repeat.set(4, 4);
         this.pokerFeelMaterial = new THREE.MeshBasicMaterial({
             map: this.pokerFeel, side: THREE.DoubleSide, color: 0x888888,   // darker multiplier
             roughness: 0.9,
             metalness: 0.0
         });
+
 
 
         this.pokerTable.pokerFeelMaterial = this.pokerFeelMaterial
@@ -60,6 +66,7 @@ class MyContents {
         this.pokerTable.pokerLegMaterial = this.pokerRestMaterial
 
         this.pokerTable.build()
+        this.pokerChip.build();
 
     }
 
