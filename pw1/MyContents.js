@@ -35,7 +35,7 @@ class MyContents {
     initTextures() {
         // load textures
 
-        this.poker = new THREE.TextureLoader().load('textures/pokerTable.jpg');
+        this.poker = new THREE.TextureLoader().load('textures/pokerTable2.jpg');
         this.pokerMaterial = new THREE.MeshBasicMaterial({ map: this.poker });
 
         this.pokerRest = new THREE.TextureLoader().load('textures/pokerRest.jpg');
