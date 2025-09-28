@@ -18,13 +18,15 @@ class PokerTable extends THREE.Object3D {
         this.pokerLegMaterial = null
 
         this.sideRingMaterial = new THREE.MeshStandardMaterial({
-            color: 0x050518,
-            metalness: 0.5,
-            roughness: 0.3,
-            emissive: new THREE.Color(0x0088ff), 
-            emissiveIntensity: 2.5,             
-            side: THREE.DoubleSide               
+            color: 0xFFD700,
+            metalness: 0.8,
+            roughness: 0.2,
+            emissive: new THREE.Color(0xE6C200), 
+            emissiveIntensity: 1.2,
+            side: THREE.DoubleSide
         });
+
+
 
     }
 
