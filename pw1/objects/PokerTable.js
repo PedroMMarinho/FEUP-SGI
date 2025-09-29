@@ -27,7 +27,6 @@ class PokerTable extends THREE.Object3D {
         });
 
 
-
     }
 
     initConstants() {
@@ -36,6 +35,9 @@ class PokerTable extends THREE.Object3D {
         this.tableRadiusZ = 5;
         this.legRadius = 0.15;
         this.legHeight = 2;
+        this.topThickness = 0.2;
+        this.lightThickness = this.topThickness / 3;
+        this.tableBase = this.legHeight + this.topThickness*2 + this.lightThickness;
     }
 
     createLight(y, thickness) {
@@ -103,28 +105,27 @@ class PokerTable extends THREE.Object3D {
     }
 
     build() {
-        const topThickness = 0.2;
-        const lightThickness = topThickness / 3;
 
-        let currentHeight = this.legHeight + topThickness / 2;
+        let currentHeight = this.legHeight + this.topThickness / 2;
 
         // From bottom to top
-        this.createTableTop(currentHeight, topThickness, this.pokerFeelMaterial);
+        this.createTableTop(currentHeight, this.topThickness, this.pokerFeelMaterial);
 
-        currentHeight += topThickness / 2 + lightThickness / 2;
-        this.createLight(currentHeight, lightThickness);
+        currentHeight += this.topThickness / 2 + this.lightThickness / 2;
+        this.createLight(currentHeight, this.lightThickness);
 
-        currentHeight += lightThickness / 2 + topThickness / 2;
-        this.createTableTop(currentHeight, topThickness, [this.pokerFeelMaterial, this.pokerTableMaterial]);
+        // Poker tables base
+        currentHeight += this.lightThickness / 2 + this.topThickness / 2;
+        this.createTableTop(currentHeight, this.topThickness, [this.pokerFeelMaterial, this.pokerTableMaterial]);
 
-        currentHeight += topThickness / 2 + lightThickness / 2;
-        this.createLight(currentHeight, lightThickness);
+        currentHeight += this.topThickness / 2 + this.lightThickness / 2;
+        this.createLight(currentHeight, this.lightThickness);
 
-        currentHeight += lightThickness / 2 + topThickness / 2;
-        this.createHollowTableTop(currentHeight, topThickness);
+        currentHeight += this.lightThickness / 2 + this.topThickness / 2;
+        this.createHollowTableTop(currentHeight, this.topThickness);
 
-        currentHeight += topThickness / 2 + lightThickness / 2;
-        this.createCoverRest(currentHeight, topThickness);
+        currentHeight += this.topThickness / 2 + this.lightThickness / 2;
+        this.createCoverRest(currentHeight, this.topThickness);
 
         // Legs
         const legGeo = new THREE.CylinderGeometry(this.legRadius, this.legRadius, this.legHeight, 32);
@@ -143,6 +144,10 @@ class PokerTable extends THREE.Object3D {
             leg.position.set(x, this.legHeight / 2, z);
             this.add(leg);
         });
+    }
+
+    getTableBase(){
+        return this.tableBase;
     }
 }
 
