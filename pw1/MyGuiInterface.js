@@ -61,6 +61,14 @@ class MyGuiInterface {
             this.contents.updateWallTextureWrapT(value);
         });
 
+        wallsFolder.add(this.contents.wallParams, 'repeatS', 1, 5, 1).onChange((value) => {
+            this.contents.updateWallTextureRepeatS(value);
+        });
+
+        wallsFolder.add(this.contents.wallParams, 'repeatT', 1, 5, 1).onChange((value) => {
+            this.contents.updateWallTextureRepeatT(value);
+        });
+
         const data = {
             'diffuse color': this.contents.diffusePlaneColor,
             'specular color': this.contents.specularPlaneColor,

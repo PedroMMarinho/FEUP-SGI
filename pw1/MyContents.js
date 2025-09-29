@@ -100,16 +100,20 @@ class MyContents {
 
 
         this.newWallTexture = new THREE.TextureLoader().load('textures/window.jpg');
-        this.newWallTexture.rotation = Math.PI;
+        /* this.newWallTexture.colorSpace = THREE.SRGBColorSpace;
+        this.newWallTexture.generateMipmaps = false;
+        this.newWallTexture.minFilter = THREE.LinearFilter; */
         // inside MyContents constructor
         this.wallParams = {
             wrapS: THREE.ClampToEdgeWrapping,
-            wrapT: THREE.ClampToEdgeWrapping
+            wrapT: THREE.ClampToEdgeWrapping,
+            repeatS: 2,
+            repeatT: 2,
         };
 
         this.newWallTexture.wrapS = this.wallParams.wrapS;
         this.newWallTexture.wrapT = this.wallParams.wrapT;
-        this.newWallTexture.repeat.set(2,2);
+        this.newWallTexture.repeat.set(this.wallParams.repeatS, this.wallParams.repeatT);
         this.newWallTexture.center.set(0.5, 0.5);
         this.newWallTexture.offset.set(0,0);
     }
@@ -144,7 +148,7 @@ class MyContents {
     buildWalls() {
         let wallsMaterial = new THREE.MeshPhongMaterial({
             color: "#7f7f7f",
-            specular: "#000000", emissive: "#000000", shininess: 90,
+            specular: "#000000", emissive: "#000000", shininess: 0,
             map: this.newWallTexture
         })
 
@@ -421,6 +425,16 @@ class MyContents {
     
     updateWallTextureWrapT(value) {
         this.newWallTexture.wrapT = value;
+        this.newWallTexture.needsUpdate = true;
+    }
+
+    updateWallTextureRepeatS(value) {
+        this.newWallTexture.repeat.set(value, this.wallParams.repeatT);
+        this.newWallTexture.needsUpdate = true;
+    }
+
+    updateWallTextureRepeatT(value) {
+        this.newWallTexture.repeat.set(this.wallParams.repeatS, value);
         this.newWallTexture.needsUpdate = true;
     }
 
