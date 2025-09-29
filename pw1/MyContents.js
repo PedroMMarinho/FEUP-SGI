@@ -3,6 +3,7 @@ import { MyAxis } from './MyAxis.js';
 import { PokerTable } from './objects/PokerTable.js';
 import { PokerChip, PokerChipValue } from './objects/PokerChip.js';
 import { CardDeck } from './objects/CardDeck.js';
+import { PokerCard } from './objects/PokerCard.js';
 
 /**
  *  This class contains the contents of out application
@@ -18,7 +19,7 @@ class MyContents {
         this.axis = new MyAxis(this);
         this.pokerTable = new PokerTable(0, 0, 0);
         this.cardDeck = new CardDeck();
-        this.card1 = this.cardDeck.create_card('D_C',0,this.pokerTable.getTableBase() + 0.02,0, true);
+        this.card1 = this.cardDeck.create_card('D_C',0,this.pokerTable.getTableBase() + PokerCard.DEPTH,0, true);
         this.card1.rotateOnAxis(new THREE.Vector3(0, 0, 1), Math.PI / 2);
         this.pokerChip = new PokerChip(0, 7, 0, 0, PokerChipValue.TWENTY_FIVE);
     }
