@@ -100,6 +100,7 @@ class MyContents {
 
 
         this.newWallTexture = new THREE.TextureLoader().load('textures/window.jpg');
+        //this.newWallTexture.rotation = Math.PI;
         /* this.newWallTexture.colorSpace = THREE.SRGBColorSpace;
         this.newWallTexture.generateMipmaps = false;
         this.newWallTexture.minFilter = THREE.LinearFilter; */
@@ -115,7 +116,14 @@ class MyContents {
         this.newWallTexture.wrapT = this.wallParams.wrapT;
         this.newWallTexture.repeat.set(this.wallParams.repeatS, this.wallParams.repeatT);
         this.newWallTexture.center.set(0.5, 0.5);
-        this.newWallTexture.offset.set(0,0);
+        this.newWallTexture.offset.set(0, 0);
+
+        // Window with landscape
+        this.windowTexture = new THREE.TextureLoader().load('textures/windowlandscape.png');
+        this.windowTexture.wrapS = this.windowTexture.wrapT = THREE.ClampToEdgeWrapping;
+        this.windowTexture.repeatS = this.windowTexture.repeatT = 1;
+        this.windowTexture.center.set(0.5, 0.5);
+        this.windowTexture.offset.set(0, 0);
     }
 
     /**
@@ -146,30 +154,45 @@ class MyContents {
      * builds the walls around the scene
      */
     buildWalls() {
-        let wallsMaterial = new THREE.MeshPhongMaterial({
-            color: "#7f7f7f",
+        let wallsMaterialTextured = new THREE.MeshPhongMaterial({
+            color: "#dfdbd4",
             specular: "#000000", emissive: "#000000", shininess: 0,
             map: this.newWallTexture
         })
 
+        let wallsMaterialPlain = new THREE.MeshPhongMaterial({
+            color: "#dfdbd4",
+            specular: "#000000", emissive: "#000000", shininess: 0,
+        })
+
         // Create the walls
         let wall = new THREE.PlaneGeometry(10, 10);
-        this.wallMesh1 = new THREE.Mesh(wall, wallsMaterial);
+        this.wallMesh1 = new THREE.Mesh(wall, wallsMaterialTextured);
         this.wallMesh1.position.set(0, 5, -5)
         this.app.scene.add(this.wallMesh1);
 
-        this.wallMesh2 = new THREE.Mesh(wall, wallsMaterial);
+        this.wallMesh2 = new THREE.Mesh(wall, wallsMaterialPlain);
         this.wallMesh2.position.set(-5, 5, 0)
         this.wallMesh2.rotateY(Math.PI / 2);
         this.app.scene.add(this.wallMesh2);
-        this.wallMesh3 = new THREE.Mesh(wall, wallsMaterial);
+
+        this.wallMesh3 = new THREE.Mesh(wall, wallsMaterialPlain);
         this.wallMesh3.position.set(5, 5, 0)
         this.wallMesh3.rotateY(-Math.PI / 2);
         this.app.scene.add(this.wallMesh3);
-        this.wallMesh4 = new THREE.Mesh(wall, wallsMaterial);
+
+        this.wallMesh4 = new THREE.Mesh(wall, wallsMaterialPlain);
         this.wallMesh4.position.set(0, 5, 5)
         this.wallMesh4.rotateY(Math.PI);
         this.app.scene.add(this.wallMesh4);
+
+        this.windowQuad = new THREE.Mesh(
+            new THREE.PlaneGeometry(8, 4),
+            new THREE.MeshPhongMaterial({map: this.windowTexture, transparent: true })
+        );
+        this.windowQuad.position.set(0, 5, 4.95);
+        this.windowQuad.rotateY(Math.PI);
+        this.app.scene.add(this.windowQuad);
     }
 
     /**
