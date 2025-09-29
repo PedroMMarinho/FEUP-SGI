@@ -16,13 +16,21 @@ class MyContents {
         this.app = app
         this.axis = new MyAxis(this);
         this.pokerTable = new PokerTable(0, 0, 0);
-        this.pokerChip = new PokerChip(0, 7, 0, 0, PokerChipValue.TWENTY_FIVE);
+        this.pokerChips = []
+        this.pokerChips[PokerChipValue.TWENTY_FIVE] = new PokerChip(0, 5, 0, 0);
+        this.pokerChips[PokerChipValue.FIFTY] = new PokerChip(0, 7, 0, 0);
+        this.pokerChips[PokerChipValue.ONE_HUNDRED] = new PokerChip(0, 9, 0, 0);
+        this.pokerChips[PokerChipValue.FIVE_HUNDRED] = new PokerChip(0, 11, 0, 0);
+        this.chipTopMaterials = []
+        this.chipSideMaterials = []
     }
 
     initObjects() {
         this.app.scene.add(this.axis);
         this.app.scene.add(this.pokerTable);
-        this.app.scene.add(this.pokerChip);
+        for (let i = 0; i < 4; i++) {
+            this.app.scene.add(this.pokerChips[i]);
+        }
     }
 
     initLights() {
@@ -65,10 +73,36 @@ class MyContents {
         this.pokerTable.pokerRestMaterial = this.pokerRestMaterial
         this.pokerTable.pokerLegMaterial = this.pokerRestMaterial
 
+        this.initChipTextures();
+
+        this.pokerChips.forEach(chip => {
+            chip.build()
+        });
+
         this.pokerTable.build()
-        this.pokerChip.build();
 
     }
+    initChipTextures() {
+        this.chipTopMaterials = []
+        this.chipSideMaterials = []
+        for (let i = 0; i < 4; i++) {
+            let sideTexture = new THREE.TextureLoader().load(`textures/chipSide${i}.png`);
+            sideTexture.wrapS = THREE.RepeatWrapping;
+            sideTexture.wrapT = THREE.RepeatWrapping;
+            sideTexture.repeat.set(6, 1);
+            this.chipSideMaterials.push(new THREE.MeshStandardMaterial({ map: sideTexture }));
+
+            let topTexture = new THREE.TextureLoader().load(`textures/chipTop${i}.png`);
+            topTexture.wrapS = THREE.RepeatWrapping;
+            topTexture.wrapT = THREE.RepeatWrapping;
+            topTexture.repeat.set(1, 1);
+            this.chipTopMaterials.push(new THREE.MeshStandardMaterial({ map: topTexture }));
+
+            this.pokerChips[i].sideMaterial = this.chipSideMaterials[i];
+            this.pokerChips[i].topMaterial = this.chipTopMaterials[i];
+        }
+    }
+
 
     /**
      * initializes the contents

@@ -1,47 +1,25 @@
 import * as THREE from 'three';
 
 export const PokerChipValue = {
-    TWENTY_FIVE: 25,
-    FIFTY: 50,
-    ONE_HUNDRED: 100,
-    FIVE_HUNDRED: 500
+    TWENTY_FIVE: 0,
+    FIFTY: 1,
+    ONE_HUNDRED: 2,
+    FIVE_HUNDRED: 3
 };
 
 class PokerChip extends THREE.Object3D {
-    constructor(x, y, z, ang = 0, value = PokerChipValue.TWENTY_FIVE) {
+    constructor(x, y, z, ang = 0) {
         super();
 
         this.position.set(x, y, z);
         this.rotation.y = ang;
-        this.value = value;
 
         this.initMaterials();
         this.initConstants();
     }
-
     initMaterials() {
-        this.sideTexture = null;
-        this.topTexture = null;
-        switch (this.value) {
-            case PokerChipValue.TWENTY_FIVE:
-                this.sideTexture = new THREE.TextureLoader().load('textures/chipSide.png');
-                this.topTexture = new THREE.TextureLoader().load('textures/chipTop.png');
-                this.sideTexture.wrapS = THREE.RepeatWrapping;
-                this.sideTexture.wrapT = THREE.RepeatWrapping;
-                this.topTexture.wrapS = THREE.RepeatWrapping;
-                this.topTexture.wrapT = THREE.RepeatWrapping;
-                this.sideTexture.repeat.set(6, 1);
-                break;
-            case PokerChipValue.FIFTY:
-                break;
-
-            case PokerChipValue.ONE_HUNDRED:
-                break;
-            case PokerChipValue.FIVE_HUNDRED:
-                break;
-        }
-        this.sideMaterial = new THREE.MeshStandardMaterial({ map: this.sideTexture });
-        this.topMaterial = new THREE.MeshStandardMaterial({ map: this.topTexture });
+        this.topMaterial = null;
+        this.sideMaterial = null;
     }
 
     initConstants() {
