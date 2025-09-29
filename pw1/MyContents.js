@@ -19,7 +19,7 @@ class MyContents {
         this.axis = new MyAxis(this);
         this.pokerTable = new PokerTable(0, 0, 0);
         this.cardDeck = new CardDeck();
-        this.card1 = this.cardDeck.create_card('D_C',0,this.pokerTable.getTableBase() + PokerCard.DEPTH,0, true);
+        this.card1 = this.cardDeck.create_card('D_C',0,this.pokerTable.getTableBase() + PokerCard.DEPTH,0, false);
         this.card1.rotateOnAxis(new THREE.Vector3(0, 0, 1), Math.PI / 2);
         this.pokerChip = new PokerChip(0, 7, 0, 0, PokerChipValue.TWENTY_FIVE);
     }
@@ -40,7 +40,7 @@ class MyContents {
 
     initPokerTextures() {
         // poker table
-        this.poker = new THREE.TextureLoader().load('textures/pokerTable2test.jpg');
+        this.poker = new THREE.TextureLoader().load('textures/pokerTable2test3.jpg');
         this.pokerMaterial = new THREE.MeshBasicMaterial({ map: this.poker });
         // poker rest for players
         this.pokerRest = new THREE.TextureLoader().load('textures/pokerRest.jpg');

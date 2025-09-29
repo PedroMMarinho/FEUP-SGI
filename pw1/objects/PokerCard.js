@@ -1,8 +1,8 @@
 import * as THREE from 'three';
 
 class PokerCard extends THREE.Object3D {
-    static WIDTH = 0.8;
-    static HEIGHT = 1.4;
+    static WIDTH = 0.4;
+    static HEIGHT = 0.7;
     static DEPTH = 0.02;
 
   constructor(name, backTexture, x, y, z, faceUp) {
