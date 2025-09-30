@@ -19,8 +19,48 @@ class MyContents {
         this.axis = new MyAxis(this);
         this.pokerTable = new PokerTable(0, 0, 0);
         this.cardDeck = new CardDeck();
-        this.card1 = this.cardDeck.create_card('D_C',0,this.pokerTable.getTableBase() + PokerCard.DEPTH,0, false);
+        // Create royal flush cards 
+        this.card1 = this.cardDeck.create_card('D_S',0,this.pokerTable.getTableBase() + PokerCard.DEPTH/2,0, true);
         this.card1.rotateOnAxis(new THREE.Vector3(0, 0, 1), Math.PI / 2);
+
+        this.card2 = this.cardDeck.create_card('A_S',0,this.pokerTable.getTableBase() + PokerCard.DEPTH/2,0.66, true);
+        this.card2.rotateOnAxis(new THREE.Vector3(0, 0, 1), Math.PI / 2);
+
+        this.card3 = this.cardDeck.create_card('10_S',0,this.pokerTable.getTableBase() + PokerCard.DEPTH/2,1.32, true);
+        this.card3.rotateOnAxis(new THREE.Vector3(0, 0, 1), Math.PI / 2);
+
+        this.card4 = this.cardDeck.create_card('V_S',0,this.pokerTable.getTableBase() + PokerCard.DEPTH/2,-0.66, true);
+        this.card4.rotateOnAxis(new THREE.Vector3(0, 0, 1), Math.PI / 2);
+
+        this.card5 = this.cardDeck.create_card('R_S',0,this.pokerTable.getTableBase() + PokerCard.DEPTH/2,-1.32, true);
+        this.card5.rotateOnAxis(new THREE.Vector3(0, 0, 1), Math.PI / 2);
+
+        // face down player cards
+        this.player1Card1 = this.cardDeck.create_card('7_H',-2.1,this.pokerTable.getTableBase() + PokerCard.DEPTH/2, 2.8, false);
+        this.player1Card1.rotateOnAxis(new THREE.Vector3(0, 0, 1), Math.PI / 6);
+        this.player1Card2 = this.cardDeck.create_card('3_C',-2.1,this.pokerTable.getTableBase() + PokerCard.DEPTH/2 + 0.01,3, false);
+        this.player1Card2.rotateOnAxis(new THREE.Vector3(0, 0, 1), Math.PI / 6);
+
+
+        this.player2Card1 = this.cardDeck.create_card('5_D',2.1,this.pokerTable.getTableBase() + PokerCard.DEPTH/2, 2.8, false);
+        this.player2Card1.rotateOnAxis(new THREE.Vector3(0, 0, 1), -Math.PI / 8);
+        this.player2Card2 = this.cardDeck.create_card('9_C',2.1,this.pokerTable.getTableBase() + PokerCard.DEPTH/2 + 0.01,3, false);
+        this.player2Card2.rotateOnAxis(new THREE.Vector3(0, 0, 1), -Math.PI / 6);
+
+
+        this.player3Card1 = this.cardDeck.create_card('8_D',2.1,this.pokerTable.getTableBase() + PokerCard.DEPTH/2,-2.8, false);
+        this.player3Card1.rotateOnAxis(new THREE.Vector3(0, 0, 1), Math.PI / 5);
+        this.player3Card2 = this.cardDeck.create_card('4_H',2.1,this.pokerTable.getTableBase() + PokerCard.DEPTH/2 + 0.01,-3, false);
+        this.player3Card2.rotateOnAxis(new THREE.Vector3(0, 0, 1), Math.PI / 4);
+
+        this.player4Card1 = this.cardDeck.create_card('6_H',-2.1,this.pokerTable.getTableBase() + PokerCard.DEPTH/2,-2.8, false);
+        this.player4Card1.rotateOnAxis(new THREE.Vector3(0, 0, 1), -Math.PI / 6);
+        this.player4Card2 = this.cardDeck.create_card('2_S',-2.1,this.pokerTable.getTableBase() + PokerCard.DEPTH/2 + 0.01,-3, false);
+        this.player4Card2.rotateOnAxis(new THREE.Vector3(0, 0, 1), -Math.PI / 6);
+
+        // Needs to be created last
+        this.cardPile = this.cardDeck.create_card_pile(0, this.pokerTable.getTableBase() + (PokerCard.DEPTH/2) * 5, -2.2);
+        this.cardPile.rotateOnAxis(new THREE.Vector3(0, 0, 1), -Math.PI / 2);
         this.pokerChip = new PokerChip(0, 7, 0, 0, PokerChipValue.TWENTY_FIVE);
     }
 
@@ -29,6 +69,20 @@ class MyContents {
         this.app.scene.add(this.pokerTable);
         //this.app.scene.add(this.pokerChip);
         this.app.scene.add(this.card1);
+        this.app.scene.add(this.card2);
+        this.app.scene.add(this.card3);
+        this.app.scene.add(this.card4);
+        this.app.scene.add(this.card5);
+        this.app.scene.add(this.player1Card1);
+        this.app.scene.add(this.player1Card2);
+        this.app.scene.add(this.player2Card1);
+        this.app.scene.add(this.player2Card2);
+        this.app.scene.add(this.player3Card1);
+        this.app.scene.add(this.player3Card2);
+        this.app.scene.add(this.player4Card1);
+        this.app.scene.add(this.player4Card2);
+
+        this.app.scene.add(this.cardPile);
     }
 
     initLights() {
@@ -40,7 +94,7 @@ class MyContents {
 
     initPokerTextures() {
         // poker table
-        this.poker = new THREE.TextureLoader().load('textures/pokerTable2test3.jpg');
+        this.poker = new THREE.TextureLoader().load('textures/pokerTable2.jpg');
         this.pokerMaterial = new THREE.MeshBasicMaterial({ map: this.poker });
         // poker rest for players
         this.pokerRest = new THREE.TextureLoader().load('textures/pokerRest.jpg');
