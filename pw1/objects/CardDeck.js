@@ -8,12 +8,66 @@ class CardDeck {
     this.availableCards = [];
     this.backCardTexture = new THREE.TextureLoader().load(`textures/cards/back.png`);
 
+    this.cardPileSideTexture = new THREE.TextureLoader().load(`textures/cards/side.png`);
+    this.cardPileSideTexture.wrapS = THREE.RepeatWrapping;
+    this.cardPileSideTexture.wrapT = THREE.RepeatWrapping;
+    this.cardPileSideTexture.minFilter = THREE.LinearFilter; 
+    this.cardPileSideTexture.magFilter = THREE.NearestFilter; 
+    this.cardPileSideTexture.anisotropy = 16;
+
+    this.cardPileSideTextureRotated = this.cardPileSideTexture.clone();
+    this.cardPileSideTextureRotated.rotation = Math.PI / 2;
+    
+
     for (let suit of this.suits) {
       for (let value of this.values) {
         this.availableCards.push(`${value}_${suit}`);
       }
     }
   }
+
+  create_card_pile(x, y, z) {
+
+  if (this.availableCards.length === 0) {
+    console.warn("No cards available to create a pile!");
+    return null;
+  }
+  
+  const cardCount = Math.floor(this.availableCards.length / 8);
+
+  this.cardPileSideTexture.repeat.set(cardCount - 1, cardCount - 1);
+  this.cardPileSideTextureRotated.repeat.set(cardCount - 1, cardCount - 1);
+
+  
+
+  const pileDepth = PokerCard.DEPTH * cardCount;
+  const pileGeometry = new THREE.BoxGeometry(PokerCard.WIDTH, PokerCard.HEIGHT, pileDepth);
+
+
+  const sideMaterial = new THREE.MeshBasicMaterial({ map: this.cardPileSideTexture });
+
+  const backMaterial = new THREE.MeshBasicMaterial({ map: this.backCardTexture });
+
+  const sideMaterialRotated = new THREE.MeshBasicMaterial({ map: this.cardPileSideTextureRotated });
+
+  const bottomMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff });
+
+  const materials = [
+    sideMaterialRotated, // left
+    sideMaterialRotated, // right
+    sideMaterial, // top edge
+    sideMaterial, // bottom edge
+    backMaterial, // top 
+    bottomMaterial // bottom
+  ];
+
+  const pileMesh = new THREE.Mesh(pileGeometry, materials);
+  pileMesh.rotation.x = -Math.PI / 2;
+  pileMesh.position.set(x, y, z);
+
+  return pileMesh;
+}
+
 
   create_card(name = null, x, y, z, faceUp = true) {
     let cardName;
