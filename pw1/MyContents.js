@@ -4,6 +4,7 @@ import { PokerTable } from './objects/PokerTable.js';
 import { PokerChip, PokerChipValue } from './objects/PokerChip.js';
 import { CardDeck } from './objects/CardDeck.js';
 import { PokerCard } from './objects/PokerCard.js';
+import { MyCowboyChair } from './MyCowboyChair.js';
 
 /**
  *  This class contains the contents of out application
@@ -17,6 +18,7 @@ class MyContents {
     constructor(app) {
         this.app = app
         this.axis = new MyAxis(this);
+		this.pokerChair = new MyCowboyChair(this.app, 7, 1.2, 0, "#FF0000"); 
         this.pokerTable = new PokerTable(0, 0, 0);
         this.cardDeck = new CardDeck();
         this.card1 = this.cardDeck.create_card('D_C',0,this.pokerTable.getTableBase() + PokerCard.DEPTH,0, false);
@@ -27,6 +29,7 @@ class MyContents {
     initObjects() {
         this.app.scene.add(this.axis);
         this.app.scene.add(this.pokerTable);
+		this.app.scene.add(this.pokerChair);
         //this.app.scene.add(this.pokerChip);
         this.app.scene.add(this.card1);
     }
