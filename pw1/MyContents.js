@@ -90,6 +90,15 @@ class MyContents {
         this.ambientLight = new THREE.AmbientLight(0x6f6f6f, 1);
         this.app.scene.add(this.ambientLight);
 
+        // Temporary Directional Light
+        this.directionalLight = new THREE.DirectionalLight(0xffffff, 0.6);
+        this.directionalLight.position.set(10, 20, 10);
+        this.directionalLight.castShadow = true;
+        this.directionalLight.shadow.mapSize.width = 512;
+        this.directionalLight.shadow.mapSize.height = 512;
+        this.directionalLight.shadow.camera.near = 0.5;
+        this.directionalLight.shadow.camera.far = 500;
+        this.app.scene.add(this.directionalLight);
     }
 
     initPokerTextures() {
@@ -101,8 +110,9 @@ class MyContents {
         this.pokerRest.wrapS = THREE.RepeatWrapping;
         this.pokerRest.wrapT = THREE.RepeatWrapping;
         this.pokerRest.rotation = -Math.PI / 2;
-        this.pokerRestMaterial = new THREE.MeshBasicMaterial({
+        this.pokerRestMaterial = new THREE.MeshPhongMaterial({
             map: this.pokerRest,
+            specular: 0x6f6f6f,
             color: 0xA0522D,  
             side: THREE.DoubleSide
         });
