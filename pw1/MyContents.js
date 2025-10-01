@@ -5,6 +5,7 @@ import { CardDeck } from './objects/CardDeck.js';
 import { PokerCard } from './objects/PokerCard.js';
 import { PokerChipHelper, PokerChipValue } from './objects/PokerChipHelper.js';
 import { BlackJackTable } from './objects/BlackJackTable.js';
+import { SlotMachine } from './objects/SlotMachine.js';
 
 /**
  *  This class contains the contents of out application
@@ -21,7 +22,7 @@ class MyContents {
         this.pokerTable = new PokerTable(0, 0, 0);
         this.cardDeck = new CardDeck();
         this.blackJackTable = new BlackJackTable(0, 0, 0);
-
+        this.slotMachine = new SlotMachine(0,0,0);
         // Create royal flush cards 
         this.card1 = this.cardDeck.create_card('D_S', 0, this.pokerTable.getTableBase() + PokerCard.DEPTH / 2, 0, true);
         this.card1.rotateOnAxis(new THREE.Vector3(0, 0, 1), Math.PI / 2);
@@ -90,9 +91,8 @@ class MyContents {
 
     initObjects() {
         this.app.scene.add(this.axis);
-        this.app.scene.add(this.pokerTable);
+        //this.app.scene.add(this.pokerTable);
 
-        //this.app.scene.add(this.pokerChip);
 
         // Adding to poker table so when moving they stay on top of it
         this.pokerTable.add(this.card1);
@@ -115,7 +115,7 @@ class MyContents {
 
 
         // BlackJack Table
-        this.app.scene.add(this.blackJackTable);
+        //this.app.scene.add(this.blackJackTable);
         
         this.blackJackTable.add(this.dealerCard1);
         this.blackJackTable.add(this.dealerCard2);
@@ -125,7 +125,9 @@ class MyContents {
         this.blackJackTable.add(this.blackJackPlayer2Card2);
 
 
-        
+        this.app.scene.add(this.slotMachine);
+
+
         this.initChips();
 
     }
