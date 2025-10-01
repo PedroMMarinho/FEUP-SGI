@@ -11,12 +11,14 @@ class PokerCard extends THREE.Object3D {
     
     this.position.set(x, y, z);
 
-    const sideMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff });
+    const sideMaterial = new THREE.MeshPhongMaterial({ color: 0xffffff });
 
     let frontMaterial = null;
 
     if (faceUp){
-        frontMaterial = new THREE.MeshBasicMaterial({ map: new THREE.TextureLoader().load(`textures/cards/${name}.png`) });
+        frontMaterial = new THREE.MeshPhongMaterial({ map: new THREE.TextureLoader().load(`textures/cards/${name}.png`), shininess: 15,
+    specular: new THREE.Color(0x222222)
+   });
         this.rotation.x = -Math.PI/2;
     }else {
       frontMaterial = sideMaterial;
@@ -31,7 +33,7 @@ class PokerCard extends THREE.Object3D {
       sideMaterial,
       sideMaterial,
       frontMaterial,
-      new THREE.MeshBasicMaterial({ map: backTexture })   // back
+      new THREE.MeshPhongMaterial({ map: backTexture })   // back
     ];
 
     this.createCard(materials);

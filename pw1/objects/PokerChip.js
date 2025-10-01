@@ -40,8 +40,8 @@ class PokerChip extends THREE.Object3D {
             case PokerChipValue.FIVE_HUNDRED:
                 break;
         }
-        this.sideMaterial = new THREE.MeshStandardMaterial({ map: this.sideTexture });
-        this.topMaterial = new THREE.MeshStandardMaterial({ map: this.topTexture });
+        this.sideMaterial = new THREE.MeshPhongMaterial({ map: this.sideTexture });
+        this.topMaterial = new THREE.MeshPhongMaterial({ map: this.topTexture });
     }
 
     initConstants() {
