@@ -21,6 +21,11 @@ class BlackJackTable extends THREE.Object3D {
     this.ringWidth = 0.4; 
     this.torusTube = 0.15;
     this.legHeight = 3;
+    this.tableFeltBase = this.legHeight + this.tableThickness + 0.01;
+  }
+
+  getTableBase(){
+    return this.tableFeltBase;
   }
 
   build() {
@@ -28,7 +33,7 @@ class BlackJackTable extends THREE.Object3D {
     const feltGeom = new THREE.CircleGeometry(this.tableRadius, 64, 0, Math.PI); 
     const felt = new THREE.Mesh(feltGeom, this.tableMaterial);
     felt.rotation.x = -Math.PI / 2;
-    felt.position.y = this.legHeight + this.tableThickness + 0.01;
+    felt.position.y = this.tableFeltBase;
     this.add(felt);
 
     // --- Outer Wooden Ring 
