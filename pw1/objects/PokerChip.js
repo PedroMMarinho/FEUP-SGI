@@ -1,11 +1,5 @@
 import * as THREE from 'three';
 
-export const PokerChipValue = {
-    TWENTY_FIVE: 0,
-    FIFTY: 1,
-    ONE_HUNDRED: 2,
-    FIVE_HUNDRED: 3
-};
 
 class PokerChip extends THREE.Object3D {
     constructor(x, y, z, ang = 0) {
@@ -14,23 +8,18 @@ class PokerChip extends THREE.Object3D {
         this.position.set(x, y, z);
         this.rotation.y = ang;
 
-        this.initMaterials();
         this.initConstants();
-    }
-    initMaterials() {
-        this.topMaterial = null;
-        this.sideMaterial = null;
     }
 
     initConstants() {
-        this.chipRadius = 2;
-        this.chipHeight = 0.3;
+        this.chipRadius = 0.05;
+        this.chipHeight = 0.01;
     }
 
-    build() {
+    build(topMaterial, sideMaterial) {
 
         const chipGeo = new THREE.CylinderGeometry(this.chipRadius, this.chipRadius, this.chipHeight, 32);
-        const chip = new THREE.Mesh(chipGeo, [this.sideMaterial, this.topMaterial, this.topMaterial]);
+        const chip = new THREE.Mesh(chipGeo, [ sideMaterial, topMaterial, topMaterial]);
         this.add(chip);
         console.log("Poker chip created");
     }
