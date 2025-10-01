@@ -5,9 +5,9 @@ class CardDeck {
   constructor() {
     this.suits = ['D', 'H', 'S', 'C'];
     this.values = ['R', 'D', 'V', '10', '9', '8', '7', '6', '5', '4', '3', '2', 'A'];
-    this.availableCards = [];
     this.backCardTexture = new THREE.TextureLoader().load(`textures/cards/back.png`);
 
+    this.textureCache = new Map();
     this.cardPileSideTexture = new THREE.TextureLoader().load(`textures/cards/side.png`);
     this.cardPileSideTexture.wrapS = THREE.RepeatWrapping;
     this.cardPileSideTexture.wrapT = THREE.RepeatWrapping;
@@ -18,22 +18,16 @@ class CardDeck {
     this.cardPileSideTextureRotated = this.cardPileSideTexture.clone();
     this.cardPileSideTextureRotated.rotation = Math.PI / 2;
     
-
-    for (let suit of this.suits) {
-      for (let value of this.values) {
-        this.availableCards.push(`${value}_${suit}`);
-      }
-    }
   }
 
-  create_card_pile(x, y, z) {
+  create_card_pile(x, y, z, cards = 52) {
 
-  if (this.availableCards.length === 0) {
+  if (cards <= 0) {
     console.warn("No cards available to create a pile!");
     return null;
   }
   
-  const cardCount = Math.floor(this.availableCards.length / 8);
+  const cardCount = Math.floor(cards / 8);
 
   this.cardPileSideTexture.repeat.set(cardCount - 1, cardCount - 1);
   this.cardPileSideTextureRotated.repeat.set(cardCount - 1, cardCount - 1);
@@ -72,33 +66,17 @@ class CardDeck {
   return pileMesh;
 }
 
-
-  create_card(name = null, x, y, z, faceUp = true) {
-    let cardName;
-
-    if (!name) {
-      if (this.availableCards.length === 0) {
-        console.warn("No cards left in the deck!");
-        return null;
-      }
-      const idx = Math.floor(Math.random() * this.availableCards.length);
-      cardName = this.availableCards.splice(idx, 1)[0];
-    } else {
-      const idx = this.availableCards.indexOf(name);
-      if (idx === -1) {
-        console.warn(`Card ${name} is not available!`);
-        return null;
-      }
-      this.availableCards.splice(idx, 1); 
-      cardName = name;
+    getRandomCardName() {
+      const suit = this.suits[Math.floor(Math.random() * this.suits.length)];
+      const value = this.values[Math.floor(Math.random() * this.values.length)];
+      return `${value}_${suit}`;
     }
 
-    // Create card
-    const myCard = new PokerCard(cardName, this.backCardTexture, x,y,z, faceUp );
-
-    
-    return myCard;
+  create_card(name = null, x, y, z, faceUp = true) {
+    const cardName = name || this.getRandomCardName();
+    return new PokerCard(cardName, this.backCardTexture, x, y, z, faceUp, this.textureCache);
   }
+
 }
 
 export { CardDeck };

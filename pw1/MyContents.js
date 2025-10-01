@@ -62,7 +62,7 @@ class MyContents {
         this.player4Card2.rotateOnAxis(new THREE.Vector3(0, 0, 1), -Math.PI / 6);
 
         // Needs to be created last
-        this.cardPile = this.cardDeck.create_card_pile(0, this.pokerTable.getTableBase() + (PokerCard.DEPTH / 2) * 5, -2.2);
+        this.cardPile = this.cardDeck.create_card_pile(0, this.pokerTable.getTableBase() + (PokerCard.DEPTH / 2) * 5, -2.2, 46);
         this.cardPile.rotateOnAxis(new THREE.Vector3(0, 0, 1), -Math.PI / 2);
         this.pokerChip = new PokerChip(0, 7, 0, 0, PokerChipValue.TWENTY_FIVE);
     }
@@ -94,7 +94,7 @@ class MyContents {
 
 
         // BlackJack Table
-        this.app.scene.add(this.blackJackTable);
+        //this.app.scene.add(this.blackJackTable);
     }
 
     initLights() {
