@@ -17,12 +17,14 @@ class PokerTable extends THREE.Object3D {
         this.pokerRestMaterial = null
         this.pokerLegMaterial = null
 
-        this.sideRingMaterial = new THREE.MeshStandardMaterial({
+        this.sideRingMaterial = new THREE.MeshPhongMaterial({
             color: 0xFFD700,
-            metalness: 0.8,
-            roughness: 0.2,
             emissive: new THREE.Color(0xE6C200), 
-            emissiveIntensity: 1.2,
+            emissiveIntensity: 2,
+            transparent: true,
+            shininess: 100,
+            specular: new THREE.Color(0xFFFFFF),
+            opacity: 0.8,
             side: THREE.DoubleSide
         });
 
