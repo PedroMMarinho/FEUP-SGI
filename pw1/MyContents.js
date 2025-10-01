@@ -1,10 +1,9 @@
 import * as THREE from 'three';
 import { MyAxis } from './MyAxis.js';
 import { PokerTable } from './objects/PokerTable.js';
-import { PokerChip, PokerChipValue } from './objects/PokerChip.js';
 import { CardDeck } from './objects/CardDeck.js';
 import { PokerCard } from './objects/PokerCard.js';
-
+import { PokerChipHelper, PokerChipValue } from './objects/PokerChipHelper.js';
 /**
  *  This class contains the contents of out application
  */
@@ -61,13 +60,13 @@ class MyContents {
         // Needs to be created last
         this.cardPile = this.cardDeck.create_card_pile(0, this.pokerTable.getTableBase() + (PokerCard.DEPTH/2) * 5, -2.2);
         this.cardPile.rotateOnAxis(new THREE.Vector3(0, 0, 1), -Math.PI / 2);
-        this.pokerChip = new PokerChip(0, 7, 0, 0, PokerChipValue.TWENTY_FIVE);
+        this.pokerChipHelper = new PokerChipHelper();
+
     }
 
     initObjects() {
         this.app.scene.add(this.axis);
         this.app.scene.add(this.pokerTable);
-        //this.app.scene.add(this.pokerChip);
         this.app.scene.add(this.card1);
         this.app.scene.add(this.card2);
         this.app.scene.add(this.card3);
@@ -81,8 +80,8 @@ class MyContents {
         this.app.scene.add(this.player3Card2);
         this.app.scene.add(this.player4Card1);
         this.app.scene.add(this.player4Card2);
-
         this.app.scene.add(this.cardPile);
+        this.initChips();
     }
 
     initLights() {
@@ -135,7 +134,8 @@ class MyContents {
 
     buildObjects() {
         this.pokerTable.build();
-        this.pokerChip.build();
+        this.buildChips();
+
     }
 
     initTextures() {
@@ -143,6 +143,19 @@ class MyContents {
         this.initPokerTextures();
 
     }
+    
+    buildChips(){
+        this.p1Tower1 = this.pokerChipHelper.createTower(0,this.pokerTable.getTableBase(),0,PokerChipValue.TWENTY_FIVE,30);
+        this.p2Tower1 = this.pokerChipHelper.createTower(0.10,this.pokerTable.getTableBase(),0,PokerChipValue.TWENTY_FIVE,20);
+        
+        
+    }
+
+    initChips(){
+        this.app.scene.add(this.p1Tower1);
+        this.app.scene.add(this.p2Tower1);
+    }
+
 
     /**
      * initializes the contents
