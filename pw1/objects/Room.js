@@ -21,16 +21,16 @@ class Room extends THREE.Object3D {
 
         this.wallMaterial = new THREE.MeshPhongMaterial({ map: wallTexture });
         this.floorMaterial = new THREE.MeshPhongMaterial({ map: floorTexture });
-        this.roofMaterial = new THREE.MeshPhongMaterial({ map: roofTexture });
+        this.roofMaterial = new THREE.MeshPhongMaterial({ map: roofTexture, color: 0x8B0000 });
     }
     initConstants() {
-        this.roomWidth = 50;
-        this.roomHeight = 20;
-        this.roomDepth = 50;
-        this.windowXPos = 0.5; // Relative position on the window wall (0 to 1)
-        this.windowYPos = 0.5; // Relative position on the window wall (0 to 1)
-        this.windowWidth = 10;
-        this.windowHeight = 10;
+        this.roomWidth = 30;
+        this.roomHeight = 10;
+        this.roomDepth = 40;
+        this.windowXPos = 0.85; // Relative position on the window wall (0 to 1)
+        this.windowYPos = 0.65; // Relative position on the window wall (0 to 1)
+        this.windowWidth = 8;
+        this.windowHeight = 5;
     }
     createRoom() {
         // Floor
@@ -68,11 +68,11 @@ class Room extends THREE.Object3D {
         this.add(wall3);
 
         const windowWall = new THREE.Shape();
-        windowWall.moveTo(-this.roomWidth / 2, -this.roomHeight / 2);
-        windowWall.lineTo(this.roomWidth / 2, -this.roomHeight / 2);
-        windowWall.lineTo(this.roomWidth / 2, this.roomHeight / 2);
-        windowWall.lineTo(-this.roomWidth / 2, this.roomHeight / 2);
-        windowWall.lineTo(-this.roomWidth / 2, -this.roomHeight / 2);
+        windowWall.moveTo(-this.roomDepth / 2, -this.roomHeight / 2);
+        windowWall.lineTo(this.roomDepth / 2, -this.roomHeight / 2);
+        windowWall.lineTo(this.roomDepth / 2, this.roomHeight / 2);
+        windowWall.lineTo(-this.roomDepth / 2, this.roomHeight / 2);
+        windowWall.lineTo(-this.roomDepth / 2, -this.roomHeight / 2);
 
         const windowHole = new THREE.Path();
 
