@@ -30,7 +30,7 @@ class BlackJackTable extends THREE.Object3D {
 
   build() {
     // --- Felt Surface ---
-    const feltGeom = new THREE.CircleGeometry(this.tableRadius, 64, 0, Math.PI); 
+    const feltGeom = new THREE.CircleGeometry(this.tableRadius + 0.02, 64, 0, Math.PI); 
     const felt = new THREE.Mesh(feltGeom, this.tableMaterial);
     felt.rotation.x = -Math.PI / 2;
     felt.position.y = this.tableFeltBase;

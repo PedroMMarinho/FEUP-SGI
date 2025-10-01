@@ -67,10 +67,26 @@ class MyContents {
 
 
         // Black Jack Game
+        const blackJackY = this.blackJackTable.getTableBase() + (PokerCard.DEPTH / 2);
 
-        this.blackJackPlayer1 = this.cardDeck.create_card('8_D', 2.1, this.blackJackTable.getTableBase(), -2.8);
+        // Dealer
+        this.dealerCard1 = this.cardDeck.create_card('10_S', -0.2, blackJackY, -0.8, true);   
+        this.dealerCard2 = this.cardDeck.create_card(null, 0.3, blackJackY, -0.8, false); 
 
-    }
+        // Player 1 
+        this.blackJackPlayer1Card1 = this.cardDeck.create_card('8_D', -1.4, blackJackY, -2.3, true);
+        this.blackJackPlayer1Card1.rotateOnAxis(new THREE.Vector3(0, 0, 1), Math.PI / 8);
+        this.blackJackPlayer1Card2 = this.cardDeck.create_card('R_H', -1.6, blackJackY + (PokerCard.DEPTH ), -2.5, true);
+        this.blackJackPlayer1Card2.rotateOnAxis(new THREE.Vector3(0, 0, 1), Math.PI / 8);
+
+        // Player 2 
+        this.blackJackPlayer2Card1 = this.cardDeck.create_card('R_D', 1.4, blackJackY, -2.5, true);
+        this.blackJackPlayer2Card1.rotateOnAxis(new THREE.Vector3(0, 0, 1), -Math.PI / 8);
+        this.blackJackPlayer2Card2 = this.cardDeck.create_card('A_S', 1.5, blackJackY + (PokerCard.DEPTH ) , -2.3, true);
+        this.blackJackPlayer2Card2.rotateOnAxis(new THREE.Vector3(0, 0, 1), -Math.PI / 8);
+        
+        // Missing Poker Chips
+        }
 
     initObjects() {
         this.app.scene.add(this.axis);
@@ -99,8 +115,17 @@ class MyContents {
 
 
         // BlackJack Table
-        //this.app.scene.add(this.blackJackTable);
-        //this.app.scene.add(this.blackJackPlayer1);
+        this.app.scene.add(this.blackJackTable);
+        
+        this.blackJackTable.add(this.dealerCard1);
+        this.blackJackTable.add(this.dealerCard2);
+        this.blackJackTable.add(this.blackJackPlayer1Card1);
+        this.blackJackTable.add(this.blackJackPlayer1Card2);
+        this.blackJackTable.add(this.blackJackPlayer2Card1);
+        this.blackJackTable.add(this.blackJackPlayer2Card2);
+
+
+        
         this.initChips();
 
     }
@@ -167,12 +192,12 @@ class MyContents {
     }
 
     initBlackJackTextures() {
-        this.blackJack = new THREE.TextureLoader().load('textures/blackJack.png');
+        this.blackJack = new THREE.TextureLoader().load('textures/blackJack2.png');
         this.blackJack.wrapS = THREE.RepeatWrapping;
         this.blackJack.wrapT = THREE.RepeatWrapping;
 
         this.blackJack.repeat.set(1, 2);
-        this.blackJack.offset.set(0, 0.6);
+        this.blackJack.offset.set(0, 0.55);
         this.blackJack.center.set(0.5, 0.5);
 
         this.greenFelt = new THREE.MeshPhongMaterial({ map: this.blackJack,shininess: 5,specular: new THREE.Color(0x111111), reflectivity: 0.1});
