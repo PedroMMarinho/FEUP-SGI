@@ -5,6 +5,7 @@ import { CardDeck } from './objects/CardDeck.js';
 import { PokerCard } from './objects/PokerCard.js';
 import { PokerChipHelper, PokerChipValue } from './objects/PokerChipHelper.js';
 import { BlackJackTable } from './objects/BlackJackTable.js';
+import { Room } from './objects/Room.js';
 
 /**
  *  This class contains the contents of out application
@@ -21,6 +22,7 @@ class MyContents {
         this.pokerTable = new PokerTable(0, 0, 0);
         this.cardDeck = new CardDeck();
         this.blackJackTable = new BlackJackTable(0, 0, 0);
+        this.room = new Room();
 
         // Create royal flush cards 
         this.card1 = this.cardDeck.create_card('D_S', 0, this.pokerTable.getTableBase() + PokerCard.DEPTH / 2, 0, true);
@@ -74,6 +76,7 @@ class MyContents {
 
     initObjects() {
         this.app.scene.add(this.axis);
+        this.app.scene.add(this.room);
         this.app.scene.add(this.pokerTable);
 
         //this.app.scene.add(this.pokerChip);
