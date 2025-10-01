@@ -44,13 +44,17 @@ class CardDeck {
   const pileGeometry = new THREE.BoxGeometry(PokerCard.WIDTH, PokerCard.HEIGHT, pileDepth);
 
 
-  const sideMaterial = new THREE.MeshBasicMaterial({ map: this.cardPileSideTexture });
+  const sideMaterial = new THREE.MeshPhongMaterial({ map: this.cardPileSideTexture,shininess: 10, 
+    specular: new THREE.Color(0x222222), 
+    side: THREE.DoubleSide });
 
-  const backMaterial = new THREE.MeshBasicMaterial({ map: this.backCardTexture });
+  const backMaterial = new THREE.MeshPhongMaterial({ map: this.backCardTexture, shininess: 15,
+    specular: new THREE.Color(0x333333) });
 
-  const sideMaterialRotated = new THREE.MeshBasicMaterial({ map: this.cardPileSideTextureRotated });
+  const sideMaterialRotated = new THREE.MeshPhongMaterial({ map: this.cardPileSideTextureRotated,shininess: 10,
+    specular: new THREE.Color(0x222222) });
 
-  const bottomMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff });
+  const bottomMaterial = new THREE.MeshPhongMaterial({ color: 0xffffff });
 
   const materials = [
     sideMaterialRotated, // left
