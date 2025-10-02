@@ -22,7 +22,7 @@ class MyContents {
         this.pokerTable = new PokerTable(0, 0, 0);
         this.cardDeck = new CardDeck();
         this.blackJackTable = new BlackJackTable(0, 0, 0);
-        this.slotMachine = new SlotMachine(0,0,0);
+        this.slotMachine = new SlotMachine(0, 0, 0);
         // Create royal flush cards 
         this.card1 = this.cardDeck.create_card('D_S', 0, this.pokerTable.getTableBase() + PokerCard.DEPTH / 2, 0, true);
         this.card1.rotateOnAxis(new THREE.Vector3(0, 0, 1), Math.PI / 2);
@@ -71,23 +71,23 @@ class MyContents {
         const blackJackY = this.blackJackTable.getTableBase() + (PokerCard.DEPTH / 2);
 
         // Dealer
-        this.dealerCard1 = this.cardDeck.create_card('10_S', -0.2, blackJackY, -0.8, true);   
-        this.dealerCard2 = this.cardDeck.create_card(null, 0.3, blackJackY, -0.8, false); 
+        this.dealerCard1 = this.cardDeck.create_card('10_S', -0.2, blackJackY, -0.8, true);
+        this.dealerCard2 = this.cardDeck.create_card(null, 0.3, blackJackY, -0.8, false);
 
         // Player 1 
         this.blackJackPlayer1Card1 = this.cardDeck.create_card('8_D', -1.4, blackJackY, -2.3, true);
         this.blackJackPlayer1Card1.rotateOnAxis(new THREE.Vector3(0, 0, 1), Math.PI / 8);
-        this.blackJackPlayer1Card2 = this.cardDeck.create_card('R_H', -1.6, blackJackY + (PokerCard.DEPTH ), -2.5, true);
+        this.blackJackPlayer1Card2 = this.cardDeck.create_card('R_H', -1.6, blackJackY + (PokerCard.DEPTH), -2.5, true);
         this.blackJackPlayer1Card2.rotateOnAxis(new THREE.Vector3(0, 0, 1), Math.PI / 8);
 
         // Player 2 
         this.blackJackPlayer2Card1 = this.cardDeck.create_card('R_D', 1.4, blackJackY, -2.5, true);
         this.blackJackPlayer2Card1.rotateOnAxis(new THREE.Vector3(0, 0, 1), -Math.PI / 8);
-        this.blackJackPlayer2Card2 = this.cardDeck.create_card('A_S', 1.5, blackJackY + (PokerCard.DEPTH ) , -2.3, true);
+        this.blackJackPlayer2Card2 = this.cardDeck.create_card('A_S', 1.5, blackJackY + (PokerCard.DEPTH), -2.3, true);
         this.blackJackPlayer2Card2.rotateOnAxis(new THREE.Vector3(0, 0, 1), -Math.PI / 8);
-        
+
         // Missing Poker Chips
-        }
+    }
 
     initObjects() {
         this.app.scene.add(this.axis);
@@ -116,7 +116,7 @@ class MyContents {
 
         // BlackJack Table
         //this.app.scene.add(this.blackJackTable);
-        
+
         this.blackJackTable.add(this.dealerCard1);
         this.blackJackTable.add(this.dealerCard2);
         this.blackJackTable.add(this.blackJackPlayer1Card1);
@@ -139,7 +139,7 @@ class MyContents {
 
         // Temporary Directional Light
         this.directionalLight = new THREE.DirectionalLight(0xffffff, 0.6);
-        this.directionalLight.position.set(10, 20, 10);
+        this.directionalLight.position.set(5, 5, 5);
         this.directionalLight.castShadow = true;
         this.directionalLight.shadow.mapSize.width = 512;
         this.directionalLight.shadow.mapSize.height = 512;
@@ -203,13 +203,15 @@ class MyContents {
         this.blackJack.offset.set(0, 0.55);
         this.blackJack.center.set(0.5, 0.5);
 
-        this.greenFelt = new THREE.MeshPhongMaterial({ map: this.blackJack,shininess: 5,specular: new THREE.Color(0x111111), reflectivity: 0.1});
+        this.greenFelt = new THREE.MeshPhongMaterial({ map: this.blackJack, shininess: 5, specular: new THREE.Color(0x111111), reflectivity: 0.1 });
 
 
         this.blackJackLegs = new THREE.TextureLoader().load('textures/blackMetal.jpg');
 
-        this.blackJackLegsMaterial = new THREE.MeshPhongMaterial({ map: this.blackJackLegs, side: THREE.DoubleSide,
-            color: 0xaaaaaa, shininess: 80,   specular: new THREE.Color(0xffffff), reflectivity: 0.8 });
+        this.blackJackLegsMaterial = new THREE.MeshPhongMaterial({
+            map: this.blackJackLegs, side: THREE.DoubleSide,
+            color: 0xaaaaaa, shininess: 80, specular: new THREE.Color(0xffffff), reflectivity: 0.8
+        });
 
         this.blackJackTable.outerMaterial = this.pokerRestMaterial;
         this.blackJackTable.legMaterial = this.blackJackLegsMaterial;
@@ -219,50 +221,103 @@ class MyContents {
     initSlotMachineTextures() {
         this.slotMachineScreenTexture = new THREE.TextureLoader().load('textures/slotMachineScreen.jpg');
 
-        this.slotMachineScreenMaterial = new THREE.MeshPhongMaterial({ map: this.slotMachineScreenTexture, side: THREE.DoubleSide,
-            color: 0xffffff, shininess: 10,   specular: new THREE.Color(0x555555), reflectivity: 0.2 });
+        this.slotMachineScreenMaterial = new THREE.MeshPhongMaterial({
+            map: this.slotMachineScreenTexture, side: THREE.DoubleSide,
+            color: 0xffffff, shininess: 10, specular: new THREE.Color(0x555555), reflectivity: 0.2
+        });
 
         this.slotMachineMetalTexture = new THREE.TextureLoader().load('textures/brushedMetal.jpg');
 
-        this.slotMachineMetalMaterial = new THREE.MeshPhongMaterial({ map: this.slotMachineMetalTexture, side: THREE.DoubleSide,
-            color: 0xaaaaaa, shininess: 80,   specular: new THREE.Color(0xffffff), reflectivity: 0.8 });
+        this.slotMachineMetalMaterial = new THREE.MeshPhongMaterial({
+            map: this.slotMachineMetalTexture, side: THREE.DoubleSide,
+            color: 0xaaaaaa, shininess: 80, specular: new THREE.Color(0xffffff), reflectivity: 0.8
+        });
 
+
+        this.slotMachineBodyTexture = new THREE.TextureLoader().load('textures/matteBlack.jpg');
+
+        this.slotMachineBodyMaterial = new THREE.MeshPhongMaterial({
+            map: this.slotMachineBodyTexture, side: THREE.DoubleSide,
+            color: 0x000000, specular: new THREE.Color(0xffffff), reflectivity: 0.9, emissive: 0x222222
+        });
+
+
+
+        this.slotMachineTopTexture = new THREE.TextureLoader().load('textures/topSlotMachine1.png');
+
+        this.slotMachineTopTexture.wrapS = THREE.RepeatWrapping;
+        this.slotMachineTopTexture.wrapT = THREE.RepeatWrapping;
+
+        this.slotMachineTopTexture.repeat.set(1, 2);
+        this.slotMachineTopTexture.offset.set(0, 0.5);
+        this.slotMachineTopTexture.center.set(0.5, 0.5);
+
+        this.slotMachineTopMaterial = new THREE.MeshPhongMaterial({
+            map: this.slotMachineTopTexture, transparent: true,
+            shininess: 10, specular: new THREE.Color(0x555555), reflectivity: 0.2
+        });
+
+
+        this.slotMachineBottomTexture = new THREE.TextureLoader().load('textures/bottomSlotMachine.png');
+
+        this.slotMachineBottomMaterial = new THREE.MeshPhongMaterial({
+            map: this.slotMachineBottomTexture, side: THREE.DoubleSide,
+            color: 0xaaaaaa, shininess: 80, specular: new THREE.Color(0xffffff), reflectivity: 0.8
+        });
+
+
+        this.slotMachineGoldTexture = new THREE.TextureLoader().load('textures/slotGold.jpg');
+
+
+        this.slotMachineGoldMaterial = new THREE.MeshPhongMaterial({
+            map: this.slotMachineGoldTexture,
+            side: THREE.DoubleSide,
+            color: 0xaaaaaa,
+            shininess: 80,
+            specular: new THREE.Color(0xffffff),
+            reflectivity: 0.8
+        });
+
+        this.slotMachine.slotMachineTopMaterial = this.slotMachineTopMaterial;
+        this.slotMachine.slotGoldMaterial = this.slotMachineGoldMaterial;
+        this.slotMachine.slotMachineBodyMaterial = this.slotMachineBodyMaterial;
         this.slotMachine.slotMachineScreenMaterial = this.slotMachineScreenMaterial;
         this.slotMachine.slotMachineMetalMaterial = this.slotMachineMetalMaterial;
+        this.slotMachine.slotMachineBottomMaterial = this.slotMachineBottomMaterial;
     }
-            
+
     initTextures() {
         // load textures
         this.initPokerTextures();
         this.initBlackJackTextures();
         this.initSlotMachineTextures();
     }
-    
-    buildChips(){
+
+    buildChips() {
 
         // player 1
-        this.p1Tower1 = this.pokerChipHelper.createTower(1.5,this.pokerTable.getTableBase(),2.8,PokerChipValue.TWENTY_FIVE,30, Math.PI/4);
-        this.p1Tower2 = this.pokerChipHelper.createTower(1.6,this.pokerTable.getTableBase(),2.6,PokerChipValue.ONE_HUNDRED,10,Math.PI/4*3);
-        this.p1Tower3 = this.pokerChipHelper.createTower(1.4,this.pokerTable.getTableBase(),2.6,PokerChipValue.FIVE_HUNDRED,5);
-        this.singleChip1 = this.pokerChipHelper.createSingle(1.35,this.pokerTable.getTableBase() + 0.05,2.55,PokerChipValue.FIFTY, Math.PI);
-        this.singleChip1.rotateOnAxis(new THREE.Vector3(1,0,-1), Math.PI/8);
+        this.p1Tower1 = this.pokerChipHelper.createTower(1.5, this.pokerTable.getTableBase(), 2.8, PokerChipValue.TWENTY_FIVE, 30, Math.PI / 4);
+        this.p1Tower2 = this.pokerChipHelper.createTower(1.6, this.pokerTable.getTableBase(), 2.6, PokerChipValue.ONE_HUNDRED, 10, Math.PI / 4 * 3);
+        this.p1Tower3 = this.pokerChipHelper.createTower(1.4, this.pokerTable.getTableBase(), 2.6, PokerChipValue.FIVE_HUNDRED, 5);
+        this.singleChip1 = this.pokerChipHelper.createSingle(1.35, this.pokerTable.getTableBase() + 0.05, 2.55, PokerChipValue.FIFTY, Math.PI);
+        this.singleChip1.rotateOnAxis(new THREE.Vector3(1, 0, -1), Math.PI / 8);
         // player 2
-        this.p2Tower1 = this.pokerChipHelper.createTower(1.5,this.pokerTable.getTableBase(),-2.5,PokerChipValue.TWENTY_FIVE,20, Math.PI/4);
-        this.p2Tower2 = this.pokerChipHelper.createTower(1.6,this.pokerTable.getTableBase(),-2.7,PokerChipValue.FIFTY,30, Math.PI/4*3);
-        this.p2Tower3 = this.pokerChipHelper.createTower(1.4,this.pokerTable.getTableBase(),-2.7,PokerChipValue.ONE_HUNDRED,15);
+        this.p2Tower1 = this.pokerChipHelper.createTower(1.5, this.pokerTable.getTableBase(), -2.5, PokerChipValue.TWENTY_FIVE, 20, Math.PI / 4);
+        this.p2Tower2 = this.pokerChipHelper.createTower(1.6, this.pokerTable.getTableBase(), -2.7, PokerChipValue.FIFTY, 30, Math.PI / 4 * 3);
+        this.p2Tower3 = this.pokerChipHelper.createTower(1.4, this.pokerTable.getTableBase(), -2.7, PokerChipValue.ONE_HUNDRED, 15);
         // player 3
-        this.p3Tower1 = this.pokerChipHelper.createTower(-1.5, this.pokerTable.getTableBase(), -2.5, PokerChipValue.FIFTY, 60, Math.PI/3);
-        this.p3Tower2 = this.pokerChipHelper.createTower(-1.6, this.pokerTable.getTableBase(), -2.7, PokerChipValue.ONE_HUNDRED, 30, Math.PI/3*2);
+        this.p3Tower1 = this.pokerChipHelper.createTower(-1.5, this.pokerTable.getTableBase(), -2.5, PokerChipValue.FIFTY, 60, Math.PI / 3);
+        this.p3Tower2 = this.pokerChipHelper.createTower(-1.6, this.pokerTable.getTableBase(), -2.7, PokerChipValue.ONE_HUNDRED, 30, Math.PI / 3 * 2);
         // player 4
-        this.p4Tower1 = this.pokerChipHelper.createTower(-1.5, this.pokerTable.getTableBase(), 2.6, PokerChipValue.FIFTY, 10, Math.PI/3);
-        this.p4Tower2 = this.pokerChipHelper.createTower(-1.55, this.pokerTable.getTableBase(), 2.85, PokerChipValue.ONE_HUNDRED, 5, Math.PI/3*2);
-        this.p4Tower3 = this.pokerChipHelper.createTower(-1.35, this.pokerTable.getTableBase(), 2.7, PokerChipValue.FIVE_HUNDRED, 2, Math.PI/3*3);
-        this.p4Tower4 = this.pokerChipHelper.createTower(-1.7, this.pokerTable.getTableBase(), 2.7, PokerChipValue.TWENTY_FIVE, 20, Math.PI/3*4);
+        this.p4Tower1 = this.pokerChipHelper.createTower(-1.5, this.pokerTable.getTableBase(), 2.6, PokerChipValue.FIFTY, 10, Math.PI / 3);
+        this.p4Tower2 = this.pokerChipHelper.createTower(-1.55, this.pokerTable.getTableBase(), 2.85, PokerChipValue.ONE_HUNDRED, 5, Math.PI / 3 * 2);
+        this.p4Tower3 = this.pokerChipHelper.createTower(-1.35, this.pokerTable.getTableBase(), 2.7, PokerChipValue.FIVE_HUNDRED, 2, Math.PI / 3 * 3);
+        this.p4Tower4 = this.pokerChipHelper.createTower(-1.7, this.pokerTable.getTableBase(), 2.7, PokerChipValue.TWENTY_FIVE, 20, Math.PI / 3 * 4);
 
 
     }
 
-    initChips(){
+    initChips() {
         // player 1
         this.pokerTable.add(this.p1Tower1);
         this.pokerTable.add(this.p1Tower2);

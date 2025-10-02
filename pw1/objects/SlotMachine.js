@@ -11,8 +11,26 @@ class SlotMachine extends THREE.Object3D {
 
     initMaterials() {
         this.slotMachineMaterial = new THREE.MeshPhongMaterial({ color: 0x8B0000, shininess: 100 });
+        this.slotLeverMaterial = new THREE.MeshPhongMaterial({ color: 0x222222, shininess: 100, specular: 0x555555 });
+        this.slotKnobMaterial = new THREE.MeshPhongMaterial({
+            color: 0xff0000,
+            shininess: 50,
+            specular: 0xffffff,
+            reflectivity: 0.1
+        });
+        this.slotCylinderMaterial = new THREE.MeshPhongMaterial({
+            color: 0x444444,
+            shininess: 120,
+            specular: new THREE.Color(0xaaaaaa),
+            reflectivity: 0.6
+        });
+        this.slotGoldMaterial = null;
+        this.slotMachineBodyMaterial = null;
         this.slotMachineScreenMaterial = null;
         this.slotMachineMetalMaterial = null;
+        this.slotMachineTopMaterial = null;
+        this.slotMachineBottomMaterial = null;
+
     }
 
     initConstants() {
@@ -21,178 +39,208 @@ class SlotMachine extends THREE.Object3D {
         this.machineDepth = 2.5;
     }
 
-   build() {
+    build() {
 
-    // main body
-    const machineGeo = new THREE.BoxGeometry(this.machineWidth, this.machineHeight, this.machineDepth);
-    const machine = new THREE.Mesh(machineGeo, this.slotMachineMaterial);
-    this.add(machine);
+        // main body
+        const machineGeo = new THREE.BoxGeometry(this.machineWidth + 0.02, this.machineHeight, this.machineDepth);
+        const machine = new THREE.Mesh(machineGeo, this.slotMachineBodyMaterial);
+        this.add(machine);
 
-    // semicircle shape
-    const radius = this.machineWidth / 2; 
-    const shape = new THREE.Shape();
+        // semicircle shape
+        const radius = this.machineWidth / 2;
+        const shape = new THREE.Shape();
 
-    shape.moveTo(-radius, 0);
-    shape.absarc(0, 0, radius, Math.PI, 0, false);
-    shape.lineTo(radius, 0);
-    shape.lineTo(-radius, 0);
+        shape.moveTo(-radius, 0);
+        shape.absarc(0, 0, radius, Math.PI, 0, false);
+        shape.lineTo(radius, 0);
+        shape.lineTo(-radius, 0);
 
-    const extrudeSettings = {
-        depth: this.machineDepth - 0.1,
-        bevelEnabled: false
-    };
+        const extrudeSettings = {
+            depth: this.machineDepth - 0.1,
+            bevelEnabled: false
+        };
 
-    const semiGeo = new THREE.ExtrudeGeometry(shape, extrudeSettings);
-    const semicircle = new THREE.Mesh(semiGeo, this.slotMachineMaterial);
-    semicircle.position.set(0, this.machineHeight / 2, -this.machineDepth / 2);
-    semicircle.rotation.z = Math.PI; 
-    this.add(semicircle);
-
-    // Thin box on the front
-    const frontBoxDepth = 0.6;
-    const frontBoxGeo = new THREE.BoxGeometry(this.machineWidth +0.01, this.machineHeight * 0.9 , frontBoxDepth);
-    const frontBox = new THREE.Mesh(frontBoxGeo, this.slotMachineMetalMaterial);
-
-    frontBox.position.set(0, -this.machineHeight * 0.05, this.machineDepth / 2);
-    this.add(frontBox);
-
-    // slot panel with hole 
-    const panelWidth = this.machineWidth - 0.01;
-    const panelHeight = this.machineHeight * 0.4;
-
-    // outer rectangle
-    const panelShape = new THREE.Shape();
-    panelShape.moveTo(-panelWidth / 2, -panelHeight / 2);
-    panelShape.lineTo(panelWidth / 2, -panelHeight / 2);
-    panelShape.lineTo(panelWidth / 2, panelHeight / 2);
-    panelShape.lineTo(-panelWidth / 2, panelHeight / 2);
-    panelShape.lineTo(-panelWidth / 2, -panelHeight / 2);
-
-    // hole rectangle
-    const holeWidth = panelWidth * 0.7;
-    const holeHeight = panelHeight * 0.5;
-    const hole = new THREE.Path();
-    hole.moveTo(-holeWidth / 2, -holeHeight / 2);
-    hole.lineTo(holeWidth / 2, -holeHeight / 2);
-    hole.lineTo(holeWidth / 2, holeHeight / 2);
-    hole.lineTo(-holeWidth / 2, holeHeight / 2);
-    hole.lineTo(-holeWidth / 2, -holeHeight / 2);
-    panelShape.holes.push(hole);
-
-    const panelExtrudeSettings = {
-        depth: 0.1,
-        bevelEnabled: false
-    };
-    const panelGeo = new THREE.ExtrudeGeometry(panelShape, panelExtrudeSettings);
-    const panel = new THREE.Mesh(panelGeo, this.slotMachineMetalMaterial);
-
-    panel.position.set(0, this.machineHeight * 0.2, this.machineDepth / 2 + frontBoxDepth - 0.2);
-    panel.rotation.x = -Math.PI / 12; 
-
-    this.add(panel);
-
-    const slotPlaneWidth = holeWidth;
-    const slotPlaneHeight = holeHeight;
-
-    const slotPlaneGeo = new THREE.PlaneGeometry(slotPlaneWidth, slotPlaneHeight);
-    
-    const slotPlane = new THREE.Mesh(slotPlaneGeo, this.slotMachineScreenMaterial);
-
-    // position the plane inside the hole
-    slotPlane.position.set(0, this.machineHeight * 0.2, this.machineDepth / 2 + frontBoxDepth - 0.2 + 0.051); 
-    slotPlane.rotation.x = -Math.PI / 12; 
-
-    this.add(slotPlane);
+        const semiGeo = new THREE.ExtrudeGeometry(shape, extrudeSettings);
+        const semicircle = new THREE.Mesh(semiGeo, this.slotMachineBodyMaterial);
+        semicircle.position.set(0, this.machineHeight / 2, -this.machineDepth / 2);
+        semicircle.rotation.z = Math.PI;
+        this.add(semicircle);
 
 
-    // left side cover plane
-    const sideWidth = 0.4; 
-    const sideHeight = panelHeight - 0.2;
+        const frontRadius = this.machineWidth / 2;
 
-    const sideGeo = new THREE.PlaneGeometry(sideWidth, sideHeight);
-    const leftSide = new THREE.Mesh(sideGeo, this.slotMachineMetalMaterial);
-
-    leftSide.position.set(-panelWidth / 2 - 0.01, this.machineHeight * 0.2, this.machineDepth / 2 + frontBoxDepth - 0.26);
-
-    leftSide.rotation.y = Math.PI / 2;
-    leftSide.rotation.x = -Math.PI / 12; 
-
-    this.add(leftSide);
-
-    // right side cover plane
-    const rightSide = new THREE.Mesh(sideGeo, this.slotMachineMetalMaterial);
-    rightSide.position.set(panelWidth / 2 + 0.01, this.machineHeight * 0.2, this.machineDepth / 2 + frontBoxDepth - 0.26);
-
-    rightSide.rotation.y = -Math.PI / 2;
-    rightSide.rotation.x = -Math.PI / 12;
-
-    this.add(rightSide);
+        const frontGeo = new THREE.CircleGeometry(frontRadius, 64, Math.PI, Math.PI);
 
 
-    // Another small box at the front
-    const frontButtonBoxDepth = 1.8;
-    const smallBoxGeo = new THREE.BoxGeometry(this.machineWidth, this.machineHeight * 0.2, frontButtonBoxDepth);
-    const smallBox = new THREE.Mesh(smallBoxGeo, this.slotMachineMaterial);
-    smallBox.position.set(0, -this.machineHeight * 0.05, this.machineDepth / 2 + frontBoxDepth - 0.15);
-    this.add(smallBox);
+        const frontSemi = new THREE.Mesh(frontGeo, this.slotMachineTopMaterial);
 
-    // another front box below the button box
-    const lowerBoxDepth = 0.8;
-    const lowerBoxGeo = new THREE.BoxGeometry(this.machineWidth, this.machineHeight * 0.6, lowerBoxDepth);
-    const lowerBox = new THREE.Mesh(lowerBoxGeo, this.slotMachineMaterial);
-    lowerBox.position.set(0, -this.machineHeight * 0.2, this.machineDepth / 2 + frontBoxDepth - 0.15);
-    this.add(lowerBox);
+        frontSemi.position.set(0, this.machineHeight / 2, this.machineDepth / 2 - 0.09);
 
-    const baseRadius = 0.6;
-    const baseHeight = 0.3;
-    const baseGeo = new THREE.CylinderGeometry(baseRadius, baseRadius, baseHeight, 16);
-    const base = new THREE.Mesh(baseGeo, this.slotMachineMaterial);
+        frontSemi.rotation.x = Math.PI;
+        frontSemi.rotation.y = Math.PI;
 
-    // position base cylinder
-    base.rotation.z = Math.PI / 2; 
-    base.position.set(this.machineWidth / 2 + baseHeight / 2, -this.machineHeight * 0.05, this.machineDepth *0.1);
-    this.add(base);
+        this.add(frontSemi);
 
-    // smaller handle cylinder
-    const handleRadius = 0.4;
-    const handleHeight = 0.2;
-    const handleGeo = new THREE.CylinderGeometry(handleRadius, handleRadius, handleHeight, 16);
-    const handle = new THREE.Mesh(handleGeo, this.slotMachineMaterial);
+        // Thin box on the front
+        const frontBoxDepth = 0.6;
+        const frontBoxGeo = new THREE.BoxGeometry(this.machineWidth + 0.03, this.machineHeight * 0.9 + 0.01, frontBoxDepth);
+        const frontBox = new THREE.Mesh(frontBoxGeo, this.slotMachineMetalMaterial);
 
-    // position handle cylinder at the end of base
-    handle.rotation.z = Math.PI / 2; 
-    handle.position.set(this.machineWidth / 2 + baseHeight + handleHeight / 2, -this.machineHeight * 0.05, this.machineDepth *0.1);
-    this.add(handle);
+        frontBox.position.set(0, -this.machineHeight * 0.05, this.machineDepth / 2);
+        this.add(frontBox);
 
-    // capsule coming out of the handle
-    const capsuleRadius = 0.1;
-    const capsuleLength = 2;
-    const capsuleGeo = new THREE.CapsuleGeometry(capsuleRadius, capsuleLength, 8, 16);
-    const capsule = new THREE.Mesh(capsuleGeo, this.slotMachineMaterial);
+        // slot panel with hole 
+        const panelWidth = this.machineWidth - 0.01;
+        const panelHeight = this.machineHeight * 0.4;
 
-    // position capsule at the end of handle
-    capsule.rotation.z = -Math.PI / 3; 
-    capsule.rotation.y = -Math.PI / 2; 
-    capsule.position.set(
-        this.machineWidth / 2 + baseHeight + handleHeight/2 ,
-        this.machineHeight * 0.05,
-        this.machineDepth *0.4 
-    );
-    this.add(capsule);
+        // outer rectangle
+        const panelShape = new THREE.Shape();
+        panelShape.moveTo(-panelWidth / 2, -panelHeight / 2);
+        panelShape.lineTo(panelWidth / 2, -panelHeight / 2);
+        panelShape.lineTo(panelWidth / 2, panelHeight / 2);
+        panelShape.lineTo(-panelWidth / 2, panelHeight / 2);
+        panelShape.lineTo(-panelWidth / 2, -panelHeight / 2);
 
-    // knob sphere at the end of the capsule
-    const knobRadius = 0.2;
-    const knobGeo = new THREE.SphereGeometry(knobRadius, 16, 16);
-    const knob = new THREE.Mesh(knobGeo, this.slotMachineMaterial);
+        // hole rectangle
+        const holeWidth = panelWidth * 0.7;
+        const holeHeight = panelHeight * 0.5;
+        const hole = new THREE.Path();
+        hole.moveTo(-holeWidth / 2, -holeHeight / 2);
+        hole.lineTo(holeWidth / 2, -holeHeight / 2);
+        hole.lineTo(holeWidth / 2, holeHeight / 2);
+        hole.lineTo(-holeWidth / 2, holeHeight / 2);
+        hole.lineTo(-holeWidth / 2, -holeHeight / 2);
+        panelShape.holes.push(hole);
 
-    knob.position.set(
-        this.machineWidth / 2 + baseHeight + handleHeight/2 ,
-        this.machineHeight * 0.15,
-        this.machineDepth * 0.75
-    );
-    this.add(knob);
+        const panelExtrudeSettings = {
+            depth: 0.1,
+            bevelEnabled: false
+        };
+        const panelGeo = new THREE.ExtrudeGeometry(panelShape, panelExtrudeSettings);
+        const panel = new THREE.Mesh(panelGeo, this.slotMachineMetalMaterial);
 
-}
+        panel.position.set(0, this.machineHeight * 0.2, this.machineDepth / 2 + frontBoxDepth - 0.2);
+        panel.rotation.x = -Math.PI / 12;
+
+        this.add(panel);
+
+        const slotPlaneWidth = holeWidth;
+        const slotPlaneHeight = holeHeight;
+
+        const slotPlaneGeo = new THREE.PlaneGeometry(slotPlaneWidth, slotPlaneHeight);
+
+        const slotPlane = new THREE.Mesh(slotPlaneGeo, this.slotMachineScreenMaterial);
+
+        // position the plane inside the hole
+        slotPlane.position.set(0, this.machineHeight * 0.2, this.machineDepth / 2 + frontBoxDepth - 0.2 + 0.051);
+        slotPlane.rotation.x = -Math.PI / 12;
+
+        this.add(slotPlane);
+
+
+        // left side cover plane
+        const sideWidth = 0.4;
+        const sideHeight = panelHeight - 0.2;
+
+        const sideGeo = new THREE.PlaneGeometry(sideWidth, sideHeight);
+        const leftSide = new THREE.Mesh(sideGeo, this.slotMachineMetalMaterial);
+
+        leftSide.position.set(-panelWidth / 2 - 0.01, this.machineHeight * 0.2, this.machineDepth / 2 + frontBoxDepth - 0.26);
+
+        leftSide.rotation.y = Math.PI / 2;
+        leftSide.rotation.x = -Math.PI / 12;
+
+        this.add(leftSide);
+
+        // right side cover plane
+        const rightSide = new THREE.Mesh(sideGeo, this.slotMachineMetalMaterial);
+        rightSide.position.set(panelWidth / 2 + 0.01, this.machineHeight * 0.2, this.machineDepth / 2 + frontBoxDepth - 0.26);
+
+        rightSide.rotation.y = -Math.PI / 2;
+        rightSide.rotation.x = -Math.PI / 12;
+
+        this.add(rightSide);
+
+
+        // Another small box at the front
+        const frontButtonBoxDepth = 1.8;
+        const smallBoxGeo = new THREE.BoxGeometry(this.machineWidth, this.machineHeight * 0.2, frontButtonBoxDepth);
+        const smallBox = new THREE.Mesh(smallBoxGeo, this.slotMachineMaterial);
+        smallBox.position.set(0, -this.machineHeight * 0.05, this.machineDepth / 2 + frontBoxDepth - 0.15);
+        this.add(smallBox);
+
+        // another front box below the button box
+        const lowerBoxDepth = 0.8;
+        const lowerBoxGeo = new THREE.BoxGeometry(this.machineWidth + 0.02, this.machineHeight * 0.6, lowerBoxDepth);
+        const lowerBox = new THREE.Mesh(lowerBoxGeo, this.slotMachineBodyMaterial);
+        lowerBox.position.set(0, -this.machineHeight * 0.2, this.machineDepth / 2 + frontBoxDepth - 0.15);
+        this.add(lowerBox);
+
+
+        // plane in front of the lower box
+        const planeWidth = this.machineWidth + 0.02;
+        const planeHeight = this.machineHeight * 0.35;
+
+        const lowerBoxPlaneGeo = new THREE.PlaneGeometry(planeWidth, planeHeight);
+        const lowerBoxPlane = new THREE.Mesh(lowerBoxPlaneGeo, this.slotMachineBottomMaterial);
+
+        lowerBoxPlane.position.set(
+            0,
+            -this.machineHeight * 0.325,
+            this.machineDepth / 2 + frontBoxDepth - 0.15 + lowerBoxDepth / 2 + 0.01
+        );
+
+        this.add(lowerBoxPlane);
+
+
+        // big cylinder support
+        const baseRadius = 0.6;
+        const baseHeight = 0.3;
+        const baseGeo = new THREE.CylinderGeometry(baseRadius, baseRadius, baseHeight, 16);
+        const base = new THREE.Mesh(baseGeo, this.slotCylinderMaterial);
+
+        base.rotation.z = Math.PI / 2;
+        base.position.set(this.machineWidth / 2 + baseHeight / 2, -this.machineHeight * 0.05, this.machineDepth * 0.1);
+        this.add(base);
+
+        // smaller handle cylinder
+        const handleRadius = 0.4;
+        const handleHeight = 0.2;
+        const handleGeo = new THREE.CylinderGeometry(handleRadius, handleRadius, handleHeight, 16);
+        const handle = new THREE.Mesh(handleGeo, this.slotGoldMaterial);
+
+        handle.rotation.z = Math.PI / 2;
+        handle.position.set(this.machineWidth / 2 + baseHeight + handleHeight / 2, -this.machineHeight * 0.05, this.machineDepth * 0.1);
+        this.add(handle);
+
+        // capsule coming out of the handle
+        const capsuleRadius = 0.1;
+        const capsuleLength = 2;
+        const capsuleGeo = new THREE.CapsuleGeometry(capsuleRadius, capsuleLength, 8, 16);
+        const capsule = new THREE.Mesh(capsuleGeo, this.slotLeverMaterial);
+
+        capsule.rotation.z = -Math.PI / 3;
+        capsule.rotation.y = -Math.PI / 2;
+        capsule.position.set(
+            this.machineWidth / 2 + baseHeight + handleHeight / 2,
+            this.machineHeight * 0.05,
+            this.machineDepth * 0.4
+        );
+        this.add(capsule);
+
+        // knob sphere at the end of the capsule
+        const knobRadius = 0.2;
+        const knobGeo = new THREE.SphereGeometry(knobRadius, 16, 16);
+        const knob = new THREE.Mesh(knobGeo, this.slotKnobMaterial);
+
+        knob.position.set(
+            this.machineWidth / 2 + baseHeight + handleHeight / 2,
+            this.machineHeight * 0.15,
+            this.machineDepth * 0.75
+        );
+        this.add(knob);
+
+    }
 
 
 }
