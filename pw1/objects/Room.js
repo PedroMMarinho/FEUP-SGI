@@ -20,7 +20,7 @@ class Room extends THREE.Object3D {
         
 
         this.wallMaterial = new THREE.MeshPhongMaterial({ map: wallTexture });
-        this.floorMaterial = new THREE.MeshPhongMaterial({ map: floorTexture });
+        this.floorMaterial = new THREE.MeshPhongMaterial({ map: floorTexture, specular: 0x111111, shininess: 50, diffuse: 0x888888 });
         this.roofMaterial = new THREE.MeshPhongMaterial({ map: roofTexture, color: 0x8B0000 });
     }
     initConstants() {

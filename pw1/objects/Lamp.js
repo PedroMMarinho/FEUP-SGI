@@ -86,20 +86,31 @@ class Lamp extends THREE.Object3D {
         shellInside.position.set(0,-this.shellHeight / 2,0);
         this.add(shellInside);
 
-        // Light
-        const light = new THREE.SpotLight(0xffffff, 1);
-        light.position.set(0, - this.shellThickness + 0.05, 0);
-        light.angle = Math.PI ;
-        light.penumbra = 0.2;
-        light.decay = 2;
-        light.distance = 50;
-        light.target.position.set(0, -1, 0);
-        light.castShadow = true;
-        light.shadow.mapSize.width = 512;
-        light.shadow.mapSize.height = 512;
-        light.shadow.camera.near = 0.5;
-        light.shadow.camera.far = 50;
-        this.add(light);
+        // SpotLight
+        const spotLight = new THREE.SpotLight(0x7F7F00, 1);
+        spotLight.position.set(0, - this.shellThickness - 0.20, 0);
+        spotLight.angle = Math.PI / 4  ;
+        spotLight.power = 50;
+        spotLight.penumbra = 0.1;
+        spotLight.decay = 1;
+        spotLight.distance = 50;
+        spotLight.castShadow = true;
+        spotLight.shadow.mapSize.width = 512;
+        spotLight.shadow.mapSize.height = 512;
+        spotLight.shadow.camera.near = 0.5;
+        spotLight.shadow.camera.far = 50;
+        const target = new THREE.Object3D();
+        target.position.set(0, -10, 0);
+        spotLight.target = target;
+        this.add(spotLight);
+        this.add(spotLight.target);
+        spotLight.target.updateMatrixWorld();
+
+        // Inside light
+        const pointLight = new THREE.PointLight(0xFFFF00, 0.5, 10, 2);
+        pointLight.power = 30
+        pointLight.position.set(0, - this.shellThickness - 0.20, 0);
+        this.add(pointLight);
 
 
     }
