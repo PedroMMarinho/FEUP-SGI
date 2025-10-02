@@ -44,8 +44,6 @@ export class PokerChipHelper{
 
     createTower(x,y,z,pokerChipValue,nChips,ang = 0){
         const chipTower = new ChipTower(x,y,z, ang);
-        console.log(pokerChipValue)
-        console.log(this.chipTopMaterials[pokerChipValue])
         chipTower.build(nChips,this.chipTopMaterials[pokerChipValue],this.chipSideMaterials[pokerChipValue]);
         this.chipTowers.push(chipTower);
         return chipTower;

@@ -6,6 +6,7 @@ import { PokerCard } from './objects/PokerCard.js';
 import { PokerChipHelper, PokerChipValue } from './objects/PokerChipHelper.js';
 import { BlackJackTable } from './objects/BlackJackTable.js';
 import { Room } from './objects/Room.js';
+import { Lamp } from './objects/Lamp.js'
 
 /**
  *  This class contains the contents of out application
@@ -71,12 +72,14 @@ class MyContents {
         // Black Jack Game
 
         this.blackJackPlayer1 = this.cardDeck.create_card('8_D', 2.1, this.blackJackTable.getTableBase(), -2.8);
+        this.lamp = new Lamp(0,0,0);
 
     }
 
     initObjects() {
         this.app.scene.add(this.axis);
         this.app.scene.add(this.room);
+        /*
         this.app.scene.add(this.pokerTable);
 
         //this.app.scene.add(this.pokerChip);
@@ -105,6 +108,9 @@ class MyContents {
         //this.app.scene.add(this.blackJackTable);
         //this.app.scene.add(this.blackJackPlayer1);
         this.initChips();
+        */
+       this.lamp.position.set(0,5,0);
+       this.app.scene.add(this.lamp);
 
     }
 
@@ -167,6 +173,7 @@ class MyContents {
         this.pokerTable.build();
         this.buildChips();
         this.blackJackTable.build()
+        this.lamp.build();
     }
 
     initBlackJackTextures() {
@@ -183,11 +190,11 @@ class MyContents {
 
         this.blackJackLegs = new THREE.TextureLoader().load('textures/blackMetal.jpg');
 
-        this.blackJackLegsMaterial = new THREE.MeshPhongMaterial({ map: this.blackJackLegs, side: THREE.DoubleSide,
+        this.blackMetalMaterial = new THREE.MeshPhongMaterial({ map: this.blackJackLegs, side: THREE.DoubleSide,
             color: 0xaaaaaa, shininess: 80,   specular: new THREE.Color(0xffffff), reflectivity: 0.8 });
 
         this.blackJackTable.outerMaterial = this.pokerRestMaterial;
-        this.blackJackTable.legMaterial = this.blackJackLegsMaterial;
+        this.blackJackTable.legMaterial = this.blackMetalMaterial;
         this.blackJackTable.tableMaterial = this.greenFelt;
     }
 
@@ -195,7 +202,28 @@ class MyContents {
         // load textures
         this.initPokerTextures();
         this.initBlackJackTextures();
+        this.initLampTextures(); 
     }
+    initLampTextures(){
+        this.lampShellTexture = new THREE.TextureLoader().load('textures/outerLamp.jpeg');
+        this.lampShellTexture.wrapS = THREE.RepeatWrapping;
+        this.lampShellTexture.wrapT = THREE.RepeatWrapping;
+        this.lampShellTexture.repeat.set(4, 1);
+        this.lampShellMaterial = new THREE.MeshPhongMaterial({ map: this.lampShellTexture, side: THREE.DoubleSide,
+            color: 0xffffff, shininess: 80,   specular: new THREE.Color(0xffffff), reflectivity: 0.5 });
+
+        this.lampInsideMaterial = new THREE.TextureLoader().load('textures/innerLamp.jpg');
+        this.lampInsideMaterial.wrapS = THREE.RepeatWrapping;
+        this.lampInsideMaterial.wrapT = THREE.RepeatWrapping;
+        this.lampInsideMaterial.repeat.set(16, 16);
+        this.lampInsideMaterial = new THREE.MeshPhongMaterial({ map: this.lampInsideMaterial, side: THREE.DoubleSide,
+            color: 0xfcf27e, shininess: 80,   specular: new THREE.Color(0xffffff), reflectivity: 0.9, emissive: new THREE.Color(0xfcf9cc), emissiveIntensity: 0.3 });
+
+        this.lamp.lampShellMaterial = this.lampShellMaterial;
+        this.lamp.lampInsideMaterial = this.lampInsideMaterial;
+        this.lamp.lampSupportMaterial = this.blackMetalMaterial;
+    }
+
     
     buildChips(){
 
