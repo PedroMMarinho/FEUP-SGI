@@ -21,7 +21,6 @@ class PokerChip extends THREE.Object3D {
         const chipGeo = new THREE.CylinderGeometry(this.chipRadius, this.chipRadius, this.chipHeight, 32);
         const chip = new THREE.Mesh(chipGeo, [ sideMaterial, topMaterial, topMaterial]);
         this.add(chip);
-        console.log("Poker chip created");
     }
 
 }

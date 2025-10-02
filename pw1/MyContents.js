@@ -191,6 +191,7 @@ class MyContents {
         this.pokerTable.build();
         this.buildChips();
         this.blackJackTable.build()
+        this.slotMachine.build();
     }
 
     initBlackJackTextures() {
@@ -215,10 +216,26 @@ class MyContents {
         this.blackJackTable.tableMaterial = this.greenFelt;
     }
 
+    initSlotMachineTextures() {
+        this.slotMachineScreenTexture = new THREE.TextureLoader().load('textures/slotMachineScreen.jpg');
+
+        this.slotMachineScreenMaterial = new THREE.MeshPhongMaterial({ map: this.slotMachineScreenTexture, side: THREE.DoubleSide,
+            color: 0xffffff, shininess: 10,   specular: new THREE.Color(0x555555), reflectivity: 0.2 });
+
+        this.slotMachineMetalTexture = new THREE.TextureLoader().load('textures/brushedMetal.jpg');
+
+        this.slotMachineMetalMaterial = new THREE.MeshPhongMaterial({ map: this.slotMachineMetalTexture, side: THREE.DoubleSide,
+            color: 0xaaaaaa, shininess: 80,   specular: new THREE.Color(0xffffff), reflectivity: 0.8 });
+
+        this.slotMachine.slotMachineScreenMaterial = this.slotMachineScreenMaterial;
+        this.slotMachine.slotMachineMetalMaterial = this.slotMachineMetalMaterial;
+    }
+            
     initTextures() {
         // load textures
         this.initPokerTextures();
         this.initBlackJackTextures();
+        this.initSlotMachineTextures();
     }
     
     buildChips(){

@@ -7,12 +7,12 @@ class SlotMachine extends THREE.Object3D {
         this.rotation.y = ang;
         this.initMaterials();
         this.initConstants();
-        this.build();
     }
 
     initMaterials() {
-        this.slotMachineMaterial = new THREE.MeshPhongMaterial({ color: 0x8B0000, shininess: 100,
-            specular: new THREE.Color(0x555555), side: THREE.DoubleSide });
+        this.slotMachineMaterial = new THREE.MeshPhongMaterial({ color: 0x8B0000, shininess: 100 });
+        this.slotMachineScreenMaterial = null;
+        this.slotMachineMetalMaterial = null;
     }
 
     initConstants() {
@@ -50,14 +50,14 @@ class SlotMachine extends THREE.Object3D {
 
     // Thin box on the front
     const frontBoxDepth = 0.6;
-    const frontBoxGeo = new THREE.BoxGeometry(this.machineWidth , this.machineHeight * 0.9 , frontBoxDepth);
-    const frontBox = new THREE.Mesh(frontBoxGeo, this.slotMachineMaterial);
+    const frontBoxGeo = new THREE.BoxGeometry(this.machineWidth +0.01, this.machineHeight * 0.9 , frontBoxDepth);
+    const frontBox = new THREE.Mesh(frontBoxGeo, this.slotMachineMetalMaterial);
 
     frontBox.position.set(0, -this.machineHeight * 0.05, this.machineDepth / 2);
     this.add(frontBox);
 
     // slot panel with hole 
-    const panelWidth = this.machineWidth;
+    const panelWidth = this.machineWidth - 0.01;
     const panelHeight = this.machineHeight * 0.4;
 
     // outer rectangle
@@ -84,7 +84,7 @@ class SlotMachine extends THREE.Object3D {
         bevelEnabled: false
     };
     const panelGeo = new THREE.ExtrudeGeometry(panelShape, panelExtrudeSettings);
-    const panel = new THREE.Mesh(panelGeo, this.slotMachineMaterial);
+    const panel = new THREE.Mesh(panelGeo, this.slotMachineMetalMaterial);
 
     panel.position.set(0, this.machineHeight * 0.2, this.machineDepth / 2 + frontBoxDepth - 0.2);
     panel.rotation.x = -Math.PI / 12; 
@@ -95,12 +95,8 @@ class SlotMachine extends THREE.Object3D {
     const slotPlaneHeight = holeHeight;
 
     const slotPlaneGeo = new THREE.PlaneGeometry(slotPlaneWidth, slotPlaneHeight);
-    // TODO
-    const slotPlaneMat = new THREE.MeshBasicMaterial({
-        map: this.slotTexture, 
-        side: THREE.DoubleSide
-    });
-    const slotPlane = new THREE.Mesh(slotPlaneGeo, slotPlaneMat);
+    
+    const slotPlane = new THREE.Mesh(slotPlaneGeo, this.slotMachineScreenMaterial);
 
     // position the plane inside the hole
     slotPlane.position.set(0, this.machineHeight * 0.2, this.machineDepth / 2 + frontBoxDepth - 0.2 + 0.051); 
@@ -114,9 +110,9 @@ class SlotMachine extends THREE.Object3D {
     const sideHeight = panelHeight - 0.2;
 
     const sideGeo = new THREE.PlaneGeometry(sideWidth, sideHeight);
-    const leftSide = new THREE.Mesh(sideGeo, this.slotMachineMaterial);
+    const leftSide = new THREE.Mesh(sideGeo, this.slotMachineMetalMaterial);
 
-    leftSide.position.set(-panelWidth / 2, this.machineHeight * 0.2, this.machineDepth / 2 + frontBoxDepth - 0.25);
+    leftSide.position.set(-panelWidth / 2 - 0.01, this.machineHeight * 0.2, this.machineDepth / 2 + frontBoxDepth - 0.26);
 
     leftSide.rotation.y = Math.PI / 2;
     leftSide.rotation.x = -Math.PI / 12; 
@@ -124,8 +120,8 @@ class SlotMachine extends THREE.Object3D {
     this.add(leftSide);
 
     // right side cover plane
-    const rightSide = new THREE.Mesh(sideGeo, this.slotMachineMaterial);
-    rightSide.position.set(panelWidth / 2, this.machineHeight * 0.2, this.machineDepth / 2 + frontBoxDepth - 0.25);
+    const rightSide = new THREE.Mesh(sideGeo, this.slotMachineMetalMaterial);
+    rightSide.position.set(panelWidth / 2 + 0.01, this.machineHeight * 0.2, this.machineDepth / 2 + frontBoxDepth - 0.26);
 
     rightSide.rotation.y = -Math.PI / 2;
     rightSide.rotation.x = -Math.PI / 12;
@@ -134,7 +130,7 @@ class SlotMachine extends THREE.Object3D {
 
 
     // Another small box at the front
-    const frontButtonBoxDepth = 1.5;
+    const frontButtonBoxDepth = 1.8;
     const smallBoxGeo = new THREE.BoxGeometry(this.machineWidth, this.machineHeight * 0.2, frontButtonBoxDepth);
     const smallBox = new THREE.Mesh(smallBoxGeo, this.slotMachineMaterial);
     smallBox.position.set(0, -this.machineHeight * 0.05, this.machineDepth / 2 + frontBoxDepth - 0.15);
