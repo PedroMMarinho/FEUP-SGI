@@ -6,7 +6,8 @@ import { PokerCard } from './objects/PokerCard.js';
 import { PokerChipHelper, PokerChipValue } from './objects/PokerChipHelper.js';
 import { BlackJackTable } from './objects/BlackJackTable.js';
 import { Room } from './objects/Room.js';
-import { Lamp } from './objects/Lamp.js'
+import { Lamp } from './objects/Lamp.js';
+import { Door } from './objects/Door.js';
 
 /**
  *  This class contains the contents of out application
@@ -73,6 +74,7 @@ class MyContents {
 
         this.blackJackPlayer1 = this.cardDeck.create_card('8_D', 2.1, this.blackJackTable.getTableBase(), -2.8);
         this.lamp = new Lamp(0,0,0);
+        this.door = new Door(0,0,0);
 
     }
 
@@ -95,7 +97,7 @@ class MyContents {
         this.pokerTable.add(this.player1Card1);
         this.pokerTable.add(this.player1Card2);
         this.pokerTable.add(this.player2Card1);
-        this.pokerTable.add(this.player2Card2);
+        this.pokerTable.add(this.player2Card2); this.app.scene.add(this.d
         this.pokerTable.add(this.player3Card1);
         this.pokerTable.add(this.player3Card2);
         this.pokerTable.add(this.player4Card1);
@@ -109,8 +111,9 @@ class MyContents {
         //this.app.scene.add(this.blackJackPlayer1);
         this.initChips();
         */
-       this.lamp.position.set(0,5,0);
-       this.app.scene.add(this.lamp);
+       //this.lamp.position.set(0,5,0);
+       //this.app.scene.add(this.lamp);
+       this.app.scene.add(this.door);   
 
     }
 
@@ -174,6 +177,7 @@ class MyContents {
         this.buildChips();
         this.blackJackTable.build()
         this.lamp.build();
+        this.door.build();
     }
 
     initBlackJackTextures() {
@@ -203,6 +207,7 @@ class MyContents {
         this.initPokerTextures();
         this.initBlackJackTextures();
         this.initLampTextures(); 
+        this.initDoorTextures();
     }
     initLampTextures(){
         this.lampShellTexture = new THREE.TextureLoader().load('textures/outerLamp.jpeg');
@@ -222,6 +227,18 @@ class MyContents {
         this.lamp.lampShellMaterial = this.lampShellMaterial;
         this.lamp.lampInsideMaterial = this.lampInsideMaterial;
         this.lamp.lampSupportMaterial = this.blackMetalMaterial;
+    }
+
+    initDoorTextures(){
+        this.doorTexture = new THREE.TextureLoader().load('textures/door.png');
+        this.doorTexture.wrapS = THREE.RepeatWrapping;
+        this.doorTexture.wrapT = THREE.RepeatWrapping;
+        this.doorTexture.repeat.set(1, 1);
+        this.doorMaterial = new THREE.MeshPhongMaterial({ map: this.doorTexture, side: THREE.DoubleSide,
+            color: 0x964B00, shininess: 80,   specular: new THREE.Color(0xffffff), reflectivity: 0.5 });
+        this.door.doorMaterial = this.doorMaterial;
+        this.door.doorFrameMaterial = this.pokerRestMaterial;
+        
     }
 
     
