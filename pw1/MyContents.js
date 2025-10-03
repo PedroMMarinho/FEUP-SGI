@@ -238,7 +238,7 @@ class MyContents {
 
         this.slotMachineBodyMaterial = new THREE.MeshPhongMaterial({
             map: this.slotMachineBodyTexture, side: THREE.DoubleSide,
-            color: 0x000000, specular: new THREE.Color(0xffffff), reflectivity: 0.9, emissive: 0x222222
+            color: 0x000000, specular: new THREE.Color(0xffffff), reflectivity: 0.9
         });
 
 
@@ -262,7 +262,7 @@ class MyContents {
 
         this.slotMachineBottomMaterial = new THREE.MeshPhongMaterial({
             map: this.slotMachineBottomTexture, side: THREE.DoubleSide,
-            color: 0xaaaaaa, shininess: 80, specular: new THREE.Color(0xffffff), reflectivity: 0.8
+            color: 0xaaaaaa, shininess: 80, specular: new THREE.Color(0xffffff), reflectivity: 0.8,
         });
 
 
@@ -272,11 +272,80 @@ class MyContents {
         this.slotMachineGoldMaterial = new THREE.MeshPhongMaterial({
             map: this.slotMachineGoldTexture,
             side: THREE.DoubleSide,
-            color: 0xaaaaaa,
+            color: 0xffff00,
             shininess: 80,
             specular: new THREE.Color(0xffffff),
-            reflectivity: 0.8
+            reflectivity: 0.8,
         });
+
+
+        this.oneLineTexture = new THREE.TextureLoader().load('textures/oneLine.png');
+
+        this.oneLineMaterial = new THREE.MeshPhongMaterial({
+            map: this.oneLineTexture,
+            transparent: true,
+            color: 0xffffff,
+            alphaTest: 0.2,
+            side: THREE.DoubleSide,
+        });
+
+        this.threeLinesTexture = new THREE.TextureLoader().load('textures/threeLine.png');
+
+        this.threeLinesMaterial = new THREE.MeshPhongMaterial({
+            map: this.threeLinesTexture,
+            transparent: true,
+            color: 0xffffff,
+            alphaTest: 0.2,
+            side: THREE.DoubleSide,
+        });
+
+
+        this.fiveLinesTexture = new THREE.TextureLoader().load('textures/fiveLine.png');
+        
+        this.fiveLinesMaterial = new THREE.MeshPhongMaterial({
+            map: this.fiveLinesTexture,
+            transparent: true,
+            color: 0xffffff,
+            alphaTest: 0.2,
+            side: THREE.DoubleSide,
+        });
+
+        this.sevenLinesTexture = new THREE.TextureLoader().load('textures/sevenLine.png');
+        
+        this.sevenLinesMaterial = new THREE.MeshPhongMaterial({
+            map: this.sevenLinesTexture,
+            transparent: true,
+            color: 0xffffff,
+            alphaTest: 0.2,
+            side: THREE.DoubleSide,
+        });
+
+        this.nineLinesTexture = new THREE.TextureLoader().load('textures/nineLine.png');
+        
+        this.nineLinesMaterial = new THREE.MeshPhongMaterial({
+            map: this.nineLinesTexture,
+            transparent: true,
+            color: 0xffffff,
+            alphaTest: 0.2,
+            side: THREE.DoubleSide,
+        });
+
+        this.repeatBetTexture = new THREE.TextureLoader().load('textures/repeatBet.png');
+
+        this.repeatBetMaterial = new THREE.MeshPhongMaterial({
+            map: this.repeatBetTexture,
+            transparent: true,
+            color: 0xffffff,
+            alphaTest: 0.2,
+            side: THREE.DoubleSide,
+        });
+
+        this.slotMachine.repeatBetMaterial = this.repeatBetMaterial;
+        this.slotMachine.oneLineMaterial = this.oneLineMaterial;
+        this.slotMachine.threeLinesMaterial = this.threeLinesMaterial;
+        this.slotMachine.fiveLinesMaterial = this.fiveLinesMaterial;
+        this.slotMachine.sevenLinesMaterial = this.sevenLinesMaterial;
+        this.slotMachine.nineLinesMaterial = this.nineLinesMaterial;
 
         this.slotMachine.slotMachineTopMaterial = this.slotMachineTopMaterial;
         this.slotMachine.slotGoldMaterial = this.slotMachineGoldMaterial;

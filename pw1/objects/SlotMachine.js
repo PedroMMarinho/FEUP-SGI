@@ -19,7 +19,7 @@ class SlotMachine extends THREE.Object3D {
             reflectivity: 0.1
         });
         this.slotCylinderMaterial = new THREE.MeshPhongMaterial({
-            color: 0x444444,
+            color: 0x555555,
             shininess: 120,
             specular: new THREE.Color(0xaaaaaa),
             reflectivity: 0.6
@@ -33,17 +33,29 @@ class SlotMachine extends THREE.Object3D {
             emissiveIntensity: 0.5
         });
         this.glassMaterial = new THREE.MeshPhysicalMaterial({
-        color: 0xffffff,
-        metalness: 0,
-        roughness: 0,
-        transparent: true,
-        opacity: 0.4,          
-        transmission: 1.0,      
-        thickness: 0.1,         
-        clearcoat: 1.0,
-        clearcoatRoughness: 0.1,
-        side: THREE.DoubleSide
-    });
+            color: 0xffffff,
+            metalness: 0,
+            roughness: 0,
+            transparent: true,
+            opacity: 0.4,
+            transmission: 1.0,
+            thickness: 0.1,
+            clearcoat: 1.0,
+            clearcoatRoughness: 0.1,
+            side: THREE.DoubleSide
+        });
+        this.buttonGlowMaterial = new THREE.MeshPhongMaterial({
+            color: 0xffffff,                  
+            emissive: 0xffffff,               
+            emissiveIntensity: 0.6,           
+        });
+
+        this.oneLineMaterial = null;
+        this.threeLinesMaterial = null;
+        this.fiveLinesMaterial = null;
+        this.sevenLinesMaterial = null;
+        this.nineLinesMaterial = null;
+        this.repeatBetMaterial = null;
         this.slotGoldMaterial = null;
         this.slotMachineBodyMaterial = null;
         this.slotMachineScreenMaterial = null;
@@ -59,88 +71,150 @@ class SlotMachine extends THREE.Object3D {
         this.machineDepth = 2.5;
     }
 
+    initButtons() {
+
+
+        const createButton = (buttonTopMaterial, buttonWidth = 0.15, buttonHeight = 0.08, buttonDepth = 0.15) => {
+            const buttonGroup = new THREE.Group();
+
+            const bottomPart = new THREE.Mesh(
+                new THREE.BoxGeometry(buttonWidth + buttonWidth * 0.15, buttonHeight, buttonDepth + buttonDepth * 0.15),
+                this.slotMachineBodyMaterial
+            );
+
+            const topPart = new THREE.Mesh(
+                new THREE.BoxGeometry(buttonWidth, buttonHeight, buttonDepth),
+                this.buttonGlowMaterial
+            );
+
+            const topGeo = new THREE.PlaneGeometry(buttonWidth, buttonDepth);
+            const topText = new THREE.Mesh(topGeo, buttonTopMaterial);
+
+            bottomPart.position.set(0, 0, 0);
+            topPart.position.set(0, buttonHeight / 2, 0);
+
+            topText.position.set(0, buttonHeight + 0.001, 0);  
+            topText.rotation.x = -Math.PI / 2;
+            buttonGroup.add(bottomPart);
+            buttonGroup.add(topPart);
+            buttonGroup.add(topText);
+
+            return buttonGroup;
+        };
+
+        // Get positioning based on smallBox
+        const currentY = -this.machineHeight * 0.05 + this.machineHeight * 0.2 / 2 + 0.08 / 2;
+        const buttonZ = this.machineDepth / 2 + 0.15 + 1.8 / 2 + 0.05;
+        const buttonX = this.machineWidth / 2;
+
+        // Create three buttons
+        const button1 = createButton(this.oneLineMaterial);
+        const button2 = createButton(this.threeLinesMaterial);
+        const button3 = createButton(this.fiveLinesMaterial);
+        const button4 = createButton(this.sevenLinesMaterial);
+        const button5 = createButton(this.nineLinesMaterial);
+        const button6 = createButton(this.repeatBetMaterial , 0.3, 0.1, 0.3);
+
+        const buttonWidth = 0.15;
+
+        button1.position.set(-buttonX + 2 * buttonWidth, currentY, buttonZ);
+        button2.position.set(-buttonX + 4 * buttonWidth, currentY, buttonZ);
+        button3.position.set(-buttonX + 8 * buttonWidth, currentY, buttonZ);
+        button4.position.set(-buttonX + 6 * buttonWidth, currentY, buttonZ);
+        button5.position.set(-buttonX + 10 * buttonWidth, currentY, buttonZ);
+        button6.position.set(-buttonX + 18 * buttonWidth, currentY, buttonZ);
+
+        this.add(button1);
+        this.add(button2);
+        this.add(button3);
+        this.add(button4);
+        this.add(button5);
+        this.add(button6);
+    }
+
+
     initTopLigth() {
-    const bigCylinderRadius = 0.22;
-    const bigCylinderHeight = 0.3;
-    
-    const smallCylinderRadius = 0.15;
-    const smallCylinderHeight = 0.2;
+        const bigCylinderRadius = 0.22;
+        const bigCylinderHeight = 0.3;
 
-    const smallCylinderLightRadius = smallCylinderRadius + 0.01;
-    
-    const bigCylinderGeo = new THREE.CylinderGeometry(bigCylinderRadius, bigCylinderRadius, bigCylinderHeight, 32);
-    const smallCylinderGeo = new THREE.CylinderGeometry(smallCylinderRadius, smallCylinderRadius, smallCylinderHeight, 32);
-    const CylinderGeoLight = new THREE.CylinderGeometry(smallCylinderLightRadius, smallCylinderLightRadius, smallCylinderHeight, 32);
+        const smallCylinderRadius = 0.15;
+        const smallCylinderHeight = 0.2;
 
+        const smallCylinderLightRadius = smallCylinderRadius + 0.01;
 
-
-    const bigCylinder = new THREE.Mesh(bigCylinderGeo, this.slotGoldMaterial);
-    const smallCylinder1 = new THREE.Mesh(smallCylinderGeo, this.slotKnobMaterial);
-    const smallCylinder2 = new THREE.Mesh(CylinderGeoLight, this.topShinyLightMaterial);
-
-    const baseY = this.machineHeight / 2 + this.machineWidth / 2; 
-    let currentY = baseY;
-
-    bigCylinder.position.set(0, currentY, 0);
-
-
-    currentY += bigCylinderHeight / 2 + smallCylinderHeight / 2; 
-    smallCylinder1.position.set(0, currentY, 0);
-
-    currentY += smallCylinderHeight / 2 + smallCylinderHeight / 2 ; 
-    smallCylinder2.position.set(0, currentY, 0);
-
-    // Two torus rings 
-    const torusRadius = smallCylinderLightRadius;
-    const tubeRadius = 0.02; 
-    const torusGeo = new THREE.TorusGeometry(torusRadius, tubeRadius, 16, 100);
-
-    const torus1 = new THREE.Mesh(torusGeo, this.slotMachineMetalMaterial);
-    const torus2 = new THREE.Mesh(torusGeo, this.slotMachineMetalMaterial);
-
-    torus1.rotation.x = Math.PI / 2;
-    torus2.rotation.x = Math.PI / 2;
-
-    torus1.position.set(0, currentY + smallCylinderHeight * 0.5, 0); 
-    torus2.position.set(0, currentY - smallCylinderHeight * 0.5, 0);
-
-
-    const topCircleGeo = new THREE.CircleGeometry(torusRadius - tubeRadius + 0.01, 32);
-    const topCircle = new THREE.Mesh(topCircleGeo, this.slotMachineMetalMaterial);
-    topCircle.rotation.x = -Math.PI / 2;
-    topCircle.position.set(0, currentY + smallCylinderHeight / 2 + 0.01 , 0); 
-
-
-    const glassGeo = new THREE.CylinderGeometry(
-        smallCylinderLightRadius + 0.01,  
-        smallCylinderLightRadius + 0.01,  
-        smallCylinderHeight,       
-        32,                
-        1,                 
-        true               
-    );
-
-
-    const glassCylinder = new THREE.Mesh(glassGeo, this.glassMaterial);
-    glassCylinder.position.set(0, currentY, 0);
-
-    this.add(glassCylinder);
-
-
-    this.add(topCircle);
-
-    this.add(bigCylinder);
-    this.add(smallCylinder1);
-    this.add(smallCylinder2);
-    this.add(torus1);
-    this.add(torus2);
+        const bigCylinderGeo = new THREE.CylinderGeometry(bigCylinderRadius, bigCylinderRadius, bigCylinderHeight, 32);
+        const smallCylinderGeo = new THREE.CylinderGeometry(smallCylinderRadius, smallCylinderRadius, smallCylinderHeight, 32);
+        const CylinderGeoLight = new THREE.CylinderGeometry(smallCylinderLightRadius, smallCylinderLightRadius, smallCylinderHeight, 32);
 
 
 
-    this.add(bigCylinder);
-    this.add(smallCylinder1);
-    this.add(smallCylinder2);
-}
+        const bigCylinder = new THREE.Mesh(bigCylinderGeo, this.slotGoldMaterial);
+        const smallCylinder1 = new THREE.Mesh(smallCylinderGeo, this.slotKnobMaterial);
+        const smallCylinder2 = new THREE.Mesh(CylinderGeoLight, this.topShinyLightMaterial);
+
+        const baseY = this.machineHeight / 2 + this.machineWidth / 2;
+        let currentY = baseY;
+
+        bigCylinder.position.set(0, currentY, 0);
+
+
+        currentY += bigCylinderHeight / 2 + smallCylinderHeight / 2;
+        smallCylinder1.position.set(0, currentY, 0);
+
+        currentY += smallCylinderHeight / 2 + smallCylinderHeight / 2;
+        smallCylinder2.position.set(0, currentY, 0);
+
+        // Two torus rings 
+        const torusRadius = smallCylinderLightRadius;
+        const tubeRadius = 0.02;
+        const torusGeo = new THREE.TorusGeometry(torusRadius, tubeRadius, 16, 100);
+
+        const torus1 = new THREE.Mesh(torusGeo, this.slotMachineMetalMaterial);
+        const torus2 = new THREE.Mesh(torusGeo, this.slotMachineMetalMaterial);
+
+        torus1.rotation.x = Math.PI / 2;
+        torus2.rotation.x = Math.PI / 2;
+
+        torus1.position.set(0, currentY + smallCylinderHeight * 0.5, 0);
+        torus2.position.set(0, currentY - smallCylinderHeight * 0.5, 0);
+
+
+        const topCircleGeo = new THREE.CircleGeometry(torusRadius - tubeRadius + 0.01, 32);
+        const topCircle = new THREE.Mesh(topCircleGeo, this.slotMachineMetalMaterial);
+        topCircle.rotation.x = -Math.PI / 2;
+        topCircle.position.set(0, currentY + smallCylinderHeight / 2 + 0.01, 0);
+
+
+        const glassGeo = new THREE.CylinderGeometry(
+            smallCylinderLightRadius + 0.01,
+            smallCylinderLightRadius + 0.01,
+            smallCylinderHeight,
+            32,
+            1,
+            true
+        );
+
+
+        const glassCylinder = new THREE.Mesh(glassGeo, this.glassMaterial);
+        glassCylinder.position.set(0, currentY, 0);
+
+        this.add(glassCylinder);
+
+
+        this.add(topCircle);
+
+        this.add(bigCylinder);
+        this.add(smallCylinder1);
+        this.add(smallCylinder2);
+        this.add(torus1);
+        this.add(torus2);
+
+
+
+        this.add(bigCylinder);
+        this.add(smallCylinder1);
+        this.add(smallCylinder2);
+    }
 
 
 
@@ -162,7 +236,8 @@ class SlotMachine extends THREE.Object3D {
 
         const extrudeSettings = {
             depth: this.machineDepth - 0.1,
-            bevelEnabled: false
+            bevelEnabled: false,
+            curveSegments: 64
         };
 
         const semiGeo = new THREE.ExtrudeGeometry(shape, extrudeSettings);
@@ -189,7 +264,7 @@ class SlotMachine extends THREE.Object3D {
         // Thin box on the front
         const frontBoxDepth = 0.6;
         const frontBoxGeo = new THREE.BoxGeometry(this.machineWidth + 0.03, this.machineHeight * 0.9 + 0.01, frontBoxDepth);
-        const frontBox = new THREE.Mesh(frontBoxGeo, this.slotMachineMetalMaterial);
+        const frontBox = new THREE.Mesh(frontBoxGeo, this.slotMachineBodyMaterial);
 
         frontBox.position.set(0, -this.machineHeight * 0.05, this.machineDepth / 2);
         this.add(frontBox);
@@ -346,6 +421,7 @@ class SlotMachine extends THREE.Object3D {
         this.add(knob);
 
         this.initTopLigth();
+        this.initButtons();
     }
 
 
