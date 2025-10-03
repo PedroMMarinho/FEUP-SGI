@@ -24,6 +24,26 @@ class SlotMachine extends THREE.Object3D {
             specular: new THREE.Color(0xaaaaaa),
             reflectivity: 0.6
         });
+        this.topShinyLightMaterial = new THREE.MeshPhongMaterial({
+            color: 0xffff00,
+            shininess: 150,
+            specular: new THREE.Color(0xffffff),
+            reflectivity: 0.9,
+            emissive: new THREE.Color(0xffff00),
+            emissiveIntensity: 0.5
+        });
+        this.glassMaterial = new THREE.MeshPhysicalMaterial({
+        color: 0xffffff,
+        metalness: 0,
+        roughness: 0,
+        transparent: true,
+        opacity: 0.4,          
+        transmission: 1.0,      
+        thickness: 0.1,         
+        clearcoat: 1.0,
+        clearcoatRoughness: 0.1,
+        side: THREE.DoubleSide
+    });
         this.slotGoldMaterial = null;
         this.slotMachineBodyMaterial = null;
         this.slotMachineScreenMaterial = null;
@@ -38,6 +58,91 @@ class SlotMachine extends THREE.Object3D {
         this.machineHeight = 5;
         this.machineDepth = 2.5;
     }
+
+    initTopLigth() {
+    const bigCylinderRadius = 0.22;
+    const bigCylinderHeight = 0.3;
+    
+    const smallCylinderRadius = 0.15;
+    const smallCylinderHeight = 0.2;
+
+    const smallCylinderLightRadius = smallCylinderRadius + 0.01;
+    
+    const bigCylinderGeo = new THREE.CylinderGeometry(bigCylinderRadius, bigCylinderRadius, bigCylinderHeight, 32);
+    const smallCylinderGeo = new THREE.CylinderGeometry(smallCylinderRadius, smallCylinderRadius, smallCylinderHeight, 32);
+    const CylinderGeoLight = new THREE.CylinderGeometry(smallCylinderLightRadius, smallCylinderLightRadius, smallCylinderHeight, 32);
+
+
+
+    const bigCylinder = new THREE.Mesh(bigCylinderGeo, this.slotGoldMaterial);
+    const smallCylinder1 = new THREE.Mesh(smallCylinderGeo, this.slotKnobMaterial);
+    const smallCylinder2 = new THREE.Mesh(CylinderGeoLight, this.topShinyLightMaterial);
+
+    const baseY = this.machineHeight / 2 + this.machineWidth / 2; 
+    let currentY = baseY;
+
+    bigCylinder.position.set(0, currentY, 0);
+
+
+    currentY += bigCylinderHeight / 2 + smallCylinderHeight / 2; 
+    smallCylinder1.position.set(0, currentY, 0);
+
+    currentY += smallCylinderHeight / 2 + smallCylinderHeight / 2 ; 
+    smallCylinder2.position.set(0, currentY, 0);
+
+    // Two torus rings 
+    const torusRadius = smallCylinderLightRadius;
+    const tubeRadius = 0.02; 
+    const torusGeo = new THREE.TorusGeometry(torusRadius, tubeRadius, 16, 100);
+
+    const torus1 = new THREE.Mesh(torusGeo, this.slotMachineMetalMaterial);
+    const torus2 = new THREE.Mesh(torusGeo, this.slotMachineMetalMaterial);
+
+    torus1.rotation.x = Math.PI / 2;
+    torus2.rotation.x = Math.PI / 2;
+
+    torus1.position.set(0, currentY + smallCylinderHeight * 0.5, 0); 
+    torus2.position.set(0, currentY - smallCylinderHeight * 0.5, 0);
+
+
+    const topCircleGeo = new THREE.CircleGeometry(torusRadius - tubeRadius + 0.01, 32);
+    const topCircle = new THREE.Mesh(topCircleGeo, this.slotMachineMetalMaterial);
+    topCircle.rotation.x = -Math.PI / 2;
+    topCircle.position.set(0, currentY + smallCylinderHeight / 2 + 0.01 , 0); 
+
+
+    const glassGeo = new THREE.CylinderGeometry(
+        smallCylinderLightRadius + 0.01,  
+        smallCylinderLightRadius + 0.01,  
+        smallCylinderHeight,       
+        32,                
+        1,                 
+        true               
+    );
+
+
+    const glassCylinder = new THREE.Mesh(glassGeo, this.glassMaterial);
+    glassCylinder.position.set(0, currentY, 0);
+
+    this.add(glassCylinder);
+
+
+    this.add(topCircle);
+
+    this.add(bigCylinder);
+    this.add(smallCylinder1);
+    this.add(smallCylinder2);
+    this.add(torus1);
+    this.add(torus2);
+
+
+
+    this.add(bigCylinder);
+    this.add(smallCylinder1);
+    this.add(smallCylinder2);
+}
+
+
 
     build() {
 
@@ -240,6 +345,7 @@ class SlotMachine extends THREE.Object3D {
         );
         this.add(knob);
 
+        this.initTopLigth();
     }
 
 
