@@ -10,7 +10,6 @@ class SlotMachine extends THREE.Object3D {
     }
 
     initMaterials() {
-        this.slotMachineMaterial = new THREE.MeshPhongMaterial({ color: 0x8B0000, shininess: 100 });
         this.slotLeverMaterial = new THREE.MeshPhongMaterial({ color: 0x222222, shininess: 100, specular: 0x555555 });
         this.slotKnobMaterial = new THREE.MeshPhongMaterial({
             color: 0xff0000,
@@ -50,6 +49,7 @@ class SlotMachine extends THREE.Object3D {
             emissiveIntensity: 0.6,           
         });
 
+        this.insertBillsMaterial = null;
         this.oneLineMaterial = null;
         this.threeLinesMaterial = null;
         this.fiveLinesMaterial = null;
@@ -216,6 +216,109 @@ class SlotMachine extends THREE.Object3D {
         this.add(smallCylinder2);
     }
 
+    initBillAcceptor() {
+
+    const frameSize = { width: 0.8, height: 0.4, depth: 0.1 }; 
+
+    const yellowBoxSize = { 
+        width: frameSize.width * 0.857,  
+        height: frameSize.height * 0.33, 
+        depth: frameSize.depth * 0.5
+    };
+    const yellowBoxPos = { 
+        x: 0, 
+        y: frameSize.height * 0.28, 
+        z: frameSize.depth / 2 + yellowBoxSize.depth / 2
+    };
+
+    const greenSlotSize = { 
+        width: frameSize.width * 0.857, 
+        height: frameSize.height * 0.278, 
+        depth: frameSize.depth * 0.5 
+    };
+    const greenSlotPos = { 
+        x: 0, 
+        y: -frameSize.height * 0.28, 
+        z: frameSize.depth / 2 + greenSlotSize.depth / 2
+    };
+    const greenSlotHoleMargin = greenSlotSize.height * 0.1;
+
+    const glowSettings = {
+        yellow: { color: 0xffff00, emissiveIntensity: 0.6 },
+        green: { color: 0x00ff00, emissiveIntensity: 0.8 }
+    };
+
+    // === Materials ===
+    const yellowGlowMat = new THREE.MeshPhongMaterial({
+        color: glowSettings.yellow.color,
+        emissive: glowSettings.yellow.color,
+        emissiveIntensity: glowSettings.yellow.emissiveIntensity
+    });
+
+    const greenGlowMat = new THREE.MeshPhongMaterial({
+        color: glowSettings.green.color,
+        emissive: glowSettings.green.color,
+        emissiveIntensity: glowSettings.green.emissiveIntensity,
+        side: THREE.DoubleSide
+    });
+
+    // === Group ===
+    const billAcceptor = new THREE.Group();
+
+    // === Yellow Box ===
+    const yellowBox = new THREE.Mesh(
+        new THREE.BoxGeometry(yellowBoxSize.width, yellowBoxSize.height, yellowBoxSize.depth),
+        yellowGlowMat
+    );
+    yellowBox.position.set(yellowBoxPos.x, yellowBoxPos.y, yellowBoxPos.z);
+    billAcceptor.add(yellowBox);
+
+    const slotShape = new THREE.Shape();
+    slotShape.moveTo(-greenSlotSize.width / 2, greenSlotSize.height / 2);
+    slotShape.lineTo(greenSlotSize.width / 2, greenSlotSize.height / 2);
+    slotShape.lineTo(greenSlotSize.width / 2, -greenSlotSize.height / 2);
+    slotShape.lineTo(-greenSlotSize.width / 2, -greenSlotSize.height / 2);
+    slotShape.lineTo(-greenSlotSize.width / 2, greenSlotSize.height / 2);
+
+    const holePath = new THREE.Path();
+    holePath.moveTo(-greenSlotSize.width / 2 + greenSlotHoleMargin, greenSlotSize.height / 2 - greenSlotHoleMargin);
+    holePath.lineTo(greenSlotSize.width / 2 - greenSlotHoleMargin, greenSlotSize.height / 2 - greenSlotHoleMargin);
+    holePath.lineTo(greenSlotSize.width / 2 - greenSlotHoleMargin, -greenSlotSize.height / 2 + greenSlotHoleMargin);
+    holePath.lineTo(-greenSlotSize.width / 2 + greenSlotHoleMargin, -greenSlotSize.height / 2 + greenSlotHoleMargin);
+    holePath.lineTo(-greenSlotSize.width / 2 + greenSlotHoleMargin, greenSlotSize.height / 2 - greenSlotHoleMargin);
+    slotShape.holes.push(holePath);
+
+    const extrudeSettings = { depth: greenSlotSize.depth, bevelEnabled: false };
+    const greenSlotGeometry = new THREE.ExtrudeGeometry(slotShape, extrudeSettings);
+    const greenSlot = new THREE.Mesh(greenSlotGeometry, greenGlowMat);
+
+    greenSlot.position.set(greenSlotPos.x, greenSlotPos.y, greenSlotPos.z);
+    billAcceptor.add(greenSlot);
+
+    // === Frame ===
+    const frame = new THREE.Mesh(
+        new THREE.BoxGeometry(frameSize.width, frameSize.height, frameSize.depth),
+        this.slotMachineBodyMaterial
+    );
+    billAcceptor.add(frame);
+
+   
+    const textPlane = new THREE.Mesh(
+        new THREE.PlaneGeometry(frameSize.width * 0.786, frameSize.height * 0.278),
+        this.insertBillsMaterial
+    );
+    textPlane.position.set(0, yellowBoxPos.y, yellowBoxPos.z + yellowBoxSize.depth / 2 + 0.01);
+    billAcceptor.add(textPlane);
+
+    this.add(billAcceptor);
+    billAcceptor.position.set(
+        1,
+        -this.machineHeight * 0.15 + this.machineHeight * 0.2 / 2 + 0.05,
+        this.machineDepth / 2 + frameSize.depth + 1.3
+    );
+}
+
+
 
 
     build() {
@@ -345,7 +448,7 @@ class SlotMachine extends THREE.Object3D {
         // Another small box at the front
         const frontButtonBoxDepth = 1.8;
         const smallBoxGeo = new THREE.BoxGeometry(this.machineWidth, this.machineHeight * 0.2, frontButtonBoxDepth);
-        const smallBox = new THREE.Mesh(smallBoxGeo, this.slotMachineMaterial);
+        const smallBox = new THREE.Mesh(smallBoxGeo, [this.slotMachineMetalMaterial, this.slotMachineMetalMaterial, this.slotMachineMetalMaterial, this.slotMachineMetalMaterial, this.slotMachineMetalMaterial, this.slotMachineBodyMaterial]);
         smallBox.position.set(0, -this.machineHeight * 0.05, this.machineDepth / 2 + frontBoxDepth - 0.15);
         this.add(smallBox);
 
@@ -422,6 +525,7 @@ class SlotMachine extends THREE.Object3D {
 
         this.initTopLigth();
         this.initButtons();
+        this.initBillAcceptor();
     }
 
 
