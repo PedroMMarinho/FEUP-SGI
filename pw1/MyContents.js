@@ -8,6 +8,7 @@ import { BlackJackTable } from './objects/BlackJackTable.js';
 import { Room } from './objects/Room.js';
 import { Lamp } from './objects/Lamp.js';
 import { Door } from './objects/Door.js';
+import { WindowFrame } from './objects/WindowFrame.js';
 
 /**
  *  This class contains the contents of out application
@@ -75,6 +76,7 @@ class MyContents {
         this.blackJackPlayer1 = this.cardDeck.create_card('8_D', 2.1, this.blackJackTable.getTableBase(), -2.8);
         this.lamp = new Lamp(0,0,0);
         this.door = new Door(0,0,0);
+        this.windowFrame = new WindowFrame(1,0,0);
 
     }
 
@@ -113,7 +115,8 @@ class MyContents {
         */
        //this.lamp.position.set(0,5,0);
        //this.app.scene.add(this.lamp);
-       this.app.scene.add(this.door);   
+       //this.app.scene.add(this.door);
+       this.app.scene.add(this.windowFrame);   
 
     }
 
@@ -178,6 +181,7 @@ class MyContents {
         this.blackJackTable.build()
         this.lamp.build();
         this.door.build();
+        this.windowFrame.build();
     }
 
     initBlackJackTextures() {
@@ -208,6 +212,7 @@ class MyContents {
         this.initBlackJackTextures();
         this.initLampTextures(); 
         this.initDoorTextures();
+        this.initWindowTextures();
     }
     initLampTextures(){
         this.lampShellTexture = new THREE.TextureLoader().load('textures/outerLamp.jpeg');
@@ -239,6 +244,14 @@ class MyContents {
         this.door.doorMaterial = this.doorMaterial;
         this.door.doorFrameMaterial = this.pokerRestMaterial;
         
+    }
+
+    initWindowTextures(){
+        this.windowFrameMaterial = this.pokerRestMaterial;
+        this.windowGlassMaterial = new THREE.MeshPhongMaterial({ color: 0xAAAAFF, side: THREE.DoubleSide,
+            shininess: 100,   specular: new THREE.Color(0xFFFFFF), reflectivity: 1, opacity: 0.5, transparent: true });
+        this.windowFrame.frameMaterial = this.windowFrameMaterial;
+        this.windowFrame.windowMaterial = this.windowGlassMaterial;
     }
 
     
