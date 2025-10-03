@@ -340,6 +340,18 @@ class MyContents {
             side: THREE.DoubleSide,
         });
 
+        this.insertBillsTexture = new THREE.TextureLoader().load('textures/inserTicketsText.png');
+        this.insertBillsMaterial = new THREE.MeshPhongMaterial({
+            map: this.insertBillsTexture,
+            transparent: true,
+            color: 0xffffff,
+            alphaTest: 0.2,
+            side: THREE.DoubleSide,
+        });
+
+        this.slotMachine.insertBillsMaterial = this.insertBillsMaterial;
+
+        // Assign materials to slot machine
         this.slotMachine.repeatBetMaterial = this.repeatBetMaterial;
         this.slotMachine.oneLineMaterial = this.oneLineMaterial;
         this.slotMachine.threeLinesMaterial = this.threeLinesMaterial;
