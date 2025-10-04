@@ -23,16 +23,19 @@ class MyContents {
     */
     constructor(app) {
         this.app = app
-        this.axis = new MyAxis(this);
-		this.cowboyChair = new CowboyChair(7, 2, 5); 
-        this.pokerTable = new PokerTable(0, 0, 0);
-        this.cardDeck = new CardDeck();
-        this.blackJackTable = new BlackJackTable(0, 0, 0);
+
         this.room = new Room();
 
-        this.slotMachine = new SlotMachine(4, 0, 0);
-        this.slotMachine2 = new SlotMachine(0, 4, 0);
-        this.slotMachine3 = new SlotMachine(-4, 0, 0);
+        const roomDimensions = this.room.getRoomDimensions();
+        this.axis = new MyAxis(this);
+		this.cowboyChair = new CowboyChair(7, 2, 5); 
+        this.pokerTable = new PokerTable(0, 0, -roomDimensions.depth / 4, -Math.PI / 2);
+        this.cardDeck = new CardDeck();
+        this.blackJackTable = new BlackJackTable(0, 0, 0);
+        
+
+
+        
             
 
         this.windowFrames = [];
@@ -45,8 +48,17 @@ class MyContents {
             this.windowFrames.push(windowFrame);
         }
 
-        const roomDimensions = this.room.getRoomDimensions();
-        this.door = new Door(-roomDimensions.width / 2 + 0.1 , 0, - roomDimensions.depth / 2 * 0.8, - Math.PI / 2);
+        this.slotMachine = new SlotMachine(0,0,0);
+        this.slotMachine.position.set(-roomDimensions.width / 2  + this.slotMachine.machineWidth / 2, this.slotMachine.machineHeight / 2, roomDimensions.depth * 0.45);
+        this.slotMachine.rotation.y = Math.PI / 2;
+        this.slotMachine2 = new SlotMachine(0, 0, 0);
+        this.slotMachine2.position.set(-roomDimensions.width / 2  + this.slotMachine2.machineWidth / 2, this.slotMachine2.machineHeight / 2, roomDimensions.depth * 0.35);
+        this.slotMachine2.rotation.y = Math.PI / 2;
+        this.slotMachine3 = new SlotMachine(0, 0, 0);
+        this.slotMachine3.position.set(-roomDimensions.width / 2  + this.slotMachine3.machineWidth / 2, this.slotMachine3.machineHeight / 2, roomDimensions.depth * 0.25);
+        this.slotMachine3.rotation.y = Math.PI / 2;
+
+        this.door = new Door(-roomDimensions.width / 2 + 0.1 , 0, - roomDimensions.depth / 2 * 0.7, - Math.PI / 2);
 
         this.lamp1 = new Lamp(0, 3*roomDimensions.height / 4, roomDimensions.depth / 4);
         this.lamp2 = new Lamp(0, 3*roomDimensions.height / 4, -roomDimensions.depth / 4);
@@ -128,7 +140,7 @@ class MyContents {
         this.app.scene.add(this.axis);
         this.app.scene.add(this.room);
         
-        //this.app.scene.add(this.pokerTable);
+        this.app.scene.add(this.pokerTable);
 		this.app.scene.add(this.cowboyChair);
 
 
@@ -153,7 +165,7 @@ class MyContents {
 
 
         // BlackJack Table
-        //this.app.scene.add(this.blackJackTable);
+        this.app.scene.add(this.blackJackTable);
 
         this.blackJackTable.add(this.dealerCard1);
         this.blackJackTable.add(this.dealerCard2);
@@ -562,9 +574,10 @@ class MyContents {
 
     initDoorTextures(){
         this.doorTexture = new THREE.TextureLoader().load('textures/door.png');
-        this.doorTexture.wrapS = THREE.RepeatWrapping;
+        this.doorTexture.wrapS = THREE.MirroredRepeatWrapping;
         this.doorTexture.wrapT = THREE.RepeatWrapping;
-        this.doorTexture.repeat.set(1, 1);
+        this.doorTexture.repeat.set(2, 1);
+        this.doorTexture.offset.set(1, 0);
         this.doorMaterial = new THREE.MeshPhongMaterial({ map: this.doorTexture, side: THREE.DoubleSide,
             color: 0x964B00, shininess: 80,   specular: new THREE.Color(0xffffff), reflectivity: 0.5 });
         this.door.doorMaterial = this.doorMaterial;

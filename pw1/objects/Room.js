@@ -25,10 +25,10 @@ class Room extends THREE.Object3D {
     }
     initConstants() {
         this.roomWidth = 30;
-        this.roomHeight = 10;
+        this.roomHeight = 12;
         this.roomDepth = 40;
         this.windowXPos = 0.85; // Relative position on the window wall (0 to 1)
-        this.windowYPos = 0.65; // Relative position on the window wall (0 to 1)
+        this.windowYPos = 0.6; // Relative position on the window wall (0 to 1)
         this.windowWidth = 8;
         this.windowHeight = 5;
     }

@@ -36,7 +36,7 @@ class PokerTable extends THREE.Object3D {
         this.tableRadiusX = 4;
         this.tableRadiusZ = 5;
         this.legRadius = 0.15;
-        this.legHeight = 2;
+        this.legHeight = 3;
         this.topThickness = 0.2;
         this.lightThickness = this.topThickness / 3;
         this.tableBase = this.legHeight + this.topThickness*2 + this.lightThickness;

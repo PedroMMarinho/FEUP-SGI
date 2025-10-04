@@ -19,8 +19,8 @@ class Door extends THREE.Object3D {
 
     initConstants() {
         
-        this.doorWidth = 3;
-        this.doorHeight = 7;
+        this.doorWidth = 6;
+        this.doorHeight = 8;
         this.doorDepth = 0.1;
         this.doorFrameThickness = 0.2;
     }
