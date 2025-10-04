@@ -28,7 +28,11 @@ class MyContents {
         this.blackJackTable = new BlackJackTable(0, 0, 0);
         this.room = new Room();
 
-        this.slotMachine = new SlotMachine(0, 0, 0);
+        this.slotMachine = new SlotMachine(4, 0, 0);
+        this.slotMachine2 = new SlotMachine(0, 4, 0);
+        this.slotMachine3 = new SlotMachine(-4, 0, 0);
+
+        
         // Create royal flush cards 
         this.card1 = this.cardDeck.create_card('D_S', 0, this.pokerTable.getTableBase() + PokerCard.DEPTH / 2, 0, true);
         this.card1.rotateOnAxis(new THREE.Vector3(0, 0, 1), Math.PI / 2);
@@ -102,8 +106,8 @@ class MyContents {
     initObjects() {
         this.app.scene.add(this.axis);
         this.app.scene.add(this.room);
-        /*
-        this.app.scene.add(this.pokerTable);
+        
+        //this.app.scene.add(this.pokerTable);
 
 
         // Adding to poker table so when moving they stay on top of it
@@ -117,7 +121,7 @@ class MyContents {
         this.pokerTable.add(this.player1Card1);
         this.pokerTable.add(this.player1Card2);
         this.pokerTable.add(this.player2Card1);
-        this.pokerTable.add(this.player2Card2); this.app.scene.add(this.d
+        this.pokerTable.add(this.player2Card2); 
         this.pokerTable.add(this.player3Card1);
         this.pokerTable.add(this.player3Card2);
         this.pokerTable.add(this.player4Card1);
@@ -136,16 +140,17 @@ class MyContents {
         this.blackJackTable.add(this.blackJackPlayer2Card1);
         this.blackJackTable.add(this.blackJackPlayer2Card2);
 
-
+        // Add slot machines
         this.app.scene.add(this.slotMachine);
-
+        this.app.scene.add(this.slotMachine2);
+        this.app.scene.add(this.slotMachine3);
 
         this.initChips();
-        */
+        
        //this.lamp.position.set(0,5,0);
        //this.app.scene.add(this.lamp);
        //this.app.scene.add(this.door);
-       this.app.scene.add(this.windowFrame);   
+       //this.app.scene.add(this.windowFrame);   
 
     }
 
@@ -212,6 +217,8 @@ class MyContents {
         this.door.build();
         this.windowFrame.build();
         this.slotMachine.build();
+        this.slotMachine2.build();
+        this.slotMachine3.build();
     }
 
     initBlackJackTextures() {
@@ -237,12 +244,29 @@ class MyContents {
     }
 
     initSlotMachineTextures() {
+        //  ---- Slot machine screens 
         this.slotMachineScreenTexture = new THREE.TextureLoader().load('textures/slotMachineScreen.jpg');
 
         this.slotMachineScreenMaterial = new THREE.MeshPhongMaterial({
             map: this.slotMachineScreenTexture, side: THREE.DoubleSide,
             color: 0xffffff, shininess: 10, specular: new THREE.Color(0x555555), reflectivity: 0.2
         });
+
+        this.slotMachineScreenTexture2 = new THREE.TextureLoader().load('textures/slotMachineEmpireScreen.jpg');
+
+        this.slotMachineScreenMaterial2 = new THREE.MeshPhongMaterial({
+            map: this.slotMachineScreenTexture2, side: THREE.DoubleSide,
+            color: 0xffffff, shininess: 10, specular: new THREE.Color(0x555555), reflectivity: 0.2
+        });
+
+        this.slotMachineScreenTexture3 = new THREE.TextureLoader().load('textures/cosmicQuestScreen.jpg');
+
+        this.slotMachineScreenMaterial3 = new THREE.MeshPhongMaterial({
+            map: this.slotMachineScreenTexture3, side: THREE.DoubleSide,
+            color: 0xffffff, shininess: 10, specular: new THREE.Color(0x555555), reflectivity: 0.2
+        });
+
+        // ----
 
         this.slotMachineMetalTexture = new THREE.TextureLoader().load('textures/brushedMetal.jpg');
 
@@ -260,7 +284,7 @@ class MyContents {
         });
 
 
-
+        // slot machine tops
         this.slotMachineTopTexture = new THREE.TextureLoader().load('textures/topSlotMachine1.png');
 
         this.slotMachineTopTexture.wrapS = THREE.RepeatWrapping;
@@ -276,6 +300,37 @@ class MyContents {
         });
 
 
+        this.slotMachineTopTexture2 = new THREE.TextureLoader().load('textures/goldenEmpireTop.png');
+        this.slotMachineTopTexture2.wrapS = THREE.RepeatWrapping;
+        this.slotMachineTopTexture2.wrapT = THREE.RepeatWrapping;
+
+        this.slotMachineTopTexture2.repeat.set(1, 2);
+        this.slotMachineTopTexture2.offset.set(0, 0.5);
+        this.slotMachineTopTexture2.center.set(0.5, 0.5);
+
+        this.slotMachineTopMaterial2 = new THREE.MeshPhongMaterial({
+            map: this.slotMachineTopTexture2, transparent: true,
+            shininess: 10, specular: new THREE.Color(0x555555), reflectivity: 0.2
+        });
+
+        this.slotMachineTopTexture3 = new THREE.TextureLoader().load('textures/comiscQuestTop.jpg');
+        this.slotMachineTopTexture3.wrapS = THREE.RepeatWrapping;
+        this.slotMachineTopTexture3.wrapT = THREE.RepeatWrapping;
+
+        this.slotMachineTopTexture3.repeat.set(1, 2);
+        this.slotMachineTopTexture3.offset.set(0, 0.5);
+        this.slotMachineTopTexture3.center.set(0.5, 0.5);
+
+        this.slotMachineTopMaterial3 = new THREE.MeshPhongMaterial({
+            map: this.slotMachineTopTexture3, transparent: true,
+            shininess: 10, specular: new THREE.Color(0x555555), reflectivity: 0.2
+        });
+
+
+
+        // ----
+
+        // bottom slot machines
         this.slotMachineBottomTexture = new THREE.TextureLoader().load('textures/bottomSlotMachine.png');
 
         this.slotMachineBottomMaterial = new THREE.MeshPhongMaterial({
@@ -283,6 +338,20 @@ class MyContents {
             color: 0xaaaaaa, shininess: 80, specular: new THREE.Color(0xffffff), reflectivity: 0.8,
         });
 
+        this.slotMachineBottomTexture2 = new THREE.TextureLoader().load('textures/goldenEmpireBottomSlotMachine.jpg');
+
+        this.slotMachineBottomMaterial2 = new THREE.MeshPhongMaterial({
+            map: this.slotMachineBottomTexture2, side: THREE.DoubleSide,
+            color: 0xaaaaaa, shininess: 80, specular: new THREE.Color(0xffffff), reflectivity: 0.8
+        });
+
+        this.slotMachineBottomTexture3 = new THREE.TextureLoader().load('textures/cosmicQuestBottom.jpg');
+
+        this.slotMachineBottomMaterial3 = new THREE.MeshPhongMaterial({
+            map: this.slotMachineBottomTexture3, side: THREE.DoubleSide,
+            color: 0xaaaaaa, shininess: 80, specular: new THREE.Color(0xffffff), reflectivity: 0.8
+        });
+        // ----
 
         this.slotMachineGoldTexture = new THREE.TextureLoader().load('textures/slotGold.jpg');
 
@@ -367,9 +436,21 @@ class MyContents {
             side: THREE.DoubleSide,
         });
 
-        this.slotMachine.insertBillsMaterial = this.insertBillsMaterial;
+        this.slotMachine.slotMachineTopMaterial = this.slotMachineTopMaterial;
+        this.slotMachine.slotMachineScreenMaterial = this.slotMachineScreenMaterial;
+        this.slotMachine.slotMachineBottomMaterial = this.slotMachineBottomMaterial;
 
-        // Assign materials to slot machine
+        this.slotMachine2.slotMachineTopMaterial = this.slotMachineTopMaterial2;
+        this.slotMachine2.slotMachineScreenMaterial = this.slotMachineScreenMaterial2;
+        this.slotMachine2.slotMachineBottomMaterial = this.slotMachineBottomMaterial2;
+        
+
+        this.slotMachine3.slotMachineTopMaterial = this.slotMachineTopMaterial3;
+        this.slotMachine3.slotMachineScreenMaterial = this.slotMachineScreenMaterial3;
+        this.slotMachine3.slotMachineBottomMaterial = this.slotMachineBottomMaterial3;
+
+        // Assign materials to slot machine 1
+        this.slotMachine.insertBillsMaterial = this.insertBillsMaterial;
         this.slotMachine.repeatBetMaterial = this.repeatBetMaterial;
         this.slotMachine.oneLineMaterial = this.oneLineMaterial;
         this.slotMachine.threeLinesMaterial = this.threeLinesMaterial;
@@ -377,12 +458,36 @@ class MyContents {
         this.slotMachine.sevenLinesMaterial = this.sevenLinesMaterial;
         this.slotMachine.nineLinesMaterial = this.nineLinesMaterial;
 
-        this.slotMachine.slotMachineTopMaterial = this.slotMachineTopMaterial;
         this.slotMachine.slotGoldMaterial = this.slotMachineGoldMaterial;
         this.slotMachine.slotMachineBodyMaterial = this.slotMachineBodyMaterial;
-        this.slotMachine.slotMachineScreenMaterial = this.slotMachineScreenMaterial;
         this.slotMachine.slotMachineMetalMaterial = this.slotMachineMetalMaterial;
-        this.slotMachine.slotMachineBottomMaterial = this.slotMachineBottomMaterial;
+
+        // Assign materials to slot machine 2
+        this.slotMachine2.insertBillsMaterial = this.insertBillsMaterial;
+        this.slotMachine2.repeatBetMaterial = this.repeatBetMaterial;
+        this.slotMachine2.oneLineMaterial = this.oneLineMaterial;
+        this.slotMachine2.threeLinesMaterial = this.threeLinesMaterial;
+        this.slotMachine2.fiveLinesMaterial = this.fiveLinesMaterial;
+        this.slotMachine2.sevenLinesMaterial = this.sevenLinesMaterial;
+        this.slotMachine2.nineLinesMaterial = this.nineLinesMaterial;
+        
+        this.slotMachine2.slotGoldMaterial = this.slotMachineGoldMaterial;
+        this.slotMachine2.slotMachineBodyMaterial = this.slotMachineBodyMaterial;
+        this.slotMachine2.slotMachineMetalMaterial = this.slotMachineMetalMaterial;
+
+        // Assign materials to slot machine 3
+        this.slotMachine3.insertBillsMaterial = this.insertBillsMaterial;
+        this.slotMachine3.repeatBetMaterial = this.repeatBetMaterial;
+        this.slotMachine3.oneLineMaterial = this.oneLineMaterial;
+        this.slotMachine3.threeLinesMaterial = this.threeLinesMaterial;
+        this.slotMachine3.fiveLinesMaterial = this.fiveLinesMaterial;
+        this.slotMachine3.sevenLinesMaterial = this.sevenLinesMaterial;
+        this.slotMachine3.nineLinesMaterial = this.nineLinesMaterial;
+
+        this.slotMachine3.slotGoldMaterial = this.slotMachineGoldMaterial;
+        this.slotMachine3.slotMachineBodyMaterial = this.slotMachineBodyMaterial;
+        this.slotMachine3.slotMachineMetalMaterial = this.slotMachineMetalMaterial;
+
     }
 
     initTextures() {
@@ -391,6 +496,7 @@ class MyContents {
         this.initBlackJackTextures();
         this.initLampTextures(); 
         this.initDoorTextures();
+        this.initSlotMachineTextures();
         this.initWindowTextures();
     }
     initLampTextures(){
