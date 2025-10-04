@@ -63,6 +63,7 @@ class SlotMachine extends THREE.Object3D {
         this.slotMachineTopMaterial = null;
         this.slotMachineBottomMaterial = null;
 
+
     }
 
     initConstants() {
