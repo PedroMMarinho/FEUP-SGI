@@ -37,17 +37,20 @@ class MyContents {
 
         this.windowFrames = [];
         const windowPositions = this.room.getWindowPositions();
-        console.log(windowPositions);
 
         for(let i = 0; i < windowPositions.length; i++) {
             const pos = windowPositions[i];
             const windowFrame = new WindowFrame(0, 0, 0, - Math.PI / 2);
-            console.log(pos.z)
             windowFrame.position.set(pos.x, pos.y , pos.z);
-            console.log(windowFrame.position);
             this.windowFrames.push(windowFrame);
-            console.log(this.windowFrames[i]);
         }
+
+        const roomDimensions = this.room.getRoomDimensions();
+        this.door = new Door(-roomDimensions.width / 2 + 0.1 , 0, - roomDimensions.depth / 2 * 0.8, - Math.PI / 2);
+
+        this.lamp1 = new Lamp(0, 3*roomDimensions.height / 4, roomDimensions.depth / 4);
+        this.lamp2 = new Lamp(0, 3*roomDimensions.height / 4, -roomDimensions.depth / 4);
+
 
 
 
@@ -100,8 +103,6 @@ class MyContents {
         const blackJackY = this.blackJackTable.getTableBase() + (PokerCard.DEPTH / 2);
 
         this.blackJackPlayer1 = this.cardDeck.create_card('8_D', 2.1, this.blackJackTable.getTableBase(), -2.8);
-        this.lamp = new Lamp(0,0,0);
-        this.door = new Door(0,0,0);
         this.windowFrame = new WindowFrame(1,0,0);
         // Dealer
         this.dealerCard1 = this.cardDeck.create_card('10_S', -0.2, blackJackY, -0.8, true);
@@ -118,6 +119,7 @@ class MyContents {
         this.blackJackPlayer2Card1.rotateOnAxis(new THREE.Vector3(0, 0, 1), -Math.PI / 8);
         this.blackJackPlayer2Card2 = this.cardDeck.create_card('A_S', 1.5, blackJackY + (PokerCard.DEPTH), -2.3, true);
         this.blackJackPlayer2Card2.rotateOnAxis(new THREE.Vector3(0, 0, 1), -Math.PI / 8);
+
 
         // Missing Poker Chips
     }
@@ -173,8 +175,9 @@ class MyContents {
         this.initChips();
         
        //this.lamp.position.set(0,5,0);
-       //this.app.scene.add(this.lamp);
-       //this.app.scene.add(this.door);
+       this.app.scene.add(this.lamp1);
+       this.app.scene.add(this.lamp2);
+       this.app.scene.add(this.door);
        //this.app.scene.add(this.windowFrame);   
 
     	//this.app.scene.add(this.pokerChip);
@@ -183,12 +186,12 @@ class MyContents {
 
     initLights() {
         // Temporary Ambient Light
-        this.ambientLight = new THREE.AmbientLight(0x6f6f6f, 1);
+        this.ambientLight = new THREE.AmbientLight(0x3f3f3f, 1);
         this.app.scene.add(this.ambientLight);
 
         // Temporary Directional Light
-        this.directionalLight = new THREE.DirectionalLight(0xffffff, 0.6);
-        this.directionalLight.position.set(5, 5, 5);
+        this.directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+        this.directionalLight.position.set(5, 10, 0);
         this.directionalLight.castShadow = true;
         this.directionalLight.shadow.mapSize.width = 512;
         this.directionalLight.shadow.mapSize.height = 512;
@@ -244,7 +247,8 @@ class MyContents {
         //this.pokerChip.build();
         this.buildChips();
         this.blackJackTable.build()
-        this.lamp.build();
+        this.lamp1.build();
+        this.lamp2.build();
         this.door.build();
         this.windowFrame.build();
         this.slotMachine.build();
@@ -547,9 +551,13 @@ class MyContents {
         this.lampInsideMaterial = new THREE.MeshPhongMaterial({ map: this.lampInsideMaterial, side: THREE.DoubleSide,
             color: 0xfcf27e, shininess: 80,   specular: new THREE.Color(0xffffff), reflectivity: 0.9, emissive: new THREE.Color(0xfcf9cc), emissiveIntensity: 0.3 });
 
-        this.lamp.lampShellMaterial = this.lampShellMaterial;
-        this.lamp.lampInsideMaterial = this.lampInsideMaterial;
-        this.lamp.lampSupportMaterial = this.blackMetalMaterial;
+        this.lamp1.lampShellMaterial = this.lampShellMaterial;
+        this.lamp1.lampInsideMaterial = this.lampInsideMaterial;
+        this.lamp1.lampSupportMaterial = this.blackMetalMaterial;
+
+        this.lamp2.lampShellMaterial = this.lampShellMaterial;
+        this.lamp2.lampInsideMaterial = this.lampInsideMaterial;
+        this.lamp2.lampSupportMaterial = this.blackMetalMaterial;
     }
 
     initDoorTextures(){

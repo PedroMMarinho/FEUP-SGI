@@ -71,7 +71,7 @@ class WindowFrame extends THREE.Object3D {
             depth: this.frameThickness / 6,
             bevelEnabled: true,
             bevelThickness: this.frameThickness / 8,
-            bevelSize: 0.18,
+            bevelSize: 0.40,
             bevelOffset: -0.15,
             bevelSegments: 1
         };
