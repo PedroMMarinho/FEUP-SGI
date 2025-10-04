@@ -28,10 +28,35 @@ class MyContents {
 
         const roomDimensions = this.room.getRoomDimensions();
         this.axis = new MyAxis(this);
-		this.cowboyChair = new CowboyChair(7, 2, 5); 
         this.pokerTable = new PokerTable(0, 0, -roomDimensions.depth / 4, -Math.PI / 2);
+
+        this.pokerChair1 = new CowboyChair(0,0,0);
+        this.pokerChair1.position.set(-roomDimensions.width / 2 * 0.4, this.pokerChair1.legHeight, -roomDimensions.depth / 4 - this.pokerTable.tableRadiusZ / 2 - this.pokerChair1.xxLength / 2 );
+        this.pokerChair1.rotation.y = - 4 * Math.PI / 6;
+        this.pokerChair2 = new CowboyChair(0,0,0);
+        this.pokerChair2.position.set(roomDimensions.width / 2 * 0.4, this.pokerChair2.legHeight, -roomDimensions.depth / 4 + this.pokerTable.tableRadiusZ / 2 +this.pokerChair2.xxLength / 2);
+        this.pokerChair2.rotation.y = 2* Math.PI / 6;
+        this.pokerChair3 = new CowboyChair(0,0,0);
+        this.pokerChair3.position.set(- roomDimensions.width / 2 * 0.4, this.pokerChair3.legHeight, -roomDimensions.depth / 4 + this.pokerTable.tableRadiusZ / 2 + this.pokerChair3.xxLength / 2 );
+        this.pokerChair3.rotation.y = -2 * Math.PI / 6;
+        this.pokerChair4 = new CowboyChair(0,0,0);
+        this.pokerChair4.position.set(roomDimensions.width / 2 * 0.4, this.pokerChair4.legHeight, -roomDimensions.depth / 4 - this.pokerTable.tableRadiusZ / 2 - this.pokerChair4.xxLength  / 2);
+        this.pokerChair4.rotation.y = 4 * Math.PI / 6;
+
         this.cardDeck = new CardDeck();
         this.blackJackTable = new BlackJackTable(roomDimensions.width / 2 *0.7, 0, roomDimensions.depth / 2 * 0.6, Math.PI / 2);
+
+        this.blackJackChair1 = new CowboyChair(0,0,0);
+        this.blackJackChair1.position.set(roomDimensions.width / 2 * 0.35, this.blackJackChair1.legHeight, roomDimensions.depth / 2 * 0.75);
+        this.blackJackChair1.rotation.y = -Math.PI / 6;
+        this.blackJackChair2 = new CowboyChair(0,0,0);
+        this.blackJackChair2.position.set(roomDimensions.width / 2 * 0.3, this.blackJackChair2.legHeight, roomDimensions.depth / 2 * 0.45);
+        this.blackJackChair2.rotation.y = -4* Math.PI / 6;
+        this.blackJackChair3 = new CowboyChair(0,0,0);
+        this.blackJackChair3.position.set(roomDimensions.width / 2 * 0.8, this.blackJackChair3.legHeight, roomDimensions.depth / 2 * 0.6);
+        this.blackJackChair3.rotation.y = 3* Math.PI / 6;
+        
+
         
 
 
@@ -153,7 +178,11 @@ class MyContents {
         this.app.scene.add(this.room);
         
         this.app.scene.add(this.pokerTable);
-		this.app.scene.add(this.cowboyChair);
+
+        this.app.scene.add(this.pokerChair1);
+        this.app.scene.add(this.pokerChair2);
+        this.app.scene.add(this.pokerChair3);
+        this.app.scene.add(this.pokerChair4);
 
 
         // Adding to poker table so when moving they stay on top of it
@@ -179,6 +208,10 @@ class MyContents {
         // BlackJack Table
         this.app.scene.add(this.blackJackTable);
 
+        this.app.scene.add(this.blackJackChair1);
+        this.app.scene.add(this.blackJackChair2);
+        this.app.scene.add(this.blackJackChair3);
+
         this.blackJackTable.add(this.dealerCard1);
         this.blackJackTable.add(this.dealerCard2);
         this.blackJackTable.add(this.blackJackPlayer1Card1);
@@ -194,6 +227,8 @@ class MyContents {
         this.app.scene.add(this.slotChair1);
         this.app.scene.add(this.slotChair2);
         this.app.scene.add(this.slotChair3);
+
+
 
 
         for(let i = 0; i < this.windowFrames.length; i++) {
@@ -269,16 +304,24 @@ class MyContents {
 
     }
     initChairTextures(){
+        this.pokerChair1.chairMaterial = this.pokerRestMaterial;
+        this.pokerChair2.chairMaterial = this.pokerRestMaterial;
+        this.pokerChair3.chairMaterial = this.pokerRestMaterial;
+        this.pokerChair4.chairMaterial = this.pokerRestMaterial;
         this.slotChair1.chairMaterial = this.pokerRestMaterial;
         this.slotChair2.chairMaterial = this.pokerRestMaterial;
         this.slotChair3.chairMaterial = this.pokerRestMaterial;
-        this.cowboyChair.chairMaterial = this.pokerRestMaterial;
+        this.blackJackChair1.chairMaterial = this.pokerRestMaterial;
+        this.blackJackChair2.chairMaterial = this.pokerRestMaterial;
+        this.blackJackChair3.chairMaterial = this.pokerRestMaterial;
     }
 
     buildObjects() {
         this.pokerTable.build();
-		this.cowboyChair.build();
-        //this.pokerChip.build();
+        this.pokerChair1.build();   
+        this.pokerChair2.build();
+        this.pokerChair3.build();
+        this.pokerChair4.build();
         this.buildChips();
         this.blackJackTable.build()
         this.lamp1.build();
@@ -291,6 +334,9 @@ class MyContents {
         this.slotChair1.build();
         this.slotChair2.build();
         this.slotChair3.build();
+        this.blackJackChair1.build();
+        this.blackJackChair2.build();
+        this.blackJackChair3.build();
 
         for(let i = 0; i < this.windowFrames.length; i++) {
             this.windowFrames[i].build();
