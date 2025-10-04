@@ -31,7 +31,7 @@ class MyContents {
 		this.cowboyChair = new CowboyChair(7, 2, 5); 
         this.pokerTable = new PokerTable(0, 0, -roomDimensions.depth / 4, -Math.PI / 2);
         this.cardDeck = new CardDeck();
-        this.blackJackTable = new BlackJackTable(0, 0, 0);
+        this.blackJackTable = new BlackJackTable(roomDimensions.width / 2 *0.7, 0, roomDimensions.depth / 2 * 0.6, Math.PI / 2);
         
 
 
@@ -57,6 +57,18 @@ class MyContents {
         this.slotMachine3 = new SlotMachine(0, 0, 0);
         this.slotMachine3.position.set(-roomDimensions.width / 2  + this.slotMachine3.machineWidth / 2, this.slotMachine3.machineHeight / 2, roomDimensions.depth * 0.25);
         this.slotMachine3.rotation.y = Math.PI / 2;
+
+        this.slotChair1 = new CowboyChair(0,0,0);
+        this.slotChair1.position.set(- roomDimensions.width / 2 + this.slotMachine.machineDepth * 2 + this.slotChair1.xxLength / 2, this.slotChair1.legHeight, roomDimensions.depth * 0.45);
+        this.slotChair1.rotation.y = Math.PI / 2;
+        this.slotChair2 = new CowboyChair(0,0,0);
+        this.slotChair2.position.set(- roomDimensions.width / 2 + this.slotMachine2.machineDepth* 2 + this.slotChair2.xxLength / 2, this.slotChair2.legHeight, roomDimensions.depth * 0.35);
+        this.slotChair2.rotation.y = Math.PI / 2;
+        this.slotChair3 = new CowboyChair(0,0,0);
+        this.slotChair3.position.set(- roomDimensions.width / 2 + this.slotMachine3.machineDepth* 2 + this.slotChair3.xxLength / 2, this.slotChair3.legHeight, roomDimensions.depth * 0.25);
+        console.log(this.slotChair3.position)
+        this.slotChair3.rotation.y = Math.PI / 2;
+
 
         this.door = new Door(-roomDimensions.width / 2 + 0.1 , 0, - roomDimensions.depth / 2 * 0.7, - Math.PI / 2);
 
@@ -179,6 +191,11 @@ class MyContents {
         this.app.scene.add(this.slotMachine2);
         this.app.scene.add(this.slotMachine3);
 
+        this.app.scene.add(this.slotChair1);
+        this.app.scene.add(this.slotChair2);
+        this.app.scene.add(this.slotChair3);
+
+
         for(let i = 0; i < this.windowFrames.length; i++) {
             console.log(this.windowFrames[i]);
             this.app.scene.add(this.windowFrames[i]);
@@ -250,7 +267,12 @@ class MyContents {
         this.pokerTable.pokerRestMaterial = this.pokerRestMaterial
         this.pokerTable.pokerLegMaterial = this.pokerRestMaterial
 
-		this.cowboyChair.chairMaterial = this.pokerRestMaterial;
+    }
+    initChairTextures(){
+        this.slotChair1.chairMaterial = this.pokerRestMaterial;
+        this.slotChair2.chairMaterial = this.pokerRestMaterial;
+        this.slotChair3.chairMaterial = this.pokerRestMaterial;
+        this.cowboyChair.chairMaterial = this.pokerRestMaterial;
     }
 
     buildObjects() {
@@ -266,6 +288,9 @@ class MyContents {
         this.slotMachine.build();
         this.slotMachine2.build();
         this.slotMachine3.build();
+        this.slotChair1.build();
+        this.slotChair2.build();
+        this.slotChair3.build();
 
         for(let i = 0; i < this.windowFrames.length; i++) {
             this.windowFrames[i].build();
@@ -547,6 +572,7 @@ class MyContents {
         this.initDoorTextures();
         this.initSlotMachineTextures();
         this.initWindowTextures();
+        this.initChairTextures();
     }
     initLampTextures(){
         this.lampShellTexture = new THREE.TextureLoader().load('textures/outerLamp.jpeg');
@@ -597,7 +623,7 @@ class MyContents {
 
     
     buildChips(){
-
+        // poker chips
         // player 1
         this.p1Tower1 = this.pokerChipHelper.createTower(1.5, this.pokerTable.getTableBase(), 2.8, PokerChipValue.TWENTY_FIVE, 30, Math.PI / 4);
         this.p1Tower2 = this.pokerChipHelper.createTower(1.6, this.pokerTable.getTableBase(), 2.6, PokerChipValue.ONE_HUNDRED, 10, Math.PI / 4 * 3);
@@ -612,13 +638,34 @@ class MyContents {
         this.p3Tower1 = this.pokerChipHelper.createTower(-1.5, this.pokerTable.getTableBase(), -2.5, PokerChipValue.FIFTY, 60, Math.PI / 3);
         this.p3Tower2 = this.pokerChipHelper.createTower(-1.6, this.pokerTable.getTableBase(), -2.7, PokerChipValue.ONE_HUNDRED, 30, Math.PI / 3 * 2);
         // player 4
-        this.p4Tower1 = this.pokerChipHelper.createTower(-1.5, this.pokerTable.getTableBase(), 2.6, PokerChipValue.FIFTY, 10, Math.PI / 3);
-        this.p4Tower2 = this.pokerChipHelper.createTower(-1.55, this.pokerTable.getTableBase(), 2.85, PokerChipValue.ONE_HUNDRED, 5, Math.PI / 3 * 2);
-        this.p4Tower3 = this.pokerChipHelper.createTower(-1.35, this.pokerTable.getTableBase(), 2.7, PokerChipValue.FIVE_HUNDRED, 2, Math.PI / 3 * 3);
-        this.p4Tower4 = this.pokerChipHelper.createTower(-1.7, this.pokerTable.getTableBase(), 2.7, PokerChipValue.TWENTY_FIVE, 20, Math.PI / 3 * 4);
+        this.p4Tower1 = this.pokerChipHelper.createTower(-1.5, this.pokerTable.getTableBase(), 2.6, PokerChipValue.FIFTY, 10, Math.PI/3);
+        this.p4Tower2 = this.pokerChipHelper.createTower(-1.55, this.pokerTable.getTableBase(), 2.85, PokerChipValue.ONE_HUNDRED, 5, Math.PI/3*2);
+        this.p4Tower3 = this.pokerChipHelper.createTower(-1.35, this.pokerTable.getTableBase(), 2.7, PokerChipValue.FIVE_HUNDRED, 2, Math.PI/3*3);
+        this.p4Tower4 = this.pokerChipHelper.createTower(-1.7, this.pokerTable.getTableBase(), 2.7, PokerChipValue.TWENTY_FIVE, 20, Math.PI/3*4);
+
+        // black jack table
+        this.p1Tower1 = this.pokerChipHelper.createTower(-2.5,this.blackJackTable.getTableBase(),-2.7,PokerChipValue.TWENTY_FIVE,20, Math.PI/4);
+        this.p1Tower2 = this.pokerChipHelper.createTower(-2.5,this.blackJackTable.getTableBase(),-2.5,PokerChipValue.ONE_HUNDRED,40, Math.PI/4*3);
+        this.p1Tower3 = this.pokerChipHelper.createTower(-2.3,this.blackJackTable.getTableBase(),-2.7,PokerChipValue.FIFTY,24);
+        this.singleChip3 = this.pokerChipHelper.createSingle(-1.70,this.blackJackTable.getTableBase() + 0.05,-3.1,PokerChipValue.FIFTY, Math.PI);
+        this.singleChip3.rotateOnAxis(new THREE.Vector3(1,0,-1), Math.PI/12);
+        this.singleChip4 = this.pokerChipHelper.createSingle(-1.65,this.blackJackTable.getTableBase() + 0.05,-3.0,PokerChipValue.ONE_HUNDRED, Math.PI);
+        
+
+        this.p2Tower1 = this.pokerChipHelper.createTower(2.2,this.blackJackTable.getTableBase(),-2.5,PokerChipValue.TWENTY_FIVE,16, Math.PI/4);
+        this.p2Tower2 = this.pokerChipHelper.createTower(2.4,this.blackJackTable.getTableBase(),-2.7,PokerChipValue.FIFTY,8, Math.PI/4*3);
+        this.p2Tower3 = this.pokerChipHelper.createTower(2.2,this.blackJackTable.getTableBase(),-2.7,PokerChipValue.ONE_HUNDRED,4);
+        this.p2Tower4 = this.pokerChipHelper.createTower(1.5,this.blackJackTable.getTableBase(),-2.9,PokerChipValue.FIVE_HUNDRED,30);
+        this.p2Tower5 = this.pokerChipHelper.createTower(1.7,this.blackJackTable.getTableBase(),-3.05,PokerChipValue.ONE_HUNDRED,10);
+        this.singleChip2 = this.pokerChipHelper.createSingle(1.6,this.blackJackTable.getTableBase() + 0.05,-3.15,PokerChipValue.ONE_HUNDRED, Math.PI);
+        this.singleChip2.rotateOnAxis(new THREE.Vector3(1,0,-1), Math.PI/6);
+
+
     }
 
-    initChips() {
+    initChips(){
+
+        // poker chips  
         // player 1
         this.pokerTable.add(this.p1Tower1);
         this.pokerTable.add(this.p1Tower2);
@@ -636,6 +683,21 @@ class MyContents {
         this.pokerTable.add(this.p4Tower2);
         this.pokerTable.add(this.p4Tower3);
         this.pokerTable.add(this.p4Tower4);
+
+        // black jack table
+        this.blackJackTable.add(this.p1Tower1);
+        this.blackJackTable.add(this.p1Tower2);
+        this.blackJackTable.add(this.p1Tower3);
+        this.blackJackTable.add(this.singleChip3);
+        this.blackJackTable.add(this.singleChip4);
+        
+        this.blackJackTable.add(this.p2Tower1);
+        this.blackJackTable.add(this.p2Tower2);
+        this.blackJackTable.add(this.p2Tower3);   
+        this.blackJackTable.add(this.p2Tower4);
+        this.blackJackTable.add(this.p2Tower5);
+        this.blackJackTable.add(this.singleChip2);
+
     }
 
 
