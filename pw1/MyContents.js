@@ -10,6 +10,7 @@ import { Lamp } from './objects/Lamp.js';
 import { Door } from './objects/Door.js';
 import { WindowFrame } from './objects/WindowFrame.js';
 import { SlotMachine } from './objects/SlotMachine.js';
+import { CowboyChair } from './objects/CowboyChair.js';
 
 /**
  *  This class contains the contents of out application
@@ -23,6 +24,7 @@ class MyContents {
     constructor(app) {
         this.app = app
         this.axis = new MyAxis(this);
+		this.cowboyChair = new CowboyChair(7, 2, 5); 
         this.pokerTable = new PokerTable(0, 0, 0);
         this.cardDeck = new CardDeck();
         this.blackJackTable = new BlackJackTable(0, 0, 0);
@@ -108,6 +110,7 @@ class MyContents {
         this.app.scene.add(this.room);
         
         //this.app.scene.add(this.pokerTable);
+		this.app.scene.add(this.cowboyChair);
 
 
         // Adding to poker table so when moving they stay on top of it
@@ -152,6 +155,8 @@ class MyContents {
        //this.app.scene.add(this.door);
        //this.app.scene.add(this.windowFrame);   
 
+    	//this.app.scene.add(this.pokerChip);
+        //this.app.scene.add(this.card1);
     }
 
     initLights() {
@@ -207,10 +212,14 @@ class MyContents {
         this.pokerTable.pokerTableMaterial = this.pokerMaterial
         this.pokerTable.pokerRestMaterial = this.pokerRestMaterial
         this.pokerTable.pokerLegMaterial = this.pokerRestMaterial
+
+		this.cowboyChair.chairMaterial = this.pokerRestMaterial;
     }
 
     buildObjects() {
         this.pokerTable.build();
+		this.cowboyChair.build();
+        //this.pokerChip.build();
         this.buildChips();
         this.blackJackTable.build()
         this.lamp.build();
@@ -487,7 +496,6 @@ class MyContents {
         this.slotMachine3.slotGoldMaterial = this.slotMachineGoldMaterial;
         this.slotMachine3.slotMachineBodyMaterial = this.slotMachineBodyMaterial;
         this.slotMachine3.slotMachineMetalMaterial = this.slotMachineMetalMaterial;
-
     }
 
     initTextures() {
@@ -560,8 +568,6 @@ class MyContents {
         this.p4Tower2 = this.pokerChipHelper.createTower(-1.55, this.pokerTable.getTableBase(), 2.85, PokerChipValue.ONE_HUNDRED, 5, Math.PI / 3 * 2);
         this.p4Tower3 = this.pokerChipHelper.createTower(-1.35, this.pokerTable.getTableBase(), 2.7, PokerChipValue.FIVE_HUNDRED, 2, Math.PI / 3 * 3);
         this.p4Tower4 = this.pokerChipHelper.createTower(-1.7, this.pokerTable.getTableBase(), 2.7, PokerChipValue.TWENTY_FIVE, 20, Math.PI / 3 * 4);
-
-
     }
 
     initChips() {
