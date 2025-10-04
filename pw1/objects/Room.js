@@ -67,6 +67,7 @@ class Room extends THREE.Object3D {
         wall3.position.y = this.roomHeight / 2;
         this.add(wall3);
 
+
         const windowWall = new THREE.Shape();
         windowWall.moveTo(-this.roomDepth / 2, -this.roomHeight / 2);
         windowWall.lineTo(this.roomDepth / 2, -this.roomHeight / 2);
@@ -74,17 +75,21 @@ class Room extends THREE.Object3D {
         windowWall.lineTo(-this.roomDepth / 2, this.roomHeight / 2);
         windowWall.lineTo(-this.roomDepth / 2, -this.roomHeight / 2);
 
-        const windowHole = new THREE.Path();
-
-        const startX = -this.roomWidth / 2 + this.roomWidth * this.windowXPos - this.windowWidth / 2;
+        // Calculate positions for 3 symmetric windows
+        const numWindows = 3;
+        const spacing = (this.roomDepth - numWindows * this.windowWidth) / (numWindows + 1);
         const startY = -this.roomHeight / 2 + this.roomHeight * this.windowYPos - this.windowHeight / 2;
 
-        windowHole.moveTo(startX, startY);
-        windowHole.lineTo(startX + this.windowWidth, startY);
-        windowHole.lineTo(startX + this.windowWidth, startY + this.windowHeight);
-        windowHole.lineTo(startX, startY + this.windowHeight);
-        windowHole.lineTo(startX, startY);
-        windowWall.holes.push(windowHole);
+        for (let i = 0; i < numWindows; i++) {
+            const windowX = -this.roomDepth / 2 + spacing * (i + 1) + this.windowWidth * i;
+            const windowHole = new THREE.Path();
+            windowHole.moveTo(windowX, startY);
+            windowHole.lineTo(windowX + this.windowWidth, startY);
+            windowHole.lineTo(windowX + this.windowWidth, startY + this.windowHeight);
+            windowHole.lineTo(windowX, startY + this.windowHeight);
+            windowHole.lineTo(windowX, startY);
+            windowWall.holes.push(windowHole);
+        }
 
         const wallGeometryWithWindow = new THREE.ShapeGeometry(windowWall);
         wallGeometryWithWindow.computeBoundingBox();
@@ -113,7 +118,7 @@ class Room extends THREE.Object3D {
         wallWithWindow.position.y = this.roomHeight / 2;
         this.add(wallWithWindow);
 
-    }
+    }   
 }
 
 export { Room };
