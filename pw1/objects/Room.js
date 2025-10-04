@@ -119,6 +119,30 @@ class Room extends THREE.Object3D {
         this.add(wallWithWindow);
 
     }   
+
+    getRoomDimensions() {
+        return {
+            width: this.roomWidth,
+            height: this.roomHeight,
+            depth: this.roomDepth
+        };
+    }
+    getWindowPositions() {
+        const windowPositions = [];
+        const numWindows = 3;
+        const spacing = (this.roomDepth - numWindows * this.windowWidth) / (numWindows + 1);
+        const startY =  this.roomHeight * this.windowYPos - this.windowHeight / 2;
+
+        for (let i = 0; i < numWindows; i++) {
+            const windowX = -this.roomDepth / 2 + spacing * (i + 1) + this.windowWidth * i;
+            windowPositions.push({
+                x: this.roomWidth / 2,
+                y: startY,
+                z: windowX + this.windowWidth / 2
+            });
+        }
+        return windowPositions;
+    }
 }
 
 export { Room };

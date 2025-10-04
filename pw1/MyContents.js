@@ -33,6 +33,23 @@ class MyContents {
         this.slotMachine = new SlotMachine(4, 0, 0);
         this.slotMachine2 = new SlotMachine(0, 4, 0);
         this.slotMachine3 = new SlotMachine(-4, 0, 0);
+            
+
+        this.windowFrames = [];
+        const windowPositions = this.room.getWindowPositions();
+        console.log(windowPositions);
+
+        for(let i = 0; i < windowPositions.length; i++) {
+            const pos = windowPositions[i];
+            const windowFrame = new WindowFrame(0, 0, 0, - Math.PI / 2);
+            console.log(pos.z)
+            windowFrame.position.set(pos.x, pos.y , pos.z);
+            console.log(windowFrame.position);
+            this.windowFrames.push(windowFrame);
+            console.log(this.windowFrames[i]);
+        }
+
+
 
         
         // Create royal flush cards 
@@ -148,6 +165,11 @@ class MyContents {
         this.app.scene.add(this.slotMachine2);
         this.app.scene.add(this.slotMachine3);
 
+        for(let i = 0; i < this.windowFrames.length; i++) {
+            console.log(this.windowFrames[i]);
+            this.app.scene.add(this.windowFrames[i]);
+        }
+
         this.initChips();
         
        //this.lamp.position.set(0,5,0);
@@ -228,8 +250,11 @@ class MyContents {
         this.slotMachine.build();
         this.slotMachine2.build();
         this.slotMachine3.build();
-    }
 
+        for(let i = 0; i < this.windowFrames.length; i++) {
+            this.windowFrames[i].build();
+        }
+    }
     initBlackJackTextures() {
         this.blackJack = new THREE.TextureLoader().load('textures/blackJack2.png');
         this.blackJack.wrapS = THREE.RepeatWrapping;
@@ -543,8 +568,10 @@ class MyContents {
         this.windowFrameMaterial = this.pokerRestMaterial;
         this.windowGlassMaterial = new THREE.MeshPhongMaterial({ color: 0xAAAAFF, side: THREE.DoubleSide,
             shininess: 100,   specular: new THREE.Color(0xFFFFFF), reflectivity: 1, opacity: 0.5, transparent: true });
-        this.windowFrame.frameMaterial = this.windowFrameMaterial;
-        this.windowFrame.windowMaterial = this.windowGlassMaterial;
+        for(let i = 0; i < this.windowFrames.length; i++) {
+            this.windowFrames[i].frameMaterial = this.windowFrameMaterial;
+            this.windowFrames[i].windowMaterial = this.windowGlassMaterial;
+        }
     }
 
     
