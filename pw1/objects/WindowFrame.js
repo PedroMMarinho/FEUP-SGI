@@ -78,7 +78,6 @@ class WindowFrame extends THREE.Object3D {
         const windowGeometry = new THREE.ExtrudeGeometry( window, extrudeSettings );
         const windowMesh1 = new THREE.Mesh( windowGeometry, this.windowMaterial );
         this.add( windowMesh1 );
-        this.position.z = this.frameThickness / 4;
         const windowMesh2 = new THREE.Mesh( windowGeometry, this.windowMaterial );
         this.add( windowMesh2 );
         windowMesh2.position.x = this.frameWidth/2 - this.frameThickness / 2;
