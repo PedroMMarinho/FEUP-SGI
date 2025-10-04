@@ -19,11 +19,11 @@ class WindowFrame extends THREE.Object3D {
 
     initConstants() {
         
-        this.frameWidth = 3;
-        this.frameHeight = 2;
-        this.frameThickness = 0.1;
-        this.sillThickness = 0.2;
-        this.sillDepth = 0.3;
+        this.frameWidth = 8;
+        this.frameHeight =5;
+        this.frameThickness = 0.3;
+        this.sillThickness = 0.5;
+        this.sillDepth = 1;
     }
 
     build() {
