@@ -89,7 +89,7 @@ class MyContents {
         this.slotChair2.rotation.y = Math.PI / 2;
         this.slotChair3 = new CowboyChair(0,0,0);
         this.slotChair3.position.set(- roomDimensions.width / 2 + this.slotMachine3.machineDepth* 2 + this.slotChair3.xxLength / 2, this.slotChair3.legHeight, roomDimensions.depth * 0.25);
-        console.log(this.slotChair3.position)
+        //console.log(this.slotChair3.position)
         this.slotChair3.rotation.y = Math.PI / 2;
 
 
@@ -258,7 +258,7 @@ class MyContents {
 
 
         for(let i = 0; i < this.windowFrames.length; i++) {
-            console.log(this.windowFrames[i]);
+            //console.log(this.windowFrames[i]);
             this.app.scene.add(this.windowFrames[i]);
         }
 
@@ -740,8 +740,15 @@ class MyContents {
     }
 
 	initPhotoFrameTextures() {
+        this.photoFrameTexture = new THREE.TextureLoader().load('textures/casinoWantedPoster.png');
+
+        this.photoFrameMaterial = new THREE.MeshPhongMaterial({
+            map: this.photoFrameTexture,
+            color: 0xffffff, shininess: 10, specular: new THREE.Color(0x555555),
+        });
+
 		this.photoFrame.frameMaterial = this.pokerRestMaterial;
-		//TODO: this.photoFrame.photoTexture = 
+		this.photoFrame.photoTexture = this.photoFrameMaterial;
 	}
 
     
