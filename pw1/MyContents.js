@@ -98,10 +98,9 @@ class MyContents {
         this.lamp1 = new Lamp(0, 3*roomDimensions.height / 4, roomDimensions.depth / 4);
         this.lamp2 = new Lamp(0, 3*roomDimensions.height / 4, -roomDimensions.depth / 4);
 
+       	this.lamp1Power = 50;
+		this.lamp2Power = 50;
 
-
-
-        
         // Create royal flush cards 
         this.card1 = this.cardDeck.create_card('D_S', 0, this.pokerTable.getTableBase() + PokerCard.DEPTH / 2, 0, true);
         this.card1.rotateOnAxis(new THREE.Vector3(0, 0, 1), Math.PI / 2);
@@ -844,6 +843,18 @@ class MyContents {
         this.newWallTexture.repeat.set(this.wallParams.repeatS, value);
         this.newWallTexture.needsUpdate = true;
     }
+
+	updateLamp1Power(value) {
+		this.lamp1.spotLight.power = value;
+		this.lamp1.pointLight.power = value * 0.6;
+		// this.lamp1.needsUpdate = true;
+	}
+
+	updateLamp2Power(value) {
+		this.lamp2.spotLight.power = value;
+		this.lamp2.pointLight.power = value * 0.6;
+		// this.lamp2.needsUpdate = true;
+	}
 
     /**
      * updates the contents
