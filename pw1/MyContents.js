@@ -11,6 +11,7 @@ import { Door } from './objects/Door.js';
 import { WindowFrame } from './objects/WindowFrame.js';
 import { SlotMachine } from './objects/SlotMachine.js';
 import { CowboyChair } from './objects/CowboyChair.js';
+import { PhotoFrame } from './objects/PhotoFrame.js';
 
 /**
  *  This class contains the contents of out application
@@ -57,10 +58,7 @@ class MyContents {
         this.blackJackChair3.rotation.y = 3* Math.PI / 6;
         
 
-        
-
-
-        
+       	this.photoFrame = new PhotoFrame(0, 8, -19.7);
             
 
         this.windowFrames = [];
@@ -256,6 +254,7 @@ class MyContents {
         this.app.scene.add(this.slotChair3);
 
 
+		this.app.scene.add(this.photoFrame);
 
 
         for(let i = 0; i < this.windowFrames.length; i++) {
@@ -407,6 +406,8 @@ class MyContents {
         this.blackJackChair1.build();
         this.blackJackChair2.build();
         this.blackJackChair3.build();
+
+		this.photoFrame.build();
 
         for(let i = 0; i < this.windowFrames.length; i++) {
             this.windowFrames[i].build();
@@ -689,6 +690,7 @@ class MyContents {
         this.initSlotMachineTextures();
         this.initWindowTextures();
         this.initChairTextures();
+		this.initPhotoFrameTextures();
     }
     initLampTextures(){
         this.lampShellTexture = new THREE.TextureLoader().load('textures/outerLamp.jpeg');
@@ -736,6 +738,11 @@ class MyContents {
             this.windowFrames[i].windowMaterial = this.windowGlassMaterial;
         }
     }
+
+	initPhotoFrameTextures() {
+		this.photoFrame.frameMaterial = this.pokerRestMaterial;
+		//TODO: this.photoFrame.photoTexture = 
+	}
 
     
     buildChips(){
