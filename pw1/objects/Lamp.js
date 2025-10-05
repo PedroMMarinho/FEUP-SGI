@@ -57,7 +57,7 @@ class Lamp extends THREE.Object3D {
         this.add(lowerSupport2);
         // shell of the lamp
         const shellTopGeometry = new THREE.BoxGeometry(this.shellTopWidth, this.shellThickness, this.shellTopDepth);
-        console.log(this.lampShellMaterial)
+        //console.log(this.lampShellMaterial)
         const shellTop = new THREE.Mesh(shellTopGeometry, this.lampShellMaterial);
 
         this.add(shellTop);

@@ -58,8 +58,8 @@ class Door extends THREE.Object3D {
         frame4.position.z = this.doorDepth / 2;
         this.add(frame4);
 
-        console.log(this.doorMaterial)
-        console.log(this.doorFrameMaterial)
+        //console.log(this.doorMaterial)
+        //console.log(this.doorFrameMaterial)
 
 
         

@@ -30,7 +30,7 @@ export class MyBowlOfSoup extends THREE.Object3D  {
         const soupMesh = new THREE.Mesh(soup, soupMaterial);
         soupMesh.rotation.x = Math.PI / 2;
         soupMesh.position.y = soupHeight;
-        console.log(soupMesh.position.y );
+        //console.log(soupMesh.position.y );
         this.add(soupMesh);
     }
 
