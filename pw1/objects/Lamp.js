@@ -28,10 +28,13 @@ class Lamp extends THREE.Object3D {
         // Support dimensions
         this.upperSupportRadius = 0.05;
         this.lowerSupportRadius = 0.1;
-        this.supportHeight = 4;
+        this.supportHeight = 4;	
 
-        // Light constants
-
+        // Light constants and placeholders
+		this.spotLight = null;
+		this.pointLight = null;
+		this.spotPower = 50;
+		this.pointPower = 30;
 
     }
 
@@ -87,33 +90,38 @@ class Lamp extends THREE.Object3D {
         this.add(shellInside);
 
         // SpotLight
-        const spotLight = new THREE.SpotLight(0x7F7F00, 1);
-        spotLight.position.set(0, - this.shellThickness - 0.20, 0);
-        spotLight.angle = Math.PI / 4  ;
-        spotLight.power = 50;
-        spotLight.penumbra = 0.1;
-        spotLight.decay = 1;
-        spotLight.distance = 50;
-        spotLight.castShadow = true;
-        spotLight.shadow.mapSize.width = 512;
-        spotLight.shadow.mapSize.height = 512;
-        spotLight.shadow.camera.near = 0.5;
-        spotLight.shadow.camera.far = 50;
+        this.spotLight = new THREE.SpotLight(0x7F7F00, 1);
+        this.spotLight.position.set(0, - this.shellThickness - 0.20, 0);
+        this.spotLight.angle = Math.PI / 4  ;
+        this.spotLight.power = this.spotPower;
+        this.spotLight.penumbra = 0.1;
+        this.spotLight.decay = 1;
+        this.spotLight.distance = 50;
+        this.spotLight.castShadow = true;
+        this.spotLight.shadow.mapSize.width = 512;
+        this.spotLight.shadow.mapSize.height = 512;
+        this.spotLight.shadow.camera.near = 0.5;
+        this.spotLight.shadow.camera.far = 50;
         const target = new THREE.Object3D();
         target.position.set(0, -10, 0);
-        spotLight.target = target;
-        this.add(spotLight);
-        this.add(spotLight.target);
-        spotLight.target.updateMatrixWorld();
+        this.spotLight.target = target;
+        this.add(this.spotLight);
+        this.add(this.spotLight.target);
+        this.spotLight.target.updateMatrixWorld();
 
         // Inside light
-        const pointLight = new THREE.PointLight(0xFFFF00, 0.5, 10, 2);
-        pointLight.power = 30
-        pointLight.position.set(0, - this.shellThickness - 0.20, 0);
-        this.add(pointLight);
+        this.pointLight = new THREE.PointLight(0xFFFF00, 0.5, 10, 2);
+        this.pointLight.power = this.pointPower;
+        this.pointLight.position.set(0, - this.shellThickness - 0.20, 0);
+        this.add(this.pointLight);
 
 
     }
+
+	update() {
+		this.pointLight.power = this.pointPower;
+		this.spotLight = this.spotPower; 
+	}
 
 }
 

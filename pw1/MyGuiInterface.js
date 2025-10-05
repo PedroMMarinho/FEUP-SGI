@@ -72,8 +72,11 @@ class MyGuiInterface {
 
         // adds a folder to the gui interface for the camera
 */
-        const objectFolder = this.datgui.addFolder('Objects');
+        // const objectFolder = this.datgui.addFolder('Objects');
         const lightFolder = this.datgui.addFolder('Lights');
+		lightFolder.add(this.contents, 'lamp1Power', 0, 100).name("Light1 Power").onChange((value) => { this.contents.updateLamp1Power(value); });
+		lightFolder.add(this.contents, 'lamp1Power', 0, 100).name("Light2 Power").onChange((value) => { this.contents.updateLamp2Power(value); });
+
         const cameraFolder = this.datgui.addFolder('Camera')
 
         cameraFolder.add(this.app, 'activeCameraName', ['Perspective', 'Left', 'Top', 'Front', 'Back', 'Right', 'Perspective2']).name("active camera");
