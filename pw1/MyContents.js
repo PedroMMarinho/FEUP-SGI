@@ -82,7 +82,8 @@ class MyContents {
         this.slotMachine3.position.set(-roomDimensions.width / 2  + this.slotMachine3.machineWidth / 2, this.slotMachine3.machineHeight / 2, roomDimensions.depth * 0.25);
         this.slotMachine3.rotation.y = Math.PI / 2;
 
-		this.jukebox = new Jukebox(0, 2, 0);
+		this.jukebox = new Jukebox(-3, 2, -14);
+		this.jukebox.rotateY(Math.PI/2);
 
         this.slotChair1 = new CowboyChair(0,0,0);
         this.slotChair1.position.set(- roomDimensions.width / 2 + this.slotMachine.machineDepth * 2 + this.slotChair1.xxLength / 2, this.slotChair1.legHeight, roomDimensions.depth * 0.45);
@@ -687,6 +688,31 @@ class MyContents {
 
 	initJukeboxTextures() {
 		this.jukebox.woodMaterial = this.pokerRestMaterial;
+		this.jukeMainPanel = new THREE.TextureLoader().load('textures/mainpanel.jpg');
+        this.mainPanelMaterial = new THREE.MeshPhongMaterial({
+            map: this.jukeMainPanel,
+			transparent: true,
+            color: 0xffffff,
+            alphaTest: 0.2,
+            side: THREE.DoubleSide,
+        });
+		this.jukeDomePanel = new THREE.TextureLoader().load('textures/dome.png');
+		this.jukeDomePanel.wrapS = THREE.RepeatWrapping;
+        this.jukeDomePanel.wrapT = THREE.RepeatWrapping;
+
+        this.jukeDomePanel.repeat.set(1, 2);
+        this.jukeDomePanel.offset.set(0, 0.55);
+        this.jukeDomePanel.center.set(0.5, 0.5);
+
+        this.domePanelMaterial = new THREE.MeshPhongMaterial({
+            map: this.jukeDomePanel,
+			transparent: true,
+            color: 0xffffff,
+            alphaTest: 0.2,
+        });
+
+		this.jukebox.mainPanel = this.mainPanelMaterial;
+		this.jukebox.domePanel = this.domePanelMaterial;
 	}
 
     initTextures() {
