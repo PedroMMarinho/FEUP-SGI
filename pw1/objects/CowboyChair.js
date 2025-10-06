@@ -99,6 +99,13 @@ export class CowboyChair extends THREE.Object3D {
 		this.add(l_stickMesh);
 		this.add(r_stickMesh);
 		this.add(backRestMesh);
+
+		this.traverse( function ( child ) {
+			if ( child instanceof THREE.Mesh ) {
+				child.castShadow = true;
+				child.receiveShadow = true;
+			}
+		} );
 	}
 }
 

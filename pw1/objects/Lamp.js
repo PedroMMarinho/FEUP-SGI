@@ -92,7 +92,7 @@ class Lamp extends THREE.Object3D {
         // SpotLight
         this.spotLight = new THREE.SpotLight(0x7F7F00, 1);
         this.spotLight.position.set(0, - this.shellThickness - 0.20, 0);
-        this.spotLight.angle = Math.PI / 4  ;
+        this.spotLight.angle = Math.PI / 5  ;
         this.spotLight.power = this.spotPower;
         this.spotLight.penumbra = 0.1;
         this.spotLight.decay = 1;
