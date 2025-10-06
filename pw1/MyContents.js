@@ -12,6 +12,7 @@ import { WindowFrame } from './objects/WindowFrame.js';
 import { SlotMachine } from './objects/SlotMachine.js';
 import { CowboyChair } from './objects/CowboyChair.js';
 import { PhotoFrame } from './objects/PhotoFrame.js';
+import { Jukebox } from './objects/Jukebox.js';
 
 /**
  *  This class contains the contents of out application
@@ -80,6 +81,8 @@ class MyContents {
         this.slotMachine3 = new SlotMachine(0, 0, 0);
         this.slotMachine3.position.set(-roomDimensions.width / 2  + this.slotMachine3.machineWidth / 2, this.slotMachine3.machineHeight / 2, roomDimensions.depth * 0.25);
         this.slotMachine3.rotation.y = Math.PI / 2;
+
+		this.jukebox = new Jukebox(0, 2, 0);
 
         this.slotChair1 = new CowboyChair(0,0,0);
         this.slotChair1.position.set(- roomDimensions.width / 2 + this.slotMachine.machineDepth * 2 + this.slotChair1.xxLength / 2, this.slotChair1.legHeight, roomDimensions.depth * 0.45);
@@ -202,6 +205,7 @@ class MyContents {
         this.app.scene.add(this.room);
         
         this.app.scene.add(this.pokerTable);
+		this.app.scene.add(this.jukebox);
 
         this.app.scene.add(this.pokerChair1);
         this.app.scene.add(this.pokerChair2);
@@ -251,7 +255,6 @@ class MyContents {
         this.app.scene.add(this.slotChair1);
         this.app.scene.add(this.slotChair2);
         this.app.scene.add(this.slotChair3);
-
 
 		this.app.scene.add(this.photoFrame);
 
@@ -405,6 +408,8 @@ class MyContents {
         this.blackJackChair1.build();
         this.blackJackChair2.build();
         this.blackJackChair3.build();
+
+		this.jukebox.build();
 
 		this.photoFrame.build();
 
@@ -680,6 +685,10 @@ class MyContents {
         this.slotMachine3.slotMachineMetalMaterial = this.slotMachineMetalMaterial;
     }
 
+	initJukeboxTextures() {
+		this.jukebox.woodMaterial = this.pokerRestMaterial;
+	}
+
     initTextures() {
         // load textures
         this.initPokerTextures();
@@ -690,6 +699,7 @@ class MyContents {
         this.initWindowTextures();
         this.initChairTextures();
 		this.initPhotoFrameTextures();
+		this.initJukeboxTextures();
     }
     initLampTextures(){
         this.lampShellTexture = new THREE.TextureLoader().load('textures/outerLamp.jpeg');
