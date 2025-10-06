@@ -51,6 +51,10 @@ class MyApp  {
         this.renderer.setPixelRatio( window.devicePixelRatio );
         this.renderer.setClearColor("#000000");
 
+        this.renderer.shadowMap.enabled = true;
+        this.renderer.shadowMap.type = THREE.PCFSoftShadowMap; // or THREE.PCFShadowMap for sharper edges
+
+
         // Configure renderer size
         this.renderer.setSize( window.innerWidth, window.innerHeight );
 

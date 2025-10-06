@@ -38,6 +38,7 @@ class Room extends THREE.Object3D {
         const floor = new THREE.Mesh(floorGeometry, this.floorMaterial);
         floor.rotation.x = -Math.PI / 2;
         floor.position.y = 0;
+        floor.receiveShadow = true; // Enable shadow reception
         this.add(floor);
 
         // Roof
@@ -45,6 +46,7 @@ class Room extends THREE.Object3D {
         const roof = new THREE.Mesh(roofGeometry, this.roofMaterial);
         roof.rotation.x = Math.PI / 2;
         roof.position.y = this.roomHeight;
+        roof.castShadow = true; // Enable shadow casting
         this.add(roof);
 
         // Walls
@@ -116,6 +118,7 @@ class Room extends THREE.Object3D {
         wallWithWindow.rotation.y = -Math.PI / 2;
         wallWithWindow.position.x = this.roomWidth / 2;
         wallWithWindow.position.y = this.roomHeight / 2;
+        wallWithWindow.castShadow = true;
         this.add(wallWithWindow);
 
     }   

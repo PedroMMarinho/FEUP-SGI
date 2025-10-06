@@ -12,6 +12,7 @@ import { WindowFrame } from './objects/WindowFrame.js';
 import { SlotMachine } from './objects/SlotMachine.js';
 import { CowboyChair } from './objects/CowboyChair.js';
 import { PhotoFrame } from './objects/PhotoFrame.js';
+import { MoonSpotlight } from './objects/MoonSpotlight.js';
 
 /**
  *  This class contains the contents of out application
@@ -66,8 +67,7 @@ class MyContents {
 
         for(let i = 0; i < windowPositions.length; i++) {
             const pos = windowPositions[i];
-            const windowFrame = new WindowFrame(0, 0, 0, - Math.PI / 2);
-            windowFrame.position.set(pos.x, pos.y , pos.z);
+            const windowFrame = new WindowFrame(pos.x, pos.y, pos.z, - Math.PI / 2);
             this.windowFrames.push(windowFrame);
         }
 
@@ -193,6 +193,7 @@ class MyContents {
         this.blackJackPlayer2Card2 = this.cardDeck.create_card('A_S', 1.5, blackJackY + (PokerCard.DEPTH), -2.3, true);
         this.blackJackPlayer2Card2.rotateOnAxis(new THREE.Vector3(0, 0, 1), -Math.PI / 8);
 
+        this.moonSpotlight = new MoonSpotlight(roomDimensions.width*4, roomDimensions.height*8, 0);
 
         // Missing Poker Chips
     }
@@ -271,6 +272,8 @@ class MyContents {
 
     	//this.app.scene.add(this.pokerChip);
         //this.app.scene.add(this.card1);
+
+        this.app.scene.add(this.moonSpotlight);
     }
 
     initLights() {
@@ -743,11 +746,8 @@ class MyContents {
 
     initWindowTextures(){
         this.windowFrameMaterial = this.pokerRestMaterial;
-        this.windowGlassMaterial = new THREE.MeshPhongMaterial({ color: 0xAAAAFF, side: THREE.DoubleSide,
-            shininess: 100,   specular: new THREE.Color(0xFFFFFF), reflectivity: 1, opacity: 0.2, transparent: true });
         for(let i = 0; i < this.windowFrames.length; i++) {
             this.windowFrames[i].frameMaterial = this.windowFrameMaterial;
-            this.windowFrames[i].windowMaterial = this.windowGlassMaterial;
         }
     }
 
