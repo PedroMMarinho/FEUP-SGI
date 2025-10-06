@@ -23,12 +23,15 @@ export class Jukebox extends THREE.Object3D {
 			specular: "#822222"
 		});
 
-		this.chromeMat = new THREE.MeshStandardMaterial({
+		this.chromeMat = new THREE.MeshPhongMaterial({
   			color: "#00fa9a",
   			emissive: "#00fa9a",
-  			emissiveIntensity: 1,
-  			metalness: 0.7,
-  			roughness: 0.2
+  			emissiveIntensity: 0.5,
+  			shininess: 1,
+  			specular: "#ffffff"
+
+			
+			  			
 		});
 	}
 
