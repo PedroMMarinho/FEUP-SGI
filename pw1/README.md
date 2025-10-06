@@ -127,5 +127,5 @@ Yes — the helper correctly represented the spotlight’s position, angle, and 
 ##### Question 1
 
 
-Yes, I was able to see the changes in real time when switching between the different wrap modes. The only thing I had to keep in mind was setting the `needsUpdate` attribute of the texture object to `true` after changing its wrap mode. This forces Three.js to re-upload the texture parameters to the GPU, so the updates become visible immediately in the scene.
+Yes, we were able to see the changes in real time when switching between the different wrap modes. The only thing we had to keep in mind was setting the `needsUpdate` attribute of the texture object to `true` after changing its wrap mode. This forces Three.js to re-upload the texture parameters to the GPU, so the updates become visible immediately in the scene.
 

@@ -728,10 +728,23 @@ class MyContents {
         
     }
 
+    initPanorama(){
+        const panoramaTexture = new THREE.CubeTextureLoader().load([
+            'textures/night.png',
+            'textures/night.png',
+            'textures/night.png',
+            'textures/night.png',
+            'textures/night.png',
+            'textures/night.png'
+        ]);
+
+        this.app.scene.background = panoramaTexture;
+    }
+
     initWindowTextures(){
         this.windowFrameMaterial = this.pokerRestMaterial;
         this.windowGlassMaterial = new THREE.MeshPhongMaterial({ color: 0xAAAAFF, side: THREE.DoubleSide,
-            shininess: 100,   specular: new THREE.Color(0xFFFFFF), reflectivity: 1, opacity: 0.5, transparent: true });
+            shininess: 100,   specular: new THREE.Color(0xFFFFFF), reflectivity: 1, opacity: 0.2, transparent: true });
         for(let i = 0; i < this.windowFrames.length; i++) {
             this.windowFrames[i].frameMaterial = this.windowFrameMaterial;
             this.windowFrames[i].windowMaterial = this.windowGlassMaterial;
@@ -838,6 +851,7 @@ class MyContents {
         this.buildObjects();
         this.initLights();
         this.initObjects();
+        this.initPanorama();
     }
 
 
