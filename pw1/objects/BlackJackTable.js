@@ -99,6 +99,13 @@ class BlackJackTable extends THREE.Object3D {
     underFelt.rotation.x = -Math.PI / 2;
     underFelt.position.y = this.legHeight + this.tableThickness;
     this.add(underFelt);
+
+    this.traverse( function ( child ) {
+      if ( child instanceof THREE.Mesh ) {
+        child.castShadow = true;
+        child.receiveShadow = true;
+      }
+    } );
   }
 }
 

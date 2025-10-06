@@ -146,6 +146,13 @@ class PokerTable extends THREE.Object3D {
             leg.position.set(x, this.legHeight / 2, z);
             this.add(leg);
         });
+
+        this.traverse( function ( child ) {
+            if ( child instanceof THREE.Mesh ) {
+                child.castShadow = true;
+                child.receiveShadow = true;
+            } 
+        } );
     }
 
     getTableBase(){

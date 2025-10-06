@@ -27,12 +27,14 @@ class MoonSpotlight extends THREE.Object3D {
         spotlight.shadow.camera.far = 50;
 
         this.add(spotlight);
-
+        /* 
         const spotlightHelper = new THREE.SpotLightHelper(spotlight);
         this.add(spotlightHelper);
         spotlightHelper.updateMatrixWorld(true);
         spotlightHelper.update();
-
+        */
+        
+        
         const spotlightTarget = new THREE.Object3D();
         spotlightTarget.position.set(0, 0, 0);
         this.add(spotlightTarget);
