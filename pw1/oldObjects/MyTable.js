@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { MyApp } from './MyApp.js';
+import { MyApp } from '../MyApp.js';
 import { MyBowlOfSoup } from './MyBowlOfSoup.js';
 import { MyChair } from './MyChair.js';
 import { MySpoon } from './MySpoon.js';

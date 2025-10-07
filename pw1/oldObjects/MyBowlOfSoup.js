@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { MyApp } from './MyApp.js';
+import { MyApp } from '../MyApp.js';
 
 export class MyBowlOfSoup extends THREE.Object3D  {
 
