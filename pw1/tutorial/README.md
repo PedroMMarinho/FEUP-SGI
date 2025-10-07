@@ -76,6 +76,9 @@ This effect is illustrated below, where `kd​` and `ka` remain constant, and on
 
 ![alt text](../assets/shininess-effect.png)
 
+Plane with 100 shininess:
+
+![alt text](../assets/PW1-C-1.png)
 
 ##### Question 2
 
