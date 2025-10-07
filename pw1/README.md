@@ -33,24 +33,134 @@ Our project aims to develop a **THREE.js** scene inspired by a **vintage casino 
 
 ## Topics
 
-- [Requirements](#requirements)
-    - [Floor and Walls](#floor-and-walls)
-    - [Table](#table)
-    - [Plates](#plates)
-    - [Cake](#cake)
-    - [Candle](#candle)
-    - [Paintings, Window, and Door](#paintings-window-and-door)
-    - [Bettle's Painting](#bettle-painting)
-    - [Spotlight](#spolight)
-    - [Spring](#spring)
-    - [Newspaper](#newspaper)
-    - [Dog](#dog)
-    - [Cartoon Fire](#cartoon-fire)
-    - [Jar](#jar)
-    - [Flower](#flower)
-    - [Shadows](#shadows)
+- [SGI 2025/2026 - PW1](#sgi-20252026---pw1)
+  - [Group T06G04](#group-t06g04)
+  - [Tutorial](#tutorial)
+  - [Project Overview](#project-overview)
+  - [Topics](#topics)
+    - [Requirements](#requirements)
+      - [BlackJack Table](#blackjack-table)
+      - [Chair](#chair)
+      - [Door](#door)
+      - [Floor and Walls](#floor-and-walls)
+      - [JukeBox](#jukebox)
+      - [Lamp](#lamp)
+      - [Panorama and Windows](#panorama-and-windows)
+      - [Poker Table](#poker-table)
+      - [Shadows](#shadows)
+      - [SlotMachine](#slotmachine)
+
+---
 
 ### Requirements
 
+#### BlackJack Table
 
-![alt text](image.png)
+A classic blackjack table featuring a curved design with a green felt surface and a wooden border.
+
+<p align="center">
+    <img src="./assets/blackjack_table.png">
+    <p align="center">Figure 2: BlackJack Table</p>
+</p>
+
+---
+
+#### Chair
+
+A simple casino wooden chair. It’s positioned near tables and slot machines for player comfort.
+
+<p align="center">
+    <img src="./assets/chair.png">
+    <p align="center">Figure 3: Chair</p>
+</p>
+
+---
+
+#### Door
+
+A vintage wooden door with decorative details, serving as the main entrance to the casino.
+
+<p align="center">
+    <img src="./assets/door.png">
+    <p align="center">Figure 4: Door</p>
+</p>
+
+---
+
+#### Floor and Walls
+
+The casino’s floor and walls are designed with textures that enhance the vintage atmosphere — a patterned carpet for the floor and wooden textures with patterns for the walls.
+
+<p align="center">
+    <img src="./assets/floor_walls.png">
+    <p align="center">Figure 5: Floor and Walls</p>
+</p>
+
+---
+
+#### JukeBox
+
+A retro-style jukebox with colorful lights and metallic details, adding to the nostalgic ambiance of the casino.
+
+<p align="center">
+    <img src="./assets/jukebox.png">
+    <p align="center">Figure 6: JukeBox</p>
+</p>
+
+---
+
+#### Lamp
+
+A hanging ceiling lamp casting warm light over nearby tables, contributing to the overall cozy environment.
+
+<p align="center">
+    <img src="./assets/lamp.png">
+    <p align="center">Figure 7: Lamp</p>
+</p>
+
+---
+
+#### Panorama and Windows
+
+A panoramic background image that surrounds the scene, that can be seen through the windows.
+
+<p align="center">
+    <img src="./assets/panorama-windows.png">
+    <p align="center">Figure 8: Panorama and Windows</p>
+</p>
+
+---
+
+#### Poker Table
+
+A round table covered in green felt, surrounded by chairs and equipped with chips and cards, representing a classic poker setup.
+
+<p align="center">
+    <img src="./assets/poker_table.png">
+    <p align="center">Figure 9: Poker Table</p>
+</p>
+
+---
+
+#### Shadows
+
+Shadows are enabled for key objects in the scene to enhance depth and realism, particularly under tables and chairs.
+
+<p align="center">
+    <img src="./assets/shadows.png">
+    <p align="center">Figure 10: Shadows</p>
+</p>
+
+---
+
+#### SlotMachine
+
+A vintage slot machine with animated reels, lever, and flashing lights, placed strategically near the walls.
+
+<p align="center">
+    <img src="./assets/slot_machine.png">
+    <p align="center">Figure 11: SlotMachine</p>
+</p>
+
+---
+
