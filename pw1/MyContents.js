@@ -836,8 +836,8 @@ class MyContents {
         this.blackJackP2Tower3 = this.pokerChipHelper.createTower(2.2,this.blackJackTable.getTableBase(),-2.7,PokerChipValue.ONE_HUNDRED,4);
         this.blackJackP2Tower4 = this.pokerChipHelper.createTower(1.5,this.blackJackTable.getTableBase(),-2.9,PokerChipValue.FIVE_HUNDRED,30);
         this.blackJackP2Tower5 = this.pokerChipHelper.createTower(1.7,this.blackJackTable.getTableBase(),-3.05,PokerChipValue.ONE_HUNDRED,10);
-        this.blackJackSingleChip2 = this.pokerChipHelper.createSingle(1.6,this.blackJackTable.getTableBase() + 0.05,-3.15,PokerChipValue.ONE_HUNDRED, Math.PI);
-        this.blackJackSingleChip2.rotateOnAxis(new THREE.Vector3(1,0,-1), Math.PI/6);
+        this.blackJackSingleChip3 = this.pokerChipHelper.createSingle(1.6,this.blackJackTable.getTableBase() + 0.05,-3.15,PokerChipValue.ONE_HUNDRED, Math.PI);
+        this.blackJackSingleChip3.rotateOnAxis(new THREE.Vector3(1,0,-1), Math.PI/6);
 
 
     }
@@ -875,7 +875,7 @@ class MyContents {
         this.blackJackTable.add(this.blackJackP2Tower3);
         this.blackJackTable.add(this.blackJackP2Tower4);
         this.blackJackTable.add(this.blackJackP2Tower5);
-        this.blackJackTable.add(this.blackJackSingleChip2);
+        this.blackJackTable.add(this.blackJackSingleChip3);
 
     }
 
