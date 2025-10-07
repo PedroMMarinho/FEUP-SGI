@@ -30,6 +30,9 @@ Our project aims to develop a **THREE.js** scene inspired by a **vintage casino 
     <p align="center">Figure 1: Project Overview</p>
 </p>
 
+Here’s your **Topics** list updated to include all the items — now in **alphabetical order** and consistent with your section names and anchors 👇
+
+---
 
 ## Topics
 
@@ -43,14 +46,18 @@ Our project aims to develop a **THREE.js** scene inspired by a **vintage casino 
       - [Chair](#chair)
       - [Door](#door)
       - [Floor and Walls](#floor-and-walls)
+      - [Group Painting](#group-painting)
       - [JukeBox](#jukebox)
       - [Lamp](#lamp)
       - [Panorama and Windows](#panorama-and-windows)
+      - [Poker Cards](#poker-cards)
+      - [Poker Chips](#poker-chips)
       - [Poker Table](#poker-table)
       - [Shadows](#shadows)
-      - [SlotMachine](#slotmachine)
+      - [SlotMachines](#slotmachines)
 
 ---
+
 
 ### Requirements
 
@@ -98,13 +105,24 @@ The casino’s floor and walls are designed with textures that enhance the vinta
 
 ---
 
+#### Group Painting
+
+A framed wall painting representing the project group, inspired by vintage art styles. It serves as a decorative element on one of the casino’s walls, giving a personal touch to the environment.
+
+<p align="center">
+    <img src="./assets/group_painting.png">
+    <p align="center">Figure 6: Group Painting</p>
+</p>
+
+---
+
 #### JukeBox
 
 A retro-style jukebox with colorful lights and metallic details, adding to the nostalgic ambiance of the casino.
 
 <p align="center">
     <img src="./assets/jukebox.png">
-    <p align="center">Figure 6: JukeBox</p>
+    <p align="center">Figure 7: JukeBox</p>
 </p>
 
 ---
@@ -115,7 +133,7 @@ A hanging ceiling lamp casting warm light over nearby tables, contributing to th
 
 <p align="center">
     <img src="./assets/lamp.png">
-    <p align="center">Figure 7: Lamp</p>
+    <p align="center">Figure 8: Lamp</p>
 </p>
 
 ---
@@ -126,7 +144,28 @@ A panoramic background image that surrounds the scene, that can be seen through 
 
 <p align="center">
     <img src="./assets/panorama-windows.png">
-    <p align="center">Figure 8: Panorama and Windows</p>
+    <p align="center">Figure 9: Panorama and Windows</p>
+</p>
+
+---
+
+#### Poker Cards
+
+A small set of playing cards spread across the poker table. The cards use textured materials to display realistic designs, contributing to the authentic casino atmosphere.
+
+<p align="center">
+    <img src="./assets/poker_cards.png">
+    <p align="center">Figure 10: Poker Cards</p>
+</p>
+
+---
+#### Poker Chips
+
+Stacks of colorful poker chips placed on the poker and blackjack tables. Each chip type uses different colors and materials to represent various denominations, adding visual detail and realism to the scene.
+
+<p align="center">
+    <img src="./assets/poker_chips.png">
+    <p align="center">Figure 11: Poker Chips</p>
 </p>
 
 ---
@@ -137,30 +176,34 @@ A round table covered in green felt, surrounded by chairs and equipped with chip
 
 <p align="center">
     <img src="./assets/poker_table.png">
-    <p align="center">Figure 9: Poker Table</p>
+    <p align="center">Figure 12: Poker Table</p>
 </p>
 
 ---
 
 #### Shadows
 
-Shadows are enabled for key objects in the scene to enhance depth and realism, particularly under tables and chairs.
+Shadows are enabled for key objects in the scene to enhance depth and realism, particularly the light through the windows.
 
 <p align="center">
     <img src="./assets/shadows.png">
-    <p align="center">Figure 10: Shadows</p>
+    <p align="center">Figure 13: Shadows</p>
 </p>
 
 ---
 
-#### SlotMachine
+#### SlotMachines
 
-A vintage slot machine with animated reels, lever, and flashing lights, placed strategically near the walls.
+Vintage slot machines with a lever, and different textures.
 
 <p align="center">
     <img src="./assets/slot_machine.png">
-    <p align="center">Figure 11: SlotMachine</p>
+    <p align="center">Figure 14: SlotMachine</p>
 </p>
 
 ---
+
+
+
+
 
