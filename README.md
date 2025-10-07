@@ -13,25 +13,27 @@
 
 ### [PW1 - ThreeJS Basics](pw1)
 
-#### Task A
+#### Tutorial
 
-**Questions**
-- Did you observe any differences when changing the order of the lines manipulating the transformations ?
+The tutorial of our class can be found here:
 
-**Surprisingly** there are no differences. If we reverse the order of the transformations we will get the same result. This happens because **Mesh objects**, internally , have a fixed transformation order. In this case it behaves like this:  
+[SGI_TUTORIAL_PDF](tutorial/SGI_25_26_Requisites_PW1.pdf)
 
-- **Scale → Rotation → Position**
+Along with its guide:
 
-The following images show no difference at all after changing the order of the lines of code.
+[SGI_TUTORIAL_GUIDE](tutorial/README.md)
 
-Rotation of 30º then scale:
 
-![Pw1-A-1](pw1/assets/PW1-A.png)
+#### Project Overview
 
-Scale then rotation of 30º:
+Our project aims to develop a **THREE.js** scene inspired by a **vintage casino setting**. It will incorporate the use of **basic geometry, curves, transformations, materials, lighting, and shaders**, applying the techniques and concepts covered in our practical classes.
 
-![Pw1-A-2](pw1/assets/PW1-A.png)
+<p align="center">
+    <img src="./pw1/assets/casinoOverview.png">
+    <p align="center">Figure 1: Project Overview</p>
+</p>
 
+**More in depth information on pw1 can be found in [pw1's README](pw1/README.md)**
 
 -----
 
