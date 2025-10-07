@@ -31,4 +31,26 @@ Our project aims to develop a **THREE.js** scene inspired by a **vintage casino 
 </p>
 
 
+## Topics
 
+- [Requirements](#requirements)
+    - [Floor and Walls](#floor-and-walls)
+    - [Table](#table)
+    - [Plates](#plates)
+    - [Cake](#cake)
+    - [Candle](#candle)
+    - [Paintings, Window, and Door](#paintings-window-and-door)
+    - [Bettle's Painting](#bettle-painting)
+    - [Spotlight](#spolight)
+    - [Spring](#spring)
+    - [Newspaper](#newspaper)
+    - [Dog](#dog)
+    - [Cartoon Fire](#cartoon-fire)
+    - [Jar](#jar)
+    - [Flower](#flower)
+    - [Shadows](#shadows)
+
+### Requirements
+
+
+![alt text](image.png)
