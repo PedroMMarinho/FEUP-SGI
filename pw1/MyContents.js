@@ -31,6 +31,7 @@ class MyContents {
 
         const roomDimensions = this.room.getRoomDimensions();
         this.axis = new MyAxis(this);
+        this.showAxis = true;
         this.pokerTable = new PokerTable(0, 0, -roomDimensions.depth / 4, -Math.PI / 2);
 
         this.pokerChair1 = new CowboyChair(0,0,0);
@@ -888,6 +889,10 @@ class MyContents {
         this.initLights();
         this.initObjects();
         this.initPanorama();
+    }
+
+    enableAxis(value){
+        this.axis.visible = value;
     }
 
 
