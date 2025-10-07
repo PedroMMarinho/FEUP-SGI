@@ -115,10 +115,19 @@ This matches the local illumination model, where the diffuse and specular terms 
 
 Yes — the main unexpected behavior was that the **SpotLightHelper** did not always update automatically after changing some spotlight properties, especially the target position. This required explicitly calling `spotHelper.update()` for the changes to be visually reflected. Also, setting the penumbra to very high values (close to 1) caused the spotlight edge to appear extremely soft, which can make the lighting look unnatural if the angle or intensity isn’t adjusted accordingly.
 
+With no spotlight:
+
+![alt text](../assets/PW1-D-1.png)
+
+
+
 ##### Question 2
 
 Yes — the helper correctly represented the spotlight’s position, angle, and target direction, as long as `spotHelper.update()` was called after each change. This confirms that the helper is reliable for visual debugging, but it needs manual updating when modifying dynamic properties such as position, target, angle, or distance.
 
+With spotlight:
+
+![alt text](../assets/PW1-D-2.png)
 
 #### Task E
 
