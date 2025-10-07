@@ -30,8 +30,6 @@ Our project aims to develop a **THREE.js** scene inspired by a **vintage casino 
     <p align="center">Figure 1: Project Overview</p>
 </p>
 
-Here’s your **Topics** list updated to include all the items — now in **alphabetical order** and consistent with your section names and anchors 👇
-
 ---
 
 ## Topics
