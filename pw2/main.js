@@ -1,7 +1,7 @@
 import * as THREE from 'three';
-import { MyApp } from './MyApp.js';
-import { MyGuiInterface } from './MyGuiInterface.js';
-import { MyContents } from './MyContents.js';
+import { MyApp } from './src/core/MyApp.js';
+import { MyGuiInterface } from './src/core/MyGuiInterface.js';
+import { MyContents } from './src/core/MyContents.js';
 
 // create the application object
 let app = new MyApp()
