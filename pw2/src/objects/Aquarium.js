@@ -1,5 +1,7 @@
 import * as THREE from 'three';
 import { BubbleGroup } from './bubble/BubbleGroup.js';
+import { RockGroup } from './rock/RockGroup.js';
+import { TerrainGroup } from './terrainSegment/TerrainGroup.js';
 
 /**
  * Main Aquarium class
@@ -30,11 +32,26 @@ class Aquarium extends THREE.Object3D {
         this.createAquariumGeometry();
         // Create bubbles
         this.createBubbles();
+        // create rocks
+        this.createRocks();
+        // create terrain
+        this.createTerrainSegments();
     }
 
     createBubbles() {
-        const bubbleGroup = new BubbleGroup(50);
+        const bubbleGroup = new BubbleGroup(10);
         this.add(bubbleGroup);
+    }
+
+
+    createRocks() {
+        const rockGroup = new RockGroup(30);
+        this.add(rockGroup);
+    }
+
+    createTerrainSegments() {
+        const terrainGroup = new TerrainGroup(10);
+        this.add(terrainGroup);
     }
 
 }
