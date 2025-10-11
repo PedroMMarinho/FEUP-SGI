@@ -26,6 +26,9 @@ class MyContents {
     init() {
         // Load textures
         this.textureManager.loadTextures();
+        // Lights TODO
+        const ambientLight = new THREE.AmbientLight(0xFFFFFF, 0.5);
+        this.app.scene.add(ambientLight);
         // Load axis
         this.app.scene.add(this.axis);
         // Load aquarium
