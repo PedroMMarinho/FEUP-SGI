@@ -45,12 +45,12 @@ class Aquarium extends THREE.Object3D {
 
 
     createRocks() {
-        const rockGroup = new RockGroup(30);
+        const rockGroup = new RockGroup(80);
         this.add(rockGroup);
     }
 
     createTerrainSegments() {
-        const terrainGroup = new TerrainGroup(10);
+        const terrainGroup = new TerrainGroup(100);
         this.add(terrainGroup);
     }
 

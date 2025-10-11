@@ -34,7 +34,7 @@ class RockGroup extends THREE.Object3D {
         for (let i = 0; i < this.count; i++) {
             const position = new THREE.Vector3(
                 THREE.MathUtils.randFloatSpread(10),
-                THREE.MathUtils.randFloat(-2, -1.5), 
+                THREE.MathUtils.randFloat(-2, -1.9), 
                 THREE.MathUtils.randFloatSpread(10)
             );
 

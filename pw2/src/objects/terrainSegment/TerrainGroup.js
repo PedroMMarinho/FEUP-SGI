@@ -4,9 +4,14 @@ import { TerrainSegment } from './TerrainSegment.js';
 class TerrainGroup extends THREE.Object3D {
     constructor(count = 10) {
         super();
+        if (count <= 0) {
+            console.warn("TerrainGroup: count must be > 0");
+            return;
+        }
         this.type = 'Group';
         this.count = count;
         this.spread = 20;
+        this.terrainY = -2;
         this.init();
     }
 
@@ -27,7 +32,7 @@ class TerrainGroup extends THREE.Object3D {
         for (let i = 0; i < this.count; i++) {
             dummy.position.set(
                 THREE.MathUtils.randFloatSpread(this.spread),
-                -2,
+                this.terrainY,
                 THREE.MathUtils.randFloatSpread(this.spread)
             );
 
