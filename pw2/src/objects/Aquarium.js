@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { BubbleGroup } from './bubble/BubbleGroup.js';
 
 /**
  * Main Aquarium class
@@ -27,9 +28,15 @@ class Aquarium extends THREE.Object3D {
     init() {
         // Create aquarium geometry and material
         this.createAquariumGeometry();
+        // Create bubbles
+        this.createBubbles();
     }
 
-    
+    createBubbles() {
+        const bubbleGroup = new BubbleGroup(50);
+        this.add(bubbleGroup);
+    }
+
 }
 
 export { Aquarium };
