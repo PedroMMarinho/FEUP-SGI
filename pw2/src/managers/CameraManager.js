@@ -20,12 +20,12 @@ class CameraManager {
     }
 
     init() {
-        // TODO CHANGE
+        //TODO: CHANGE
         const perspective = new THREE.PerspectiveCamera(75, this.aspect, 0.1, 1000);
         perspective.position.set(10, 10, 3);
         this.cameras['Free Fly'] = perspective;
 
-        // TODO CHANGE
+        //TODO: CHANGE
         const aquariumCam = new THREE.OrthographicCamera(
             this.left, this.right, this.top, this.bottom, this.near, this.far
         );
@@ -33,7 +33,7 @@ class CameraManager {
         aquariumCam.lookAt(new THREE.Vector3(0, 0, 0));
         this.cameras['Aquarium View'] = aquariumCam;
 
-        // TODO CHANGE
+        //TODO: CHANGE
         const submarineCam = new THREE.PerspectiveCamera(75, this.aspect, 0.1, 1000);
         submarineCam.position.set(0, 1, 0);
         this.cameras['Submarine View'] = submarineCam;
