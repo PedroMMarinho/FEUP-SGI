@@ -20,7 +20,6 @@ class CameraManager {
         this.pitch = 0;
 
         this.freeFlyActive = false;
-        this.pointerLockCooldown = false;
 
 
         // Orthographic parameters
@@ -124,25 +123,11 @@ changeCamera(oldName, newName) {
         this.freeFlyActive = false;
     }
 
-    // Ensure pointer lock is off
-    this.pointerLockCooldown = true;
-    setTimeout(() => { this.pointerLockCooldown = false; }, 200);
-    this.keyManager.isMouseClicked();
-    document.exitPointerLock();
 }
 
 
    updateFreeFly() {
     const keyManager = this.keyManager;
-    const mouse = keyManager.isMouseClicked();
-
-    // Ignore clicks during cooldown
-    if (mouse && !this.pointerLockCooldown) {
-        this.togglePointerLock();
-        this.freeFlyActive = !this.freeFlyActive;
-    }
-
-    if (!this.freeFlyActive || document.pointerLockElement !== document.getElementById('canvas')) return;
 
     const camera = this.activeCamera;
     const moveSpeed = this.moveSpeed;
@@ -152,8 +137,10 @@ changeCamera(oldName, newName) {
     this.yaw = camera.rotation.y;
     this.pitch = camera.rotation.x;
 
-    this.yaw -= deltaX * this.lookSpeed;
-    this.pitch -= deltaY * this.lookSpeed;
+    if( keyManager.isMousePressed() ) {
+        this.yaw -= deltaX * this.lookSpeed;
+        this.pitch -= deltaY * this.lookSpeed;
+    }
 
     const limit = Math.PI / 2 - 0.01;
     this.pitch = Math.max(-limit, Math.min(limit, this.pitch));
