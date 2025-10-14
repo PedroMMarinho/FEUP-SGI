@@ -11,6 +11,7 @@ class CameraManager {
         this.cameras = {};
         this.activeCameraName = null;
         this.lastCameraName = null;
+        this.cameraSelection = "Free Fly"; // default selection
         this.controls = null;
 
         this.moveSpeed = 0.2;
@@ -54,13 +55,23 @@ class CameraManager {
     }
 
 setActiveCamera(name) {
+    console.log("setActiveCamera: " + name);
+    console.log("active camera" + this.activeCameraName);
     if (this.activeCameraName === name) return;
+    console.log("Changing active camera to: " + name);
+    console.log("previous camera was: " + this.lastCameraName);
 
     const previous = this.activeCameraName; // could be null
+
     this.lastCameraName = previous;
+
+    console.log(this.lastCameraName);
 
     this.activeCameraName = name;
     this.activeCamera = this.cameras[name];
+
+    console.log(`Active camera set to: ${name}`);
+    console.log("previous camera was: " + previous);
 
     this.changeCamera(previous, name);
 }
@@ -113,6 +124,7 @@ setActiveCamera(name) {
 changeCamera(oldName, newName) {
     // Aquarium is always static
     if (newName === 'Aquarium View') {
+        console.log("Aquarium View here");
         const cam = this.cameras['Aquarium View'];
         cam.position.set(0, this.frustumSize / 4, this.frustumSize / 2);
         cam.lookAt(0, 10, 0);
