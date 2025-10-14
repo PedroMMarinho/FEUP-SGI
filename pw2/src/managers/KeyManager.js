@@ -2,19 +2,16 @@ class KeyManager {
     constructor() {
         this.activeKeys = {};
         this.mouseDelta = { x: 0, y: 0 };
-        this.mouseClicked = false;
+        this.mouseHeld = false;
 
 
         const canvas = document.getElementById('canvas');
-        canvas.addEventListener('click', () => { this.mouseClicked = true; }, false);        
+        canvas.addEventListener('mousedown', () => this.processMouseDown(), false);
+        canvas.addEventListener('mouseup', () => this.processMouseUp(), false);
         document.addEventListener('keydown', (event) => this.processKeyDown(event), false);
         document.addEventListener('keyup', (event) => this.processKeyUp(event), false);
         document.addEventListener('mousemove', (event) => this.processMouseMove(event), false);
 
-        // Debugging: see when lock changes
-        document.addEventListener('pointerlockchange', () => {
-            console.log('Pointer lock state:', document.pointerLockElement ? 'locked' : 'unlocked');
-        });
     }
 
     processKeyDown(event) {
@@ -30,11 +27,9 @@ class KeyManager {
     }
 
     processMouseMove(event) {
-        // Only capture movement when pointer lock is active
-        if (document.pointerLockElement) {
-            this.mouseDelta.x += event.movementX || 0;
-            this.mouseDelta.y += event.movementY || 0;
-        }
+        this.mouseDelta.x += event.movementX || 0;
+        this.mouseDelta.y += event.movementY || 0;
+        
     }
 
     getDelta() {
@@ -44,13 +39,17 @@ class KeyManager {
         return delta;
     }
 
-    isMouseClicked() {
-        if (this.mouseClicked) {
-            this.mouseClicked = false;
-            return true;
-        }
-        return false;
+    processMouseDown() {
+        this.mouseHeld = true;
     }
+
+    processMouseUp() {
+        this.mouseHeld = false;
+    }
+
+    isMousePressed() {
+        return this.mouseHeld;
+    }            
 }
 
 export { KeyManager };
