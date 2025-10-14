@@ -47,9 +47,9 @@ class CameraManager {
         this.cameras['Aquarium View'] = aquariumCam;
 
         //TODO: CHANGE
-        const submarineCam = new THREE.PerspectiveCamera(75, this.aspect, 0.1, 1000);
-        submarineCam.position.set(0, 2, 5);
-        this.cameras['Submarine View'] = submarineCam;
+        const UnderwaterCam = new THREE.PerspectiveCamera(75, this.aspect, 0.1, 1000);
+        UnderwaterCam.position.set(0, 2, 5);
+        this.cameras['Underwater View'] = UnderwaterCam;
 
         this.setActiveCamera('Free Fly');
     }
@@ -82,13 +82,13 @@ setActiveCamera(name) {
     }
 
     update(renderer) {
-        if (this.activeCameraName === 'Submarine View' && !this.controls) {
+        if (this.activeCameraName === 'Underwater View' && !this.controls) {
             this.controls = new OrbitControls(this.activeCamera, renderer.domElement);
             this.controls.target.set(0, 1, 0); // orbit around this point
             this.controls.enableZoom = true;
             this.controls.enablePan = false;
             this.controls.update(); // important!
-        } else if (this.activeCameraName !== 'Submarine View') {
+        } else if (this.activeCameraName !== 'Underwater View') {
             if (this.controls) {
                 this.controls.dispose();
                 this.controls = null;
