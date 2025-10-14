@@ -3,6 +3,7 @@ import Stats from 'three/addons/libs/stats.module.js';
 import { MyContents } from './MyContents.js';
 import { MyGuiInterface } from './MyGuiInterface.js';
 import { CameraManager } from '../managers/CameraManager.js';
+import { KeyManager } from '../managers/KeyManager.js';
 
 /**
  * This class contains the main application logic
@@ -18,7 +19,8 @@ class MyApp {
         // Camera-related
         this.aspect = window.innerWidth / window.innerHeight;
         this.frustumSize = 20;
-        this.cameraManager = new CameraManager(this.aspect, this.frustumSize);
+        this.keyManager = new KeyManager();
+        this.cameraManager = new CameraManager(this.aspect,this.keyManager, this.frustumSize);
     }
 
     /**
