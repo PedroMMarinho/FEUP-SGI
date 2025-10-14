@@ -11,6 +11,10 @@ class KeyManager {
         document.addEventListener('keydown', (event) => this.processKeyDown(event), false);
         document.addEventListener('keyup', (event) => this.processKeyUp(event), false);
         document.addEventListener('mousemove', (event) => this.processMouseMove(event), false);
+        window.addEventListener('blur', () => this.resetKeys(), false);
+        window.addEventListener('focus', () => this.resetKeys(), false);
+        window.addEventListener('load', () => this.resetKeys(), false);
+
 
     }
 
@@ -49,7 +53,13 @@ class KeyManager {
 
     isMousePressed() {
         return this.mouseHeld;
-    }            
+    }       
+    
+    resetKeys() {
+        this.activeKeys = {};
+        this.mouseHeld = false;
+        this.mouseDelta = { x: 0, y: 0 };
+    }
 }
 
 export { KeyManager };
