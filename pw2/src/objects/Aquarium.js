@@ -4,6 +4,7 @@ import { RockGroup } from './rock/RockGroup.js';
 import { TerrainGroup } from './terrainSegment/TerrainGroup.js';
 import { CoralGroup } from './coral/CoralGroup.js';
 import { FishGroup } from './fish/FishGroup.js';
+import { Shark } from './shark/Shark.js';
 
 /**
  * Main Aquarium class
@@ -42,6 +43,8 @@ class Aquarium extends THREE.Object3D {
 		this.createCorals();
 		// create fishes
 		this.createFishes();
+        // create shark
+        this.createShark();
     }
 
     createBubbles() {
@@ -69,6 +72,12 @@ class Aquarium extends THREE.Object3D {
 		const fishGroup = new FishGroup(35);
 		this.add(fishGroup);
 	}
+    createShark() {
+        const shark = new Shark('./assets/models/shark-test.glb', this);
+        shark.setPosition(0, 0, 0); 
+        shark.setScale(5); 
+        this.shark = shark; 
+    }
 
 }
 
