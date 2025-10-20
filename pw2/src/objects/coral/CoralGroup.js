@@ -17,39 +17,32 @@ class CoralGroup extends THREE.Object3D {
 		this.init();
 	}
 
-	init() {
-		const coralTemplate = new Coral();
+    init() {
+        // create one template group (Coral returns a Group)
+        const coralTemplate = new Coral();
 
-		// Instanced mesh - all corals share the same geometry/material
-		this.mesh = new THREE.InstancedMesh(
-			coralTemplate.geometry,
-			coralTemplate.material,
-			this.count
-		);
-		this.mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
-		this.add(this.mesh);
+        const dummy = new THREE.Object3D();
 
-		const dummy = new THREE.Object3D();
+        for (let i = 0; i < this.count; i++) {
+            // Random position
+            const position = new THREE.Vector3(
+                THREE.MathUtils.randFloatSpread(15),
+                THREE.MathUtils.randFloat(-2, -1.9),
+                THREE.MathUtils.randFloatSpread(15)
+            );
 
-		for (let i = 0; i < this.count; i++) {
-			// Random position
-			const position = new THREE.Vector3(
-				THREE.MathUtils.randFloatSpread(15),
-				THREE.MathUtils.randFloat(-2, -1.9),
-				THREE.MathUtils.randFloatSpread(15)
-			);
-			
-			// Store logical coral data
-			this.corals.push({ position })
+            // clone the template group (deep clone)
+            const coral = coralTemplate.clone(true);
+            coral.position.copy(position);
+            // if the template uses InstancedMesh, ensure instanceMatrix updates are kept:
+            coral.traverse((child) => {
+                if (child.isInstancedMesh) child.instanceMatrix.needsUpdate = true;
+            });
 
-			// Apply transform
-			dummy.position.copy(position);
-			dummy.updateMatrix();
-			this.mesh.setMatrixAt(i, dummy.matrix);
-		}
-
-		this.mesh.instanceMatrix.needsUpdate = true;
-	}
+            this.add(coral);
+            this.corals.push({ position, object: coral });
+        }
+    }
 
 	update() {
 		// Static for now
