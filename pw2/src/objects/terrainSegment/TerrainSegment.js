@@ -1,15 +1,26 @@
 import * as THREE from 'three';
 
-class TerrainSegment {
-    constructor() {
-        this.geometry = new THREE.PlaneGeometry(10, 10);
-        this.material = new THREE.MeshStandardMaterial({
-            color: 0xdeb887, 
-            roughness: 1,
-            metalness: 0,
-            side: THREE.DoubleSide
-        });
-    }
+class TerrainSegment extends THREE.Object3D {
+
+  constructor(width = 10, height = 10, widthSegments = 64, heightSegments = 64) {
+    super();
+    // Create geometry and material
+    const geometry = new THREE.PlaneGeometry(width, height, widthSegments, heightSegments);
+    
+    const material = new THREE.MeshStandardMaterial({
+      color: 0xdeb887,
+      roughness: 1,
+      metalness: 0,
+      side: THREE.DoubleSide
+    });
+
+    // Create the mesh and orient it
+    const mesh = new THREE.Mesh(geometry, material);
+    mesh.rotation.x = -Math.PI / 2; 
+
+    this.add(mesh);
+  }
+
 }
 
 export { TerrainSegment };
