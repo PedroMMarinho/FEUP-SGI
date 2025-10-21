@@ -37,7 +37,6 @@ export class Shark extends THREE.Object3D {
       this.animations[clip.name] = action;
     });
 
-    this.play("Swim");
   }
 
   play(name, fadeDuration = 0.3, speed = 1) {
