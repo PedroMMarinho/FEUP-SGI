@@ -73,7 +73,7 @@ class Aquarium extends THREE.Object3D {
 		this.add(fishGroup);
 	}
     createShark() {
-        const shark = new Shark('./assets/models/shark-test-4.glb', this);
+        const shark = new Shark('./assets/models/shark-grey.glb', this);
         shark.setPosition(0, 0, 0); 
         shark.setScale(5); 
         this.shark = shark; 
