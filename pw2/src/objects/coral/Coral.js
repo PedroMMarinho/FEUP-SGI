@@ -1,7 +1,8 @@
 import * as THREE from 'three';
 
 export class Coral {
-    constructor(complexity = 5) {
+    constructor(material,complexity = 5) {
+        this.material = material; 
         return this.createObject(complexity)
     }
 
@@ -38,8 +39,8 @@ export class Coral {
         // --- Stochastic L-System Rules ---
         const stochasticRules = {
             'X': [
-                { prob: 0.7, rule: '[&&FFFL]+++[&&FFFL]+++[&&FFFL]+++[&&FFFL]FFFL' },
-                { prob: 0.3, rule: '[&&FFFL]++++[&&FFFL]++++[&&FFFL]FFFL' },
+                { prob: 0.7, rule: '[&&FQFQFQL]+++[&&FQFQFQL]+++[&&FQFQFQL]+++[&&FQFQFQL]FQTFQTFQTL' },
+                { prob: 0.3, rule: '[&&FQFQFQL]++++[&&FQFQFQL]++++[&&FQFQFQL]FQTFQTFQTL' },
 
             ],
             'L': [
@@ -51,10 +52,18 @@ export class Coral {
 
             'K': [
                 { prob: 0.5, rule: 'F' },
-                { prob: 0.2, rule: 'KF' },
+                { prob: 0.2, rule: 'KQF' },
 
-            ]
-
+            ],
+            'T': [
+                { prob: 0.1, rule: '[&&FL]' }
+            ],
+            'Q': [
+                { prob: 0.1, rule: '[&&F]' },
+                { prob: 0.1, rule: '[---&&F]' },
+                { prob: 0.1, rule: '[+++&&F]' },
+                
+            ],
         };
 
         const axiom = 'X';
@@ -135,10 +144,7 @@ export class Coral {
                 case ']': {
                     
                     const state = stack.pop();
-                    console.log(state);
-                    console.log('popped');
                     if (!state) break;
-                    console.log(state.position);
                     turtle.position = state.position;
                     turtle.quaternion = state.quaternion;
                     branchLength = state.length;
@@ -154,25 +160,17 @@ export class Coral {
 
         const branchGeo = new THREE.CylinderGeometry(0.05, 0.05, 1, 8);
         branchGeo.translate(0, 0.5, 0);
-        const branchMat = new THREE.MeshStandardMaterial({ color: 0x8B4513, metalness: 0.1, roughness: 0.8 });
+        //const branchMat = this.material;
+            
+        const branchMat = new THREE.MeshPhongMaterial({ specular: 0x222222, shininess: 25, color: 0xff7f50 });
+        
         const branchMesh = new THREE.InstancedMesh(branchGeo, branchMat, branchMatrices.length);
         branchMesh.name = "branches";
         for (let i = 0; i < branchMatrices.length; i++) {
             branchMesh.setMatrixAt(i, branchMatrices[i]);
-            console.log(branchMatrices[i]);
         }
         group.add(branchMesh);
 
-        if (leafMatrices.length > 0) {
-            const leafGeo = new THREE.IcosahedronGeometry(0.2, 0);
-            const leafMat = new THREE.MeshStandardMaterial({ color: 0x228B22, metalness: 0, roughness: 0.8 });
-            const leafMesh = new THREE.InstancedMesh(leafGeo, leafMat, leafMatrices.length);
-            leafMesh.name = "leaves";
-            for (let i = 0; i < leafMatrices.length; i++) {
-                leafMesh.setMatrixAt(i, leafMatrices[i]);
-            }
-            group.add(leafMesh);
-        }
 
         group.scale.setScalar(0.4);
 

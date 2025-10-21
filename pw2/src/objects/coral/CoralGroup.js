@@ -19,7 +19,9 @@ class CoralGroup extends THREE.Object3D {
 
     init() {
         // create one template group (Coral returns a Group)
-        const coralTemplate = new Coral();
+        const coralTexture = new THREE.TextureLoader().load('coral.jpg');
+        const coralMaterial = new THREE.MeshPhongMaterial({ map: coralTexture });
+        const coralTemplate = new Coral(coralMaterial);
 
         const dummy = new THREE.Object3D();
 
