@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { MyAxis } from '../objects/MyAxis.js';
 import { Aquarium } from '../objects/Aquarium.js';
 import { TextureManager } from '../managers/TextureManager.js';
+import { AssetManager } from '../managers/AssetManager.js';
 
 /**
  *  This class contains the contents of out application
@@ -16,16 +17,20 @@ class MyContents {
         this.app = app
         this.axis = new MyAxis(this);
         this.showAxis = true;
-        this.aquarium = new Aquarium(this); // Main Object of the scene
-        this.textureManager = new TextureManager(); // Texture Manager
+        this.assetManager = new AssetManager(); // Asset Manager
+        this.aquarium = new Aquarium(this.assetManager); // Main Object of the scene
     }
 
     /**
      * initializes the contents
      */
-    init() {
-        // Load textures
-        this.textureManager.loadTextures();
+    async init() {
+        // asset loading
+        await this.assetManager.preloadAll();
+        // Initialize aquarium
+        this.aquarium.init();
+
+        
         // Lights TODO
         const ambientLight = new THREE.AmbientLight(0xFFFFFF, 0.5);
         const pointLight = new THREE.PointLight(0xFFFFFF, 40);
@@ -34,14 +39,13 @@ class MyContents {
         this.app.scene.add(ambientLight);
         this.app.scene.add(pointLight);
         this.app.scene.add(pointLightHelper);
+
+
         // Load axis
         this.app.scene.add(this.axis);
         // Load aquarium
         this.app.scene.add(this.aquarium);
     }
-
-    
-
 
     enableAxis(value){
         this.axis.visible = value;

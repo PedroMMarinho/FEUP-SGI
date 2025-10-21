@@ -1,8 +1,7 @@
 import * as THREE from 'three';
 
 export class Coral {
-    constructor(material,complexity = 5) {
-        this.material = material; 
+    constructor(complexity = 5) {
         return this.createObject(complexity)
     }
 
