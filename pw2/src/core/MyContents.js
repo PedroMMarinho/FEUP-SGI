@@ -48,7 +48,7 @@ class MyContents {
     }
 
     setWireframeMode(wireframe) {
-        this.app.scene.traverse((child) => {
+        this.aquarium.traverse((child) => {
             if (child.isMesh && child.material) {
                 if (Array.isArray(child.material)) {
                     child.material.forEach(mat => mat.wireframe = wireframe);
@@ -65,7 +65,7 @@ class MyContents {
      * 
      */
     update() {
-        if (this.aquarium.shark) this.aquarium.shark.update();
+        if (this.aquarium) this.aquarium.update();
     }
 
 }
