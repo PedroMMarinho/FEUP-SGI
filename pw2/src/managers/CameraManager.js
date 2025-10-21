@@ -54,27 +54,27 @@ class CameraManager {
         this.setActiveCamera('Free Fly');
     }
 
-setActiveCamera(name) {
-    console.log("setActiveCamera: " + name);
-    console.log("active camera" + this.activeCameraName);
-    if (this.activeCameraName === name) return;
-    console.log("Changing active camera to: " + name);
-    console.log("previous camera was: " + this.lastCameraName);
+    setActiveCamera(name) {
+        console.log("setActiveCamera: " + name);
+        console.log("active camera" + this.activeCameraName);
+        if (this.activeCameraName === name) return;
+        console.log("Changing active camera to: " + name);
+        console.log("previous camera was: " + this.lastCameraName);
 
-    const previous = this.activeCameraName; // could be null
+        const previous = this.activeCameraName; // could be null
 
-    this.lastCameraName = previous;
+        this.lastCameraName = previous;
 
-    console.log(this.lastCameraName);
+        console.log(this.lastCameraName);
 
-    this.activeCameraName = name;
-    this.activeCamera = this.cameras[name];
+        this.activeCameraName = name;
+        this.activeCamera = this.cameras[name];
 
-    console.log(`Active camera set to: ${name}`);
-    console.log("previous camera was: " + previous);
+        console.log(`Active camera set to: ${name}`);
+        console.log("previous camera was: " + previous);
 
-    this.changeCamera(previous, name);
-}
+        this.changeCamera(previous, name);
+    }
 
 
     getActiveCamera() {
@@ -121,24 +121,25 @@ setActiveCamera(name) {
         renderer.setSize(width, height);
     }
 
-changeCamera(oldName, newName) {
-    // Aquarium is always static
-    if (newName === 'Aquarium View') {
-        console.log("Aquarium View here");
-        const cam = this.cameras['Aquarium View'];
-        cam.position.set(0, this.frustumSize / 4, this.frustumSize / 2);
-        cam.lookAt(0, 10, 0);
-    }
+    changeCamera(oldName, newName) {
+        // Aquarium is always static
+        if (newName === 'Aquarium View') {
+            console.log("Aquarium View here");
+            const cam = this.cameras['Aquarium View'];
+            cam.position.set(0, this.frustumSize / 4, this.frustumSize / 2);
+            cam.lookAt(0, 10, 0);
+        }
 
-    // Free Fly resets
-    if (oldName === 'Free Fly') {
-        this.freeFlyActive = false;
-    }
+        // Free Fly resets
+        if (oldName === 'Free Fly') {
+            this.freeFlyActive = false;
+        }
 
-}
+    }
 
 
    updateFreeFly() {
+    
     const keyManager = this.keyManager;
 
     const camera = this.activeCamera;
@@ -175,7 +176,8 @@ changeCamera(oldName, newName) {
     if (keyManager.isKeyPressed('KeyD')) camera.position.addScaledVector(right, moveSpeed);
     if (keyManager.isKeyPressed('Space')) camera.position.y += moveSpeed;
     if (keyManager.isKeyPressed('ShiftLeft')) camera.position.y -= moveSpeed;
-}
+
+    }
 
     togglePointerLock() {
         const canvas = document.getElementById('canvas');

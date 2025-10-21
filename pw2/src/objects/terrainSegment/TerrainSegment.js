@@ -14,10 +14,10 @@ class TerrainSegment extends THREE.Object3D {
       side: THREE.DoubleSide
     });
 
-    // Create the mesh and orient it
     const mesh = new THREE.Mesh(geometry, material);
+    mesh.position.y = -0.01;
     mesh.rotation.x = -Math.PI / 2; 
-
+    
     this.add(mesh);
   }
 

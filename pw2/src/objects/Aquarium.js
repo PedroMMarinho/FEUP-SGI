@@ -3,22 +3,22 @@ import { BubbleGroup } from './bubble/BubbleGroup.js';
 import { RockGroup } from './rock/RockGroup.js';
 import { CoralGroup } from './coral/CoralGroup.js';
 import { FishGroup } from './fish/FishGroup.js';
-import { Shark } from './shark/Shark.js';
 import { TerrainSegment } from './terrainSegment/TerrainSegment.js';
+import { SharkLOD } from './shark/SharkLOD.js';
 
 /**
  * Main Aquarium class
  */
 class Aquarium extends THREE.Object3D {
-    constructor() {
+    constructor(assetManager) {
         super();
+        this.assetManager = assetManager;
         // Load aquarium features
         this.width = 1000;
         this.height = 1000;
         this.depth = 1000;
 
         this.objects = [];
-        this.init();
     }
 
     addToAquarium(object) {
@@ -65,12 +65,14 @@ class Aquarium extends THREE.Object3D {
     }
 
     createTerrainSegments() {
-        const terrainGroup = new TerrainSegment(100,100);
+        this.terrainWidth = 100;
+        this.terrainHeight = 100;
+        const terrainGroup = new TerrainSegment(this.terrainWidth, this.terrainHeight);
         this.addToAquarium(terrainGroup);
     }
 
 	createCorals() {
-		const coralGroup = new CoralGroup(40);
+		const coralGroup = new CoralGroup(40, this.terrainWidth/2, this.terrainHeight/2);
 		this.addToAquarium(coralGroup);
 	}
 
@@ -80,14 +82,15 @@ class Aquarium extends THREE.Object3D {
 	}
 
     createShark() {
-        const shark = new Shark('./assets/models/shark-grey.glb', this);
-        shark.position.set(0, 10, 0);
-        this.addToAquarium(shark);
+        const sharks = new SharkLOD('grey-shark', this.assetManager.blenderManager.getAllLODs('grey-shark'));
+        this.addToAquarium(sharks);
+        console.log(sharks.getObjectForDistance(0));
+
     }
 
     update() {
         for (const obj of this.objects) {
-            if (obj.update) obj.update();
+            if (obj.updateState) obj.updateState();
         }
     }
 

@@ -11,22 +11,11 @@ class TextureManager {
 
         this.loader = new THREE.TextureLoader();
         this.textures = new Map();
-        this.basePath = './../assets/textures/'; 
+        this.basePath = './assets/textures/'; 
 
         TextureManager._instance = this;
     }
 
-    loadTextures(){
-        // Example of Loading predefined textures
-        //const textureMap = {
-        //    'water': 'water.jpg',
-        //    'sand': 'sand.jpg',
-        //    'rock': 'rock.jpg',
-        //    'fish1': 'fish1.png',
-        //    'fish2': 'fish2.png',
-        //};
-        //this.preload(textureMap);
-    }
 
     loadTexture(name, filename) {
         if (this.textures.has(name)) {

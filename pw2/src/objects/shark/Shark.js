@@ -1,60 +1,43 @@
 import * as THREE from 'three';
-import { GLTFLoader } from 'https://unpkg.com/three@0.164.0/examples/jsm/loaders/GLTFLoader.js';
 
 export class Shark extends THREE.Object3D {
-  constructor(url) {
+  /**
+   * @param {string} key - model identifier (for logging)
+   * @param {GLTF} [gltfModel] - optional preloaded GLTF model
+   */
+  constructor(key, gltfModel) {
     super();
 
-    this.url = url;
-    this.mixer = null;
+    this.key = key;
     this.model = null;
+    this.mixer = null;
     this.animations = {};
     this.currentAction = null;
     this.clock = new THREE.Clock();
 
-    // Load the model asynchronously
-    this.loadModel();
+    this.setModel(gltfModel);
   }
+  /**
+   * Set a GLTF model for this shark instance
+   * @param {GLTF} gltf
+   */
+  setModel(gltf) {
+    this.model = gltf.scene;
+    
+    this.add(this.model);
+    
+    // Setup animation mixer
+    this.mixer = new THREE.AnimationMixer(this.model);
 
-  loadModel() {
-    const loader = new GLTFLoader();
+    // Store animation clips by name
+    gltf.animations.forEach((clip) => {
+      const action = this.mixer.clipAction(clip);
+      action.loop = THREE.LoopRepeat;
+      action.repetitions = Infinity;
+      this.animations[clip.name] = action;
+    });
 
-    loader.load(
-      this.url,
-      (gltf) => {
-        this.model = gltf.scene;
-        this.add(this.model); // Add the shark model to this Object3D
-
-        // Set up model transform
-        this.model.scale.set(1, 1, 1);
-        this.model.rotation.y = Math.PI;
-
-        // Create animation mixer
-        this.mixer = new THREE.AnimationMixer(this.model);
-
-        // Store animation clips by name
-        gltf.animations.forEach((clip) => {
-          const action = this.mixer.clipAction(clip);
-          action.loop = THREE.LoopRepeat;
-          action.repetitions = Infinity;
-          this.animations[clip.name] = action;
-        });
-
-        // Auto-play the first animation at a slower speed
-        const firstClip = Object.keys(this.animations)[0];
-        if (firstClip) {
-          this.play(firstClip, 0.3, 0.6); // smooth fade-in, 60% speed
-        }
-
-        console.log('✅ Shark model loaded with animations:', Object.keys(this.animations));
-      },
-      (xhr) => {
-        console.log(`Loading shark: ${(xhr.loaded / xhr.total * 100).toFixed(2)}%`);
-      },
-      (error) => {
-        console.error('❌ Error loading shark model:', error);
-      }
-    );
+    this.play("Swim");
   }
 
   play(name, fadeDuration = 0.3, speed = 1) {
@@ -80,11 +63,10 @@ export class Shark extends THREE.Object3D {
     }
   }
 
-  update() {
+  updateState() {
     if (this.mixer) {
       const delta = this.clock.getDelta();
       this.mixer.update(delta);
     }
   }
-
 }
