@@ -28,7 +28,6 @@ export class Shark {
         this.model.scale.set(1, 1, 1);
         this.model.rotation.y = Math.PI;
 
-        // Setup animation mixer
         this.mixer = new THREE.AnimationMixer(this.model);
 
         // Store animation clips by name
@@ -39,10 +38,9 @@ export class Shark {
           this.animations[clip.name] = action;
         });
 
-        // Auto-play first animation if exists
         const firstClip = Object.keys(this.animations)[0];
         if (firstClip) {
-          this.play(firstClip);
+          this.play(firstClip, 0, 0.6);
         }
 
         console.log('Shark model loaded with animations:', Object.keys(this.animations));
@@ -56,14 +54,15 @@ export class Shark {
     );
   }
 
-  play(name, fadeDuration = 0.3) {
-    if (!this.animations[name]) return console.warn(`No animation named "${name}"`);
+  play(name, fadeDuration = 0.3, speed = 1) {
+    const nameObj = Object(name);
+    if (!this.animations[nameObj]) return console.warn(`No animation named "${name}"`);
 
-    const nextAction = this.animations[name];
+    const nextAction = this.animations[nameObj];
 
-    // Make sure it loops infinitely
     nextAction.loop = THREE.LoopRepeat;
     nextAction.repetitions = Infinity;
+    nextAction.timeScale = speed;
 
     if (this.currentAction && this.currentAction !== nextAction) {
       this.currentAction.crossFadeTo(nextAction, fadeDuration, true);
