@@ -7,7 +7,7 @@ export class SharkLOD extends THREE.LOD {
     this.key = key;
     this.lods = lods;
     this.distanceOffset = 5;
-    this.distanceStart = 10;
+    this.distanceStart = 2;
 
     this.setupLODs();
   }
@@ -32,8 +32,8 @@ export class SharkLOD extends THREE.LOD {
  
    updateState() {
        const visibleLOD = this.levels.find(level => level.object.visible);
-         if (visibleLOD && visibleLOD.object.updateState) {
+        if (visibleLOD && visibleLOD.object.updateState) {
               visibleLOD.object.updateState();
-         }
-  }
+        }
+    }
 }
