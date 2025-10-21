@@ -1,21 +1,33 @@
 import * as THREE from 'three';
 
 export class Fish {
-	constructor() {
-		this.geometry = new THREE.BufferGeometry();
+	constructor(fishColor, bodyLenRatio = 1, fatFishRatio = 1, finSizeRatio = 1) {
 		
-		// directions according to image on moodle document
+		this.geometry = new THREE.BufferGeometry();
 
+		this.fishColor = fishColor;
+		this.bodyLenRatio = bodyLenRatio;
+		this.fatFishRatio = fatFishRatio;
+		this.finSizeRatio = finSizeRatio;
+
+		this.initBuffers();
+
+		this.initMaterials();	
+	}
+
+	initBuffers() {
+		// directions according to image on moodle document
+		
 		const vertices = new Float32Array([
-			0, 0, 0.5, // v0 face tip
-			0.3, 0, -0.1, // v1 right face tip
-			0, 0.4, 0, // v2 face top
-			0, -0.4, 0, // v3 face bottom
-			-0.3, 0, -0.1, // v4 left face tip
-			0, 0, -1.5, // v5 back spine tip
-			0, 0, -1.7, // v6 tail bone tip
-			0, 0.5, -2, // v7 tail top tip 
-			0, -0.5, -2 // v8 tail bottom tip
+			0, 0, 0.5 * this.bodyLenRatio, // v0 face tip
+			0.3 * this.fatFishRatio, 0, -0.1, // v1 right face tip
+			0, 0.4 * this.fatFishRatio, 0, // v2 face top
+			0, -0.4 * this.fatFishRatio, 0, // v3 face bottom
+			-0.3 * this.fatFishRatio, 0, -0.1, // v4 left face tip
+			0, 0, -1.5 * this.bodyLenRatio, // v5 back spine tip
+			0, 0, -1.7 * this.finSizeRatio, // v6 tail bone tip
+			0, 0.5 * this.finSizeRatio, -2 * this.finSizeRatio, // v7 tail top tip 
+			0, -0.5 * this.finSizeRatio, -2 * this.finSizeRatio // v8 tail bottom tip
 		]);
 
 		const indices = [
@@ -35,11 +47,29 @@ export class Fish {
 
 		this.geometry.setIndex(indices);
 		this.geometry.setAttribute('position', new THREE.BufferAttribute(vertices, 3));
-		
+	}
+	
+	initMaterials() {
 		this.material = new THREE.MeshStandardMaterial({
-			color: 0xdc143c,
+			color: this.fishColor,
 			roughness: 0.8,
 			metalness: 0.3,
 		});
+	}
+
+	setFishColor(color) {
+		this.fishColor = color;
+	}
+
+	setBodyLenRatio(r) {
+		this.bodyLenRatio = r;
+	}
+
+	setFatFishRatio(r) {
+		this.fatFishRatio = r;
+	}
+
+	setFinSizeRatio(r) {
+		this.finSizeRatio = r;
 	}
 }
