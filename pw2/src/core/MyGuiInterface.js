@@ -42,7 +42,7 @@ class MyGuiInterface {
         const cameraNames = Object.keys(this.app.cameraManager.cameras);
 
         const cameraController = cameraFolder
-            .add(this.app.cameraManager, 'activeCameraName', cameraNames)
+            .add(this.app.cameraManager, 'cameraSelection', cameraNames)
             .name('Active Camera');
 
         cameraController.onChange((name) => {
