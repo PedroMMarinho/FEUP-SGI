@@ -65,6 +65,7 @@ class MyContents {
      * 
      */
     update() {
+        if (this.aquarium.shark) this.aquarium.shark.update();
     }
 
 }
