@@ -6,8 +6,8 @@ export class SharkLOD extends THREE.LOD {
     super();
     this.key = key;
     this.lods = lods;
-    this.distanceOffset = 5;
-    this.distanceStart = 2;
+    this.distanceOffset = 10;
+    this.distanceStart = 15;
     this.animationFrameRateStart = 60;
     this.animationFrameRateOffset = 15;
     this.clock = new THREE.Clock();

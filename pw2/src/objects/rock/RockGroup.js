@@ -1,58 +1,44 @@
 import * as THREE from 'three';
-import { Rock } from './Rock.js';
+import { RockLOD } from './RockLOD.js';
 
 class RockGroup extends THREE.Object3D {
-    constructor(count = 30) {
-        super();
+	constructor(count = 30, spreadX = 15, spreadZ = 15) {
+		super();
 
-        if (count <= 0) {
-            console.warn("RockGroup: count must be > 0");
-            return;
-        }
-        this.type = 'Group';
+		if (count <= 0) {
+			console.warn("RockGroup: count must be > 0");
+			return;
+		}
 
-        this.count = count;
-        this.rocks = [];
-        this.init();
-    }
+		this.type = 'Group';
+		this.count = count;
+		this.spreadX = spreadX;
+		this.spreadZ = spreadZ;
+		this.rocks = [];
 
-    init() {
-        const rockTemplate = new Rock();
+		this.init();
+	}
 
-        // Instanced mesh (shared geometry and material)
-        this.mesh = new THREE.InstancedMesh(
-            rockTemplate.geometry,
-            rockTemplate.material,
-            this.count
-        );
+	init() {
+		for (let i = 0; i < this.count; i++) {
+			const rockLOD = new RockLOD();
 
-        this.mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
-        this.add(this.mesh);
+			// Random position on the aquarium floor
+			rockLOD.position.set(
+				THREE.MathUtils.randFloatSpread(this.spreadX),
+				0, // on the ground
+				THREE.MathUtils.randFloatSpread(this.spreadZ)
+			);
 
-        const dummy = new THREE.Object3D();
+			// Random rotation
+			rockLOD.rotation.y = THREE.MathUtils.randFloat(0, Math.PI * 2);
+			rockLOD.rotation.x = THREE.MathUtils.randFloat(0, Math.PI / 8);
+			rockLOD.rotation.z = THREE.MathUtils.randFloat(0, Math.PI / 8);
 
-        for (let i = 0; i < this.count; i++) {
-            const position = new THREE.Vector3(
-                THREE.MathUtils.randFloatSpread(10),
-                THREE.MathUtils.randFloat(-2, -1.9), 
-                THREE.MathUtils.randFloatSpread(10)
-            );
-
-            // Slightly random size and rotation
-            const scale = THREE.MathUtils.randFloat(0.2, 0.6);
-            dummy.scale.set(scale, scale, scale);
-            dummy.rotation.y = THREE.MathUtils.randFloat(0, Math.PI * 2);
-            dummy.position.copy(position);
-
-            dummy.updateMatrix();
-            this.mesh.setMatrixAt(i, dummy.matrix);
-
-            this.rocks.push({ position, scale });
-        }
-
-        this.mesh.instanceMatrix.needsUpdate = true;
-    }
-
+			this.add(rockLOD);
+			this.rocks.push(rockLOD);
+		}
+	}
 }
 
 RockGroup.prototype.isGroup = true;
