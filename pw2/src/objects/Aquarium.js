@@ -39,12 +39,12 @@ class Aquarium extends THREE.Object3D {
     init() {
         // Create aquarium geometry and material
         this.createAquariumGeometry();
+        // create terrain
+        this.createTerrainSegments();
         // Create bubbles
         this.createBubbles();
         // create rocks
         this.createRocks();
-        // create terrain
-        this.createTerrainSegments();
 		// create corals
 		this.createCorals();
 		// create fishes
@@ -60,7 +60,7 @@ class Aquarium extends THREE.Object3D {
 
 
     createRocks() {
-        const rockGroup = new RockGroup(80);
+        const rockGroup = new RockGroup(180, this.terrainWidth, this.terrainHeight);
         this.addToAquarium(rockGroup);
     }
 
