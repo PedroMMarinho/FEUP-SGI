@@ -8,8 +8,11 @@ export class SharkLOD extends THREE.LOD {
     this.lods = lods;
     this.distanceOffset = 5;
     this.distanceStart = 2;
+    this.animationFrameRateStart = 60;
+    this.animationFrameRateOffset = 15;
     this.clock = new THREE.Clock();
     this.globalTime = 0;
+    this.timeSinceLastUpdate = 0;
 
     this.setupLODs();
   }
@@ -33,23 +36,30 @@ export class SharkLOD extends THREE.LOD {
     this.addLevel(emptyObject, distance);
   }
  
-  updateState() {
-    const delta = this.clock.getDelta();
-    this.globalTime += delta;
+updateState() {
+  const delta = this.clock.getDelta();
+  this.globalTime += delta;
 
-    const visibleLOD = this.levels.find(level => level.object.visible);
+  const visibleLOD = this.levels.find(level => level.object.visible);
+  const lodIndex = this.levels.indexOf(visibleLOD);
 
-    if (visibleLOD && visibleLOD.object.mixer) {
-      visibleLOD.object.mixer.update(delta);
+  const targetFrameRate = Math.max(5, this.animationFrameRateStart - lodIndex * this.animationFrameRateOffset);
+  const updateInterval = 1 / targetFrameRate;
+  this.timeSinceLastUpdate += delta;
+
+  this.levels.forEach(level => {
+    const obj = level.object;
+    if (!obj.mixer) return;
+
+    obj.mixer.setTime(this.globalTime);
+
+    if (obj === visibleLOD.object && this.timeSinceLastUpdate >= updateInterval) {
+      const effectiveDelta = this.timeSinceLastUpdate;
+      obj.mixer.update(effectiveDelta); // advance bones
+      this.timeSinceLastUpdate = 0;
     }
+  });
+}
 
-    this.levels.forEach(level => {
-      const obj = level.object;
-      if (obj.mixer && obj !== visibleLOD.object) {
-        obj.mixer.setTime(this.globalTime);
-      }
-    });
-
-  }
 
 }
