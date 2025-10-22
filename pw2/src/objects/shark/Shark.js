@@ -30,7 +30,6 @@ export class Shark extends THREE.Object3D {
     // Setup animation mixer
     this.mixer = new THREE.AnimationMixer(this.model);
 
-    console.log(`🦈 Shark model "${this.key}" loaded with ${gltf.animations.length} animations.`);
 
     // Store animation clips by name
     gltf.animations.forEach((clip) => {
