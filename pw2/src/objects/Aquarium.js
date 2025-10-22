@@ -84,7 +84,7 @@ class Aquarium extends THREE.Object3D {
     createShark() {
         const sharks = new SharkLOD('grey-shark', this.assetManager.blenderManager.getAllLODs('grey-shark'));
         this.addToAquarium(sharks);
-        sharks.getObjectForDistance(0).play("Swim");
+        
 
     }
 
