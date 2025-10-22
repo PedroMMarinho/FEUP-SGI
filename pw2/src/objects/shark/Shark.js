@@ -5,7 +5,7 @@ export class Shark extends THREE.Object3D {
    * @param {string} key - model identifier (for logging)
    * @param {GLTF} [gltfModel] - optional preloaded GLTF model
    */
-  constructor(key, gltfModel) {
+  constructor(key, gltfModel,lodLevel) {
     super();
 
     this.key = key;
@@ -13,9 +13,10 @@ export class Shark extends THREE.Object3D {
     this.mixer = null;
     this.animations = {};
     this.currentAction = null;
-    this.clock = new THREE.Clock();
+    this.lodLevel = lodLevel;
 
     this.setModel(gltfModel);
+    this.play("Swim");
   }
   /**
    * Set a GLTF model for this shark instance
@@ -28,6 +29,8 @@ export class Shark extends THREE.Object3D {
     
     // Setup animation mixer
     this.mixer = new THREE.AnimationMixer(this.model);
+
+    console.log(`🦈 Shark model "${this.key}" loaded with ${gltf.animations.length} animations.`);
 
     // Store animation clips by name
     gltf.animations.forEach((clip) => {
@@ -51,7 +54,7 @@ export class Shark extends THREE.Object3D {
       this.currentAction.crossFadeTo(action, fadeDuration, true);
     }
 
-    action.reset().play();
+    action.play();
     this.currentAction = action;
   }
 
@@ -62,9 +65,8 @@ export class Shark extends THREE.Object3D {
     }
   }
 
-  updateState() {
+  updateState(delta) {
     if (this.mixer) {
-      const delta = this.clock.getDelta();
       this.mixer.update(delta);
     }
   }
