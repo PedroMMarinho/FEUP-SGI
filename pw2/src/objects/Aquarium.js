@@ -5,6 +5,7 @@ import { CoralGroup } from './coral/CoralGroup.js';
 import { FishGroup } from './fish/FishGroup.js';
 import { TerrainSegment } from './terrainSegment/TerrainSegment.js';
 import { SharkLOD } from './shark/SharkLOD.js';
+import { Fish } from './fish/Fish.js';
 
 /**
  * Main Aquarium class
@@ -51,6 +52,10 @@ class Aquarium extends THREE.Object3D {
 		this.createFishes();
         // create shark
         this.createShark();
+        // Testing fish
+        const fish = new Fish(0xffffff, 1.0, 1.0, 1.0);
+        fish.position.set(0, 10, 0);
+        this.addToAquarium(fish);
     }
 
     createBubbles() {
@@ -84,8 +89,6 @@ class Aquarium extends THREE.Object3D {
     createShark() {
         const sharks = new SharkLOD('grey-shark', this.assetManager.blenderManager.getAllLODs('grey-shark'));
         this.addToAquarium(sharks);
-        
-
     }
 
     update() {

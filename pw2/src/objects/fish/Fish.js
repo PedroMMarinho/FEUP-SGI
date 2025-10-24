@@ -1,23 +1,33 @@
 import * as THREE from 'three';
 
-export class Fish {
+export class Fish extends THREE.Object3D {
 	constructor(fishColor, bodyLenRatio = 1, fatFishRatio = 1, finSizeRatio = 1) {
-		
+		super();
 		this.geometry = new THREE.BufferGeometry();
 
 		this.fishColor = fishColor;
 		this.bodyLenRatio = bodyLenRatio;
 		this.fatFishRatio = fatFishRatio;
 		this.finSizeRatio = finSizeRatio;
+		
+		// animation parameters
+		this.clock = new THREE.Clock();
+		this.globalTime = 0;
 
 		this.initBuffers();
 
-		this.initMaterials();	
+		this.initMaterials();
+
+		this.createSkeleton();
+
+		this.addSkinning();
+
+		this.bindSkeleton();
 	}
 
 	initBuffers() {
 		// directions according to image on moodle document
-		
+
 		const vertices = new Float32Array([
 			0, 0, 0.5 * this.bodyLenRatio, // v0 face tip
 			0.3 * this.fatFishRatio, 0, -0.1, // v1 right face tip
@@ -47,8 +57,62 @@ export class Fish {
 
 		this.geometry.setIndex(indices);
 		this.geometry.setAttribute('position', new THREE.BufferAttribute(vertices, 3));
+		this.geometry.computeVertexNormals();
 	}
-	
+
+	createSkeleton() {
+		const bone0 = new THREE.Bone(); // Head
+		const bone1 = new THREE.Bone(); // Middle
+		const bone2 = new THREE.Bone(); // Tail
+
+		bone0.position.set(0, 0, 0);
+		bone1.position.set(0, 0, -0.75 * this.bodyLenRatio);
+		bone2.position.set(0, 0, -1.5 * this.bodyLenRatio);
+
+		bone0.add(bone1);
+		bone1.add(bone2);
+
+		this.bones = [bone0, bone1, bone2];
+		this.skeleton = new THREE.Skeleton(this.bones);
+	}
+
+	addSkinning() {
+		const pos = this.geometry.getAttribute('position');
+		const vertexCount = pos.count;
+
+		const skinIndices = [];
+		const skinWeights = [];
+
+		for (let i = 0; i < vertexCount; i++) {
+			const z = pos.getZ(i);
+
+			// Assign weights based on z position
+			if (z > -0.3) {
+				// Head area → bone 0
+				skinIndices.push(0, 1, 0, 0);
+				skinWeights.push(1, 0, 0, 0);
+			} else if (z > -1.2) {
+				// Middle area → blend bone 0 and 1
+				skinIndices.push(0, 1, 0, 0);
+				skinWeights.push(0.5, 0.5, 0, 0);
+			} else {
+				// Tail area → blend bone 1 and 2
+				skinIndices.push(1, 2, 0, 0);
+				skinWeights.push(0.3, 0.7, 0, 0);
+			}
+		}
+
+		this.geometry.setAttribute('skinIndex', new THREE.Uint16BufferAttribute(skinIndices, 4));
+		this.geometry.setAttribute('skinWeight', new THREE.Float32BufferAttribute(skinWeights, 4));
+	}
+
+	bindSkeleton() {
+		this.mesh = new THREE.SkinnedMesh(this.geometry, this.material);
+		this.mesh.add(this.bones[0]);       // attach the root bone
+		this.mesh.bind(this.skeleton);
+		this.add(this.mesh);
+	}
+
 	initMaterials() {
 		this.material = new THREE.MeshStandardMaterial({
 			color: this.fishColor,
@@ -71,5 +135,13 @@ export class Fish {
 
 	setFinSizeRatio(r) {
 		this.finSizeRatio = r;
+	}
+
+	updateState() {
+		const delta = this.clock.getDelta();
+		this.globalTime += delta;
+
+		this.bones[1].rotation.y = Math.sin(this.globalTime * 2.0) * 0.3;
+		this.bones[2].rotation.y = Math.sin(this.globalTime * 2.0 + 0.5) * 0.5;
 	}
 }
