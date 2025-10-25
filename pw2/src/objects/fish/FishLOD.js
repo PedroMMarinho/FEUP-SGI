@@ -7,13 +7,14 @@ export class FishLOD extends THREE.LOD {
 		this.bodyColor = bodyColor;
 		this.finColor = finColor;
 		this.distanceStart = 20;
-		this.distanceOffset = 5;
+		this.distanceOffset = 10;
 		this.init();
 	}
 
 	init() {
 		const normalFish = new Fish(0);
 		const lowResFish = new Fish(1);
+		const emptyFish = new THREE.Object3D();
 
 		const bodyMaterial = new THREE.MeshStandardMaterial(this.bodyColor);
 		const finMaterial = new THREE.MeshStandardMaterial(this.bodyColor);
@@ -33,5 +34,6 @@ export class FishLOD extends THREE.LOD {
 
 		this.addLevel(hiMesh, this.distanceStart);
 		this.addLevel(lowMesh, this.distanceStart + this.distanceOffset);
+		this.addLevel(emptyFish, this.distanceStart + 2 * this.distanceOffset);
 	}
 }
