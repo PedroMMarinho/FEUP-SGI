@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { Fish } from './Rock.js';
+import { Fish } from './Fish.js';
 
 export class FishLOD extends THREE.LOD {
 	constructor(bodyColor, finColor) {
@@ -19,13 +19,13 @@ export class FishLOD extends THREE.LOD {
 		const finMaterial = new THREE.MeshStandardMaterial(this.bodyColor);
 
 		// low res model
-		const lowMesh = THREE.Group();
+		const lowMesh = new THREE.Group();
 		const lowResBodyMesh = new THREE.Mesh(lowResFish.bodyGeometry, bodyMaterial);
 		const lowResTailMesh = new THREE.Mesh(lowResFish.tailGeometry, finMaterial);
 		lowMesh.add(lowResTailMesh, lowResBodyMesh);
 		
 		// high res model
-		const hiMesh = THREE.Group();
+		const hiMesh = new THREE.Group();
 		const highResBodyMesh = new THREE.Mesh(normalFish.bodyGeometry, bodyMaterial);
 		const highResTailMesh = new THREE.Mesh(normalFish.tailGeometry, finMaterial);
 		const highResDorsalMesh = new THREE.Mesh(normalFish.dorsalFinGeometry, finMaterial);
