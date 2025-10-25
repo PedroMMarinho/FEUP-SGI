@@ -77,7 +77,7 @@ class Aquarium extends THREE.Object3D {
 	}
 
 	createFishes() {
-		const fishGroup = new FishGroup(35);
+		const fishGroup = new FishGroup(30);
 		this.addToAquarium(fishGroup);
 	}
 
