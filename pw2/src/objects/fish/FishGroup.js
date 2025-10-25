@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { Fish } from './Fish.js';
+import { FishLOD } from './FishLOD.js';
 
 // NOTE: Using instanced meshes disables the use of different fatFishScale, colors, etc.
 // (constructor attributes) per fish. Using an actual different mesh for every fish would be fine 
@@ -24,18 +24,31 @@ class FishGroup extends THREE.Object3D {
 	}
 
 	init() {
-		const material = new THREE.MeshStandardMaterial({ color: 0xdc143c });
+		/* const material = new THREE.MeshStandardMaterial({ color: 0xdc143c });
 		const finMaterial = new THREE.MeshStandardMaterial({color: 0x00ff55 });
 		const fatFish = new Fish(0xdc143c, 0.8, 1.3, 1.2);
 		const normalFish = new Fish(0xdc143c);
-		const thinFish = new Fish(0xdc143c, 1.3, 0.8, 1.1);
+		const thinFish = new Fish(0xdc143c, 1.3, 0.8, 1.1); */
 
 		for (let i = 0; i < this.count; i++) {
-			this.createFish(normalFish, material, finMaterial);
+			const fishLOD = new FishLOD(0xdc143c, 0x00ff55);
+
+			fishLOD.position.set(
+				THREE.MathUtils.randFloatSpread(10),
+				THREE.MathUtils.randFloat(-1, 6),
+				THREE.MathUtils.randFloatSpread(10)
+			);
+
+			fishLOD.rotation.y = THREE.MathUtils.randFloat(0, Math.PI * 2);
+			const scale = THREE.MathUtils.randFloat(0.8, 1.2);
+			fishLOD.scale.set(scale, scale, scale);
+
+			this.add(fishLOD);
+			this.fishes.push(fishLOD);
 		}
 	}
 
-	createFish(fishType, bodyMaterial, finMaterial) {
+	/* createFish(fishType, bodyMaterial, finMaterial) {
 		const bodyMesh = new THREE.Mesh(fishType.bodyGeometry, bodyMaterial);	
 		const tailMesh = new THREE.Mesh(fishType.tailGeometry, finMaterial);
 		const dorsalMesh = new THREE.Mesh(fishType.dorsalFinGeometry, finMaterial);
@@ -63,6 +76,12 @@ class FishGroup extends THREE.Object3D {
 		this.add(tailMesh);
 		this.add(dorsalMesh);
 		this.fishes.push((bodyMesh, tailMesh, dorsalMesh));
+	} */
+
+	updateLOD(camera) {
+		for (const fish of this.fishes) {
+			fish.update(camera);
+		}
 	}
 
 }

@@ -1,20 +1,42 @@
 import * as THREE from 'three';
 
 export class Fish {
-	constructor(fishColor, bodyLenRatio = 1, fatFishRatio = 1, finSizeRatio = 1) {
+	constructor(lowRes, bodyLenRatio = 1, fatFishRatio = 1, finSizeRatio = 1) {
 		
 		this.bodyGeometry = new THREE.BufferGeometry();
 		this.tailGeometry = new THREE.BufferGeometry();
 		this.dorsalFinGeometry = new THREE.BufferGeometry();
 
-		this.fishColor = fishColor;
+		// this.fishColor = fishColor;
 		this.bodyLenRatio = bodyLenRatio;
 		this.fatFishRatio = fatFishRatio;
 		this.finSizeRatio = finSizeRatio;
 
-		this.initBody();
-		this.initTail();
-		this.initDorsalFin();
+		if (!lowRes) {
+			this.initBody();
+			this.initTail();
+			this.initDorsalFin();
+		} else if (lowRes == 1){
+			this.initLowResBody();
+			this.initLowResTail();
+		}
+
+	}
+
+	initLowResBody() {
+		const vertices = new Float32Array([
+			0, -0.4 * this.fatFishRatio, 0,
+			0, 0.4 * this.fatFishRatio, 0,
+			0, 0, -1.5 * this.bodyLenRatio
+		]);
+
+		const indices = [
+			0, 2, 1,
+			0, 1, 2,
+		];
+
+		this.bodyGeometry.setIndex(indices);
+		this.bodyGeometry.setAttribute('position', new THREE.BufferAttribute(vertices, 3));
 	}
 
 	initBody() {
@@ -63,6 +85,22 @@ export class Fish {
 		this.tailGeometry.setAttribute('position', new THREE.BufferAttribute(vertices, 3));
 	}
 
+	initLowResTail() {
+		const vertices = new Float64Array([
+			0, 0, -1.5 * this.bodyLenRatio,
+			0, 0.5 * this.finSizeRatio, -2 * this.finSizeRatio,
+			0, -0.5 * this.finSizeRatio, -2 * this.finSizeRatio
+		]);
+
+		const indices = [
+			0, 2, 1,
+			0, 1, 2
+		];
+
+		this.tailGeometry.setIndex(indices);
+		this.tailGeometry.setAttribute('position', new THREE.BufferAttribute(vertices, 3));
+	}
+
 	initDorsalFin() {
 		const vertices = new Float32Array([
 			0, 0.4 * this.fatFishRatio, 0, // v0 face top
@@ -82,7 +120,7 @@ export class Fish {
 		this.dorsalFinGeometry.setAttribute('position', new THREE.BufferAttribute(vertices, 3));
 	}
 	
-	initMaterials() {
+	/* initMaterials() {
 		this.material = new THREE.MeshStandardMaterial({
 			color: this.fishColor,
 			roughness: 0.8,
@@ -92,7 +130,7 @@ export class Fish {
 
 	setFishColor(color) {
 		this.fishColor = color;
-	}
+	} */
 
 	setBodyLenRatio(r) {
 		this.bodyLenRatio = r;
