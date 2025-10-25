@@ -14,7 +14,7 @@ export class CoralLOD extends THREE.LOD {
         const lodLevels = [
             { complexity: 5, distance: this.startDistance },
             { complexity: 4, distance: this.startDistance + this.distanceOffset },
-            { complexity: 3, distance: this.startDistance + 2 * this.distanceOffset }
+            { complexity: 3, distance: this.startDistance + 2 * this.distanceOffset },
         ];
 
         lodLevels.forEach((level) => {
@@ -22,6 +22,8 @@ export class CoralLOD extends THREE.LOD {
             this.addLevel(coral, level.distance);
             this.corals.push(coral);
         });
+        const emptyObject = new THREE.Object3D();
+        this.addLevel(emptyObject, this.startDistance + lodLevels.length * this.distanceOffset);
     }
 
 
