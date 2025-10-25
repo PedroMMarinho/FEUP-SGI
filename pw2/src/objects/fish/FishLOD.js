@@ -6,8 +6,8 @@ export class FishLOD extends THREE.LOD {
 		super();
 		this.bodyColor = bodyColor;
 		this.finColor = finColor;
-		this.distanceStart = 70;
-		this.distanceOffset = 20;
+		this.distanceStart = 20;
+		this.distanceOffset = 5;
 		this.init();
 	}
 
