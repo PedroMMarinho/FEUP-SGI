@@ -86,7 +86,7 @@ export class Fish {
 	}
 
 	initLowResTail() {
-		const vertices = new Float64Array([
+		const vertices = new Float32Array([
 			0, 0, -1.5 * this.bodyLenRatio,
 			0, 0.5 * this.finSizeRatio, -2 * this.finSizeRatio,
 			0, -0.5 * this.finSizeRatio, -2 * this.finSizeRatio
