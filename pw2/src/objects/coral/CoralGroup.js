@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { Coral } from "./Coral.js";
+import { CoralLOD } from "./CoralLOD.js";
 
 class CoralGroup extends THREE.Object3D {
 	constructor(count = 40, spreadX = 15, spreadZ = 15) {
@@ -21,7 +21,7 @@ class CoralGroup extends THREE.Object3D {
 	}
 
     init() {
-        const coralTemplate = new Coral();
+        const coralTemplate = new CoralLOD();
 
         const dummy = new THREE.Object3D();
 
