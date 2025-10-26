@@ -77,13 +77,18 @@ class FishGroup extends THREE.Object3D {
 		this.add(dorsalMesh);
 		this.fishes.push((bodyMesh, tailMesh, dorsalMesh));
 	} */
-
+	/*
 	updateLOD(camera) {
 		for (const fish of this.fishes) {
 			fish.update(camera);
 		}
 	}
-
+	*/
+	updateState() {
+		for (const fish of this.fishes) {
+			fish.updateState();
+		}
+	}
 }
 
 FishGroup.prototype.isGroup = true;

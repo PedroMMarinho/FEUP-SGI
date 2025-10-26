@@ -11,11 +11,14 @@ export class Fish {
 		this.bodyLenRatio = bodyLenRatio;
 		this.fatFishRatio = fatFishRatio;
 		this.finSizeRatio = finSizeRatio;
+		this.isLowRes = lowRes;
 
 		if (!lowRes) {
 			this.initBody();
 			this.initTail();
 			this.initDorsalFin();
+			this.initSkeleton();
+			this.addSkinning();
 		} else if (lowRes == 1){
 			this.initLowResBody();
 			this.initLowResTail();
@@ -118,6 +121,57 @@ export class Fish {
 		
 		this.dorsalFinGeometry.setIndex(indices);
 		this.dorsalFinGeometry.setAttribute('position', new THREE.BufferAttribute(vertices, 3));
+	}
+
+	// --- Skeleton setup ---
+	initSkeleton() {
+		const bone0 = new THREE.Bone(); // head
+		const bone1 = new THREE.Bone(); // middle
+		const bone2 = new THREE.Bone(); // tail
+
+		bone0.position.set(0,0,0);
+		bone1.position.set(0,0,-0.75 * this.bodyLenRatio);
+		bone2.position.set(0,0,-1.5 * this.bodyLenRatio);
+
+		bone0.add(bone1);
+		bone1.add(bone2);
+
+		this.bones = [bone0, bone1, bone2];
+		this.skeleton = new THREE.Skeleton(this.bones);
+	}
+
+	// --- Assign skin weights to vertices ---
+	addSkinning() {
+		this.skinBody(this.bodyGeometry);
+		this.skinBody(this.tailGeometry);
+		this.skinBody(this.dorsalFinGeometry);
+	}
+
+	// helper function
+	skinBody(geometry) {
+		const pos = geometry.getAttribute('position');
+		const vertexCount = pos.count;
+
+		const skinIndices = [];
+		const skinWeights = [];
+
+		for (let i = 0; i < vertexCount; i++) {
+			const z = pos.getZ(i);
+
+			if (z > -0.3) {
+				skinIndices.push(0, 1, 0, 0);
+				skinWeights.push(1, 0, 0, 0);
+			} else if (z > -1.2) {
+				skinIndices.push(0, 1, 0, 0);
+				skinWeights.push(0.5, 0.5, 0, 0);
+			} else {
+				skinIndices.push(1, 2, 0, 0);
+				skinWeights.push(0.3, 0.7, 0, 0);
+			}
+		}
+
+		geometry.setAttribute('skinIndex', new THREE.Uint16BufferAttribute(skinIndices, 4));
+		geometry.setAttribute('skinWeight', new THREE.Float32BufferAttribute(skinWeights, 4));
 	}
 	
 	/* initMaterials() {
