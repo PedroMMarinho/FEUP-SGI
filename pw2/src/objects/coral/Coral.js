@@ -30,6 +30,7 @@ export class Coral {
         const variableAngle = 10 * THREE.MathUtils.DEG2RAD; // random angle variation for more natural trees
 
         // 'F': Move forward and draw a branch
+        // Z: Move and draw triple branch
         // 'X': Draw a leaf at the current position
         // '+','-': Yaw (turn left/right 15 degrees)
         // '&','^': Pitch (turn up/down)
@@ -43,10 +44,10 @@ export class Coral {
 
             ],
             'L': [
-                { prob: 0.3, rule: 'K[&&FFFX]+++[&&FFFX]+++[&&FFFX]+++[&&FFFX]' },
-                { prob: 0.3, rule: 'K[&&FFFX]++++[&&FFFX]++++[&&FFFX]' },
-                { prob: 0.3, rule: 'K[&&FFFX]+++[&&FFFX]' },
-                { prob: 0.1, rule: 'K[&&FFFX]++++[&&FFFX]'}
+                { prob: 0.3, rule: 'K[&&ZX]+++[&&ZX]+++[&&ZX]+++[&&ZX]' },
+                { prob: 0.3, rule: 'K[&&ZX]++++[&&ZX]++++[&&ZX]' },
+                { prob: 0.3, rule: 'K[&&ZX]+++[&&ZX]' },
+                { prob: 0.1, rule: 'K[&&ZX]++++[&&ZX]'}
             ],
 
             'K': [
@@ -147,6 +148,20 @@ export class Coral {
                     turtle.position = state.position;
                     turtle.quaternion = state.quaternion;
                     branchLength = state.length;
+                    break;
+                }
+                case 'Z': {
+                    const startPosition = turtle.position.clone();
+                    const forward = new THREE.Vector3(0, 1, 0)
+                        .applyQuaternion(turtle.quaternion)
+                        .multiplyScalar(branchLength);
+                    turtle.position.add(forward);
+
+                    const instanceMatrix = new THREE.Matrix4();
+                    const orientation = new THREE.Quaternion().setFromUnitVectors(axisY, forward.clone().normalize());
+                    const scale = new THREE.Vector3(1, branchLength, 1);
+                    instanceMatrix.compose(startPosition, orientation, scale);
+                    branchMatrices.push(instanceMatrix);
                     break;
                 }
                 default:
