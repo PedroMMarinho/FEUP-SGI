@@ -157,7 +157,7 @@ export class Coral {
 
         const group = new THREE.Group();
 
-        const branchGeo = new THREE.CylinderGeometry(0.05, 0.05, 1, 8);
+        const branchGeo = new THREE.CylinderGeometry(0.05, 0.05, 1, 3);
         branchGeo.translate(0, 0.5, 0);
         //const branchMat = this.material;
             

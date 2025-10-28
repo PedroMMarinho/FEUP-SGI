@@ -11,9 +11,9 @@ class SeaweedLOD extends THREE.LOD {
     }
     createLODs(){
         const lodLevels = [
-            { complexity: 5, distance: this.startDistance },
-            { complexity: 4, distance: this.startDistance + this.distanceOffset },
-            { complexity: 3, distance: this.startDistance + 2 * this.distanceOffset },
+            { complexity: 6, distance: this.startDistance },
+            { complexity: 5, distance: this.startDistance + this.distanceOffset },
+            { complexity: 4, distance: this.startDistance + 2 * this.distanceOffset },
         ];
 
         lodLevels.forEach((level) => {
