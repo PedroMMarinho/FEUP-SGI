@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 
 export class Seaweed {
-    constructor(complexity = 5) {
+    constructor(complexity = 10) {
         return this.createObject(complexity)
     }
 
@@ -25,9 +25,9 @@ export class Seaweed {
 
     createObject(complexity) {
         const iterations = complexity;
-        const yawAngle = 20 * THREE.MathUtils.DEG2RAD;
-        const pitchAngle = 50 * THREE.MathUtils.DEG2RAD;
-        const variableAngle = 0 * THREE.MathUtils.DEG2RAD; // random angle variation for more natural trees
+        const yawAngle = 45 * THREE.MathUtils.DEG2RAD;
+        const pitchAngle = 20 * THREE.MathUtils.DEG2RAD;
+        const variableAngle = 10 * THREE.MathUtils.DEG2RAD; // random angle variation for more natural trees
 
         // 'F': Move forward and draw a branch
         // 'X': Draw a leaf at the current position
@@ -38,13 +38,18 @@ export class Seaweed {
         // --- Stochastic L-System Rules ---
         const stochasticRules = {
             'X': [
-                { prob: 1, rule: '&^FFFX' },
+                { prob: 0.25, rule: 'F[&+FX]A[&X]' },
+                { prob: 0.25, rule: 'F[&-FX]A[&-X]' },
+                { prob: 0.25, rule: 'F[^++FX]A[^--X]' },
+                { prob: 0.25, rule: 'F[^--FX]A[&++X]' },
             ],
-            '&': [
-                { prob: 1, rule: '&&' },
+            'F': [
+                { prob: 0.4, rule: 'FF' },
+                { prob: 0.6, rule: 'F' },
             ],
-            '^': [
-                { prob: 1, rule: '^^' },
+            'A': [
+                { prob: 0.5, rule: 'F[&+X][&-X]A' },
+                { prob: 0.5, rule: 'F[^+X][^-X]A' },
             ],
 
         };
@@ -56,7 +61,13 @@ export class Seaweed {
         for (let i = 0; i < iterations; i++) {
             let nextString = '';
             for (const char of currentString) {
-                if (stochasticRules[char]) {
+                if( char === 'F' ) {
+                    if( iterations - i <= 2 ) {
+                        nextString += this.chooseNextRule(stochasticRules[char]);
+                    } else {
+                        continue;
+                    }
+                } else if (stochasticRules[char]) {
                     nextString += this.chooseNextRule(stochasticRules[char]);
                 } else {
                     nextString += char;
@@ -75,7 +86,6 @@ export class Seaweed {
         let branchLength = 0.8;
         const lengthFactor = 0.5;
         const branchMatrices = [];
-        const leafMatrices = [];
 
         const axisX = new THREE.Vector3(1, 0, 0);
         const axisY = new THREE.Vector3(0, 1, 0);
@@ -141,7 +151,7 @@ export class Seaweed {
 
         const group = new THREE.Group();
 
-        const branchGeo = new THREE.CylinderGeometry(0.05, 0.05, 1, 8);
+        const branchGeo = new THREE.CylinderGeometry(0.05, 0.05, 1, 3);
         branchGeo.translate(0, 0.5, 0);
         //const branchMat = this.material;
             
