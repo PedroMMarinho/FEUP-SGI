@@ -20,7 +20,7 @@ export class AssetManager {
 
     initBlenderModels() {
         const modelList = [
-            { key: 'grey-shark', url: 'sharks/grey/shark-high.glb', lod: 0 },
+            { key: 'grey-shark', url: 'submarine.glb', lod: 0 },
             { key: 'grey-shark', url: 'sharks/grey/shark-medium.glb', lod: 1 },
             { key: 'grey-shark', url: 'sharks/grey/shark-low.glb', lod: 2 },
         ];

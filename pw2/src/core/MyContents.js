@@ -3,6 +3,7 @@ import { MyAxis } from '../objects/MyAxis.js';
 import { Aquarium } from '../objects/Aquarium.js';
 import { TextureManager } from '../managers/TextureManager.js';
 import { AssetManager } from '../managers/AssetManager.js';
+import { Submarine } from '../objects/submarine/Submarine.js';
 
 /**
  *  This class contains the contents of out application
@@ -19,6 +20,8 @@ class MyContents {
         this.showAxis = true;
         this.assetManager = new AssetManager(); // Asset Manager
         this.aquarium = new Aquarium(this.assetManager); // Main Object of the scene
+        this.submarine = new Submarine();
+        this.app.scene.add(this.submarine);
     }
 
     /**

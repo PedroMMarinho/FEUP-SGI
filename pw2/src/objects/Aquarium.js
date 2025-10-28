@@ -5,6 +5,7 @@ import { CoralGroup } from './coral/CoralGroup.js';
 import { FishGroup } from './fish/FishGroup.js';
 import { TerrainSegment } from './terrainSegment/TerrainSegment.js';
 import { SharkLOD } from './shark/SharkLOD.js';
+import { Submarine } from './submarine/Submarine.js';
 
 /**
  * Main Aquarium class
@@ -40,17 +41,19 @@ class Aquarium extends THREE.Object3D {
         // Create aquarium geometry and material
         this.createAquariumGeometry();
         // create terrain
-        this.createTerrainSegments();
-        // Create bubbles
-        this.createBubbles();
-        // create rocks
-        this.createRocks();
-		// create corals
-		this.createCorals();
-		// create fishes
-		this.createFishes();
-        // create shark
+        //this.createTerrainSegments();
+        //// Create bubbles
+        //this.createBubbles();
+        //// create rocks
+        //this.createRocks();
+		//// create corals
+		//this.createCorals();
+		//// create fishes
+		//this.createFishes();
+        //// create shark
         this.createShark();
+        // create submarine
+        //this.createSubmarine();
     }
 
     createBubbles() {
@@ -86,6 +89,11 @@ class Aquarium extends THREE.Object3D {
         this.addToAquarium(sharks);
         
 
+    }
+    createSubmarine() {
+        this.submarine = new Submarine();
+        this.submarine.position.set(0, 0, 0);
+        this.addToAquarium(this.submarine);
     }
 
     update() {

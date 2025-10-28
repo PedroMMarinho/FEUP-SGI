@@ -2,6 +2,7 @@ import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 import * as THREE from 'three';
 import { MyApp } from './MyApp.js';
 import { MyContents } from './MyContents.js';
+import { Submarine } from '../objects/submarine/Submarine.js';
 
 /**
  * Custom GUI interface for the app
@@ -61,6 +62,21 @@ class MyGuiInterface {
         });
 
         renderFolder.open();
+
+
+        const submarine = this.contents.submarine; // Make sure MyContents stores the submarine reference
+
+        if (submarine) {
+            const submarineFolder = this.datgui.addFolder('Submarine Controls');
+
+  
+            submarineFolder.add(submarine.position, 'x', 0, 4, 1).name('Position X');
+
+
+            submarineFolder.open();
+        } else {
+            console.log('Submarine not found in contents — make sure it’s stored in MyContents!');
+        }
     }
 }
 
