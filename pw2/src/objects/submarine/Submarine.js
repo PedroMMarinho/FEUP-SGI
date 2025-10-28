@@ -24,6 +24,7 @@ export class Submarine extends THREE.Object3D {
 		this.createBody();
 		this.addRectangleFins();
 		this.addEllipticalFins();
+		this.createTampSemiCircleRingGeometry();
 	}
 
 	initMaterials() {
@@ -180,4 +181,28 @@ export class Submarine extends THREE.Object3D {
 		shape.holes.push(inner);
 		return shape;
 	}
+
+	createTampSemiCircleRingGeometry() {
+		const shape = new THREE.Shape();
+		const radiusOuter = 1;
+		const radiusInner = 0.96;
+		const angleStart = 3 *  Math.PI / 8;
+		const angleEnd =  5 * Math.PI / 8;
+		shape.absarc(0, 0, radiusOuter, angleStart, angleEnd, false);
+		shape.absarc(0, 0, radiusInner, angleEnd, angleStart, true);
+		shape.closePath();
+
+		const extrudeSettings = {
+			steps: 1,
+			depth: 0.6,
+			bevelEnabled: false,
+		};
+
+		const geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
+		const mesh = new THREE.Mesh(geometry, this.finMaterial);
+		mesh.position.set(0, -0.01, - (this.width / 2 + this.height / 2) - 0.49);
+		mesh.rotation.x = - Math.PI / 40;
+		this.bodyGroup.add(mesh);
+	}
+
 }
