@@ -321,7 +321,7 @@ export class Submarine extends THREE.Object3D {
 
 		const geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
 		const mesh = new THREE.Mesh(geometry, this.finMaterial);
-		mesh.position.set(0, -0.01, - (this.width / 2 + this.height / 2) - 0.49);
+		mesh.position.set(0, -0.04, - (this.width / 2 + this.height / 2) - 0.49);
 		mesh.rotation.x = - Math.PI / 40;
 		this.bodyGroup.add(mesh);
 	}
@@ -352,9 +352,9 @@ export class Submarine extends THREE.Object3D {
 			new THREE.Vector2(baseRadius * 0.68, totalHeight / 2 - 0.53),
 			new THREE.Vector2(baseRadius * 1.02, totalHeight / 2 - 0.4),
 			new THREE.Vector2(baseRadius * 1.1, totalHeight / 2 - 0.3),
-			new THREE.Vector2(baseRadius * 1.25,  totalHeight / 2 - 0.1),
-			new THREE.Vector2(baseRadius * 1.2,  totalHeight / 2 - 0.05),
-			new THREE.Vector2(this.height / 18,  totalHeight / 2),
+			new THREE.Vector2(baseRadius * 1.25, totalHeight / 2 - 0.1),
+			new THREE.Vector2(baseRadius * 1.2, totalHeight / 2 - 0.05),
+			new THREE.Vector2(this.height / 18, totalHeight / 2),
 		];
 
 		const geometry = new THREE.LatheGeometry(points, 64, 0, Math.PI * 2);
@@ -378,9 +378,13 @@ export class Submarine extends THREE.Object3D {
 			ballMesh.position.set(x, y, this.width + baseRadius + 0.646);
 			this.motorGroup.add(ballMesh);
 		}
+
+		this.createCurvedBlade();
+
+	}
+
+	createCurvedBlade() {
 		
-
-
 	}
 
 
