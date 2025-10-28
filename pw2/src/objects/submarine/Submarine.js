@@ -10,10 +10,12 @@ export class Submarine extends THREE.Object3D {
 		// --- Groups ---
 		this.bodyGroup = new THREE.Group();
 		this.finGroup = new THREE.Group();
+		this.motorGroup = new THREE.Group();
 
 		// Add both groups to the main object
 		this.add(this.bodyGroup);
 		this.add(this.finGroup);
+		this.add(this.motorGroup);
 
 		this.init();
 	}
@@ -25,6 +27,7 @@ export class Submarine extends THREE.Object3D {
 		this.addRectangleFins();
 		this.addEllipticalFins();
 		this.createTampSemiCircleRingGeometry();
+		this.createMotorPropeller();
 	}
 
 	initMaterials() {
@@ -89,7 +92,7 @@ export class Submarine extends THREE.Object3D {
 		// Second cylinder
 		const secondCylinderHeight = this.height / 8;
 		const secondCylinderGeometry = new THREE.CylinderGeometry(
-			this.height / 16,
+			this.height / 15,
 			this.height / 12,
 			secondCylinderHeight,
 			64
@@ -134,13 +137,13 @@ export class Submarine extends THREE.Object3D {
 		this.createFinElipticalCylinder({
 			side: "left",
 			position: { x: 0.4, y: 0, z: 6.62 },
-			rotation: { x: 0, y: - Math.PI /140, z: - Math.PI / 110  },
+			rotation: { x: 0, y: - Math.PI / 140, z: - Math.PI / 110 },
 			scale: { x: 0.6, y: 1.41, z: 4.1 },
 		});
 		this.createFinElipticalCylinder({
 			side: "right",
 			position: { x: -0.4, y: 0, z: 6.62 },
-			rotation: { x: 0, y: Math.PI /140, z: Math.PI / 110  },
+			rotation: { x: 0, y: Math.PI / 140, z: Math.PI / 110 },
 			scale: { x: 0.6, y: 1.41, z: 4.1 },
 		});
 		this.createFinElipticalCylinder({
@@ -158,113 +161,115 @@ export class Submarine extends THREE.Object3D {
 	}
 
 	createRectangleFin({
-	side = "right",      
-	position = { x: 0, y: 0, z: -3.21 },
-	rotation = { x: 0, y: 0, z: 0 },
-}) {
-	const shapeWidth = 0.905;
-	const shapeHeight = 0.21;
-	const borderThickness = 0.03;
+		side = "right",
+		position = { x: 0, y: 0, z: -3.21 },
+		rotation = { x: 0, y: 0, z: 0 },
+	}) {
+		const shapeWidth = 0.905;
+		const shapeHeight = 0.21;
+		const borderThickness = 0.03;
 
-	// Create the diamond shape
-	const diamondShape = this.createHollowDiamondShape(shapeWidth, shapeHeight, borderThickness);
-	const extrudeGeometry = new THREE.ExtrudeGeometry(diamondShape, {
-		steps: 1,
-		depth: 0.05,
-		bevelEnabled: false,
-	});
+		// Create the diamond shape
+		const diamondShape = this.createHollowDiamondShape(shapeWidth, shapeHeight, borderThickness);
+		const extrudeGeometry = new THREE.ExtrudeGeometry(diamondShape, {
+			steps: 1,
+			depth: 0.05,
+			bevelEnabled: false,
+		});
 
-	const extrudeMaterial = new THREE.MeshStandardMaterial({
-		color: 0x007bff,
-		roughness: 0.5,
-		metalness: 0.3,
-		side: THREE.DoubleSide,
-	});
+		const extrudeMaterial = new THREE.MeshStandardMaterial({
+			color: 0x007bff,
+			roughness: 0.5,
+			metalness: 0.3,
+			side: THREE.DoubleSide,
+		});
 
-	const extrudedDiamond = new THREE.Mesh(extrudeGeometry, extrudeMaterial);
+		const extrudedDiamond = new THREE.Mesh(extrudeGeometry, extrudeMaterial);
 
-	// Base offset depending on the side
-	const offset = this.height / 2 + 0.225;
-	switch (side.toLowerCase()) {
-		case "right":
-			extrudedDiamond.position.set(offset, 0, 0);
-			extrudedDiamond.rotation.y = Math.PI / 2;
-			break;
-		case "left":
-			extrudedDiamond.position.set(-offset, 0, 0);
-			extrudedDiamond.rotation.y = -Math.PI / 2;
-			break;
-		case "top":
-			extrudedDiamond.position.set(0, offset, 0);
-			extrudedDiamond.rotation.x = Math.PI / 2;
-			break;
-		case "bottom":
-			extrudedDiamond.position.set(0, -offset, 0);
-			extrudedDiamond.rotation.x = -Math.PI / 2;
-			break;
-		default:
-			console.warn(`Unknown side: ${side}. Defaulting to right.`);
-			extrudedDiamond.position.set(offset, 0, 0);
-			extrudedDiamond.rotation.y = Math.PI / 2;
+		// Base offset depending on the side
+		const offset = this.height / 2 + 0.225;
+		switch (side.toLowerCase()) {
+			case "right":
+				extrudedDiamond.position.set(offset, 0, 0);
+				extrudedDiamond.rotation.y = Math.PI / 2;
+				break;
+			case "left":
+				extrudedDiamond.position.set(-offset, 0, 0);
+				extrudedDiamond.rotation.y = -Math.PI / 2;
+				break;
+			case "top":
+				extrudedDiamond.position.set(0, offset, 0);
+				extrudedDiamond.rotation.x = Math.PI / 2;
+				break;
+			case "bottom":
+				extrudedDiamond.position.set(0, -offset, 0);
+				extrudedDiamond.rotation.x = -Math.PI / 2;
+				break;
+			default:
+				console.warn(`Unknown side: ${side}. Defaulting to right.`);
+				extrudedDiamond.position.set(offset, 0, 0);
+				extrudedDiamond.rotation.y = Math.PI / 2;
+		}
+
+		// Apply custom position and rotation overrides
+		extrudedDiamond.position.add(new THREE.Vector3(position.x, position.y, position.z));
+		extrudedDiamond.rotation.x += rotation.x;
+		extrudedDiamond.rotation.y += rotation.y;
+		extrudedDiamond.rotation.z += rotation.z;
+
+		this.bodyGroup.add(extrudedDiamond);
 	}
 
-	// Apply custom position and rotation overrides
-	extrudedDiamond.position.add(new THREE.Vector3(position.x, position.y, position.z));
-	extrudedDiamond.rotation.x += rotation.x;
-	extrudedDiamond.rotation.y += rotation.y;
-	extrudedDiamond.rotation.z += rotation.z;
-	
-	this.bodyGroup.add(extrudedDiamond);
-}
+
 
 
 	createFinElipticalCylinder({
-	side = "right", // "left", "right", "top", "bottom"
-	position = { x: 0, y: 0, z: -3.21 },
-	rotation = { x: 0, y: 0, z: 0 },
-	scale = { x: 0.6, y: 1, z: 4.1 },
-}) {
-	const finGeometry = new THREE.CylinderGeometry(
-		this.height / 16,
-		this.height / 16,
-		this.height / 2 + 0.1,
-		64
-	);
-	const finMesh = new THREE.Mesh(finGeometry, this.finMaterial);
+		side = "right", // "left", "right", "top", "bottom"
+		position = { x: 0, y: 0, z: -3.21 },
+		rotation = { x: 0, y: 0, z: 0 },
+		scale = { x: 0.6, y: 1, z: 4.1 },
+	}) {
+		const finGeometry = new THREE.CylinderGeometry(
+			this.height / 16,
+			this.height / 16,
+			this.height / 2 + 0.1,
+			64
+		);
+		const finMesh = new THREE.Mesh(finGeometry, this.finMaterial);
 
-	// Base rotation/orientation per side
-	const offset = this.height - 0.115;
-	switch (side.toLowerCase()) {
-		case "right":
-			finMesh.position.set(offset, 0, 0);
-			finMesh.rotation.z = Math.PI / 2;
-			finMesh.rotation.y = 0;
-			break;
-		case "left":
-			finMesh.position.set(-offset, 0, 0);
-			finMesh.rotation.z = Math.PI / 2;
-			finMesh.rotation.y = Math.PI;
-			break;
-		case "top":
-			finMesh.position.set(0, offset, 0);
-			break;
-		case "bottom":
-			finMesh.position.set(0, -offset, 0);
-			break;
-		default:
-			console.warn(`Unknown side: ${side}. Defaulting to right.`);
-			finMesh.position.set(offset, 0, 0);
-			finMesh.rotation.z = -Math.PI / 2;
+		// Base rotation/orientation per side
+		const offset = this.height - 0.115;
+		switch (side.toLowerCase()) {
+			case "right":
+				finMesh.position.set(offset, 0, 0);
+				finMesh.rotation.z = Math.PI / 2;
+				finMesh.rotation.y = 0;
+				break;
+			case "left":
+				finMesh.position.set(-offset, 0, 0);
+				finMesh.rotation.z = Math.PI / 2;
+				finMesh.rotation.y = Math.PI;
+				break;
+			case "top":
+				finMesh.position.set(0, offset, 0);
+				break;
+			case "bottom":
+				finMesh.position.set(0, -offset, 0);
+				break;
+			default:
+				console.warn(`Unknown side: ${side}. Defaulting to right.`);
+				finMesh.position.set(offset, 0, 0);
+				finMesh.rotation.z = -Math.PI / 2;
+		}
+
+		// Apply custom offsets and transformations
+		finMesh.position.add(new THREE.Vector3(position.x, position.y, position.z));
+		finMesh.rotation.x += rotation.x;
+		finMesh.rotation.y += rotation.y;
+		finMesh.rotation.z += rotation.z;
+		finMesh.scale.set(scale.x, scale.y, scale.z);
+		this.finGroup.add(finMesh);
 	}
-
-	// Apply custom offsets and transformations
-	finMesh.position.add(new THREE.Vector3(position.x, position.y, position.z));
-	finMesh.rotation.x += rotation.x;
-	finMesh.rotation.y += rotation.y;
-	finMesh.rotation.z += rotation.z;
-	finMesh.scale.set(scale.x, scale.y, scale.z);
-	this.finGroup.add(finMesh);
-}
 
 
 	createHollowDiamondShape(width, height, thickness) {
@@ -302,8 +307,8 @@ export class Submarine extends THREE.Object3D {
 		const shape = new THREE.Shape();
 		const radiusOuter = 1;
 		const radiusInner = 0.96;
-		const angleStart = 3 *  Math.PI / 8;
-		const angleEnd =  5 * Math.PI / 8;
+		const angleStart = 3 * Math.PI / 8;
+		const angleEnd = 5 * Math.PI / 8;
 		shape.absarc(0, 0, radiusOuter, angleStart, angleEnd, false);
 		shape.absarc(0, 0, radiusInner, angleEnd, angleStart, true);
 		shape.closePath();
@@ -320,5 +325,63 @@ export class Submarine extends THREE.Object3D {
 		mesh.rotation.x = - Math.PI / 40;
 		this.bodyGroup.add(mesh);
 	}
+
+	createMotorPropeller() {
+		this.createMotor();
+	}
+
+	createMotor() {
+		// Motor cylinder
+		const motorGeometry = new THREE.CylinderGeometry(
+			this.height / 18,
+			this.height / 18,
+			this.height / 3,
+			64
+		);
+		const motorMesh = new THREE.Mesh(motorGeometry, this.finMaterial);
+		motorMesh.rotation.x = Math.PI / 2;
+		motorMesh.position.set(0, 0, this.width + (this.height / 6));
+		this.motorGroup.add(motorMesh);
+
+		// Propeller support
+		const totalHeight = this.height / 2;
+		const baseRadius = this.height / 10;
+
+		const points = [
+			new THREE.Vector2(0, totalHeight / 2 - 0.55),
+			new THREE.Vector2(baseRadius * 0.68, totalHeight / 2 - 0.53),
+			new THREE.Vector2(baseRadius * 1.02, totalHeight / 2 - 0.4),
+			new THREE.Vector2(baseRadius * 1.1, totalHeight / 2 - 0.3),
+			new THREE.Vector2(baseRadius * 1.25,  totalHeight / 2 - 0.1),
+			new THREE.Vector2(baseRadius * 1.2,  totalHeight / 2 - 0.05),
+			new THREE.Vector2(this.height / 18,  totalHeight / 2),
+		];
+
+		const geometry = new THREE.LatheGeometry(points, 64, 0, Math.PI * 2);
+		const material = new THREE.MeshStandardMaterial({ color: 0x00ff00, metalness: 0.2, roughness: 0.5, side: THREE.DoubleSide });
+
+		const lathe = new THREE.Mesh(geometry, material);
+		lathe.rotation.x = -Math.PI / 2;
+		lathe.position.set(0, 0, this.width + baseRadius + 0.67);
+
+		this.motorGroup.add(lathe);
+		// Propeller balls 6 around the support
+		const ballGeometry = new THREE.SphereGeometry(this.height / 34, 32, 32);
+		const ballMaterial = new THREE.MeshStandardMaterial({ color: 0xff0000, metalness: 0.3, roughness: 0.4 });
+		const rotationOffset = Math.PI / 5; // To stagger the balls
+		const ballRadius = this.height / 10;
+		for (let i = 0; i < 6; i++) {
+			const angle = (i / 6) * Math.PI * 2 + rotationOffset;
+			const x = ballRadius * Math.cos(angle);
+			const y = ballRadius * Math.sin(angle);
+			const ballMesh = new THREE.Mesh(ballGeometry, ballMaterial);
+			ballMesh.position.set(x, y, this.width + baseRadius + 0.646);
+			this.motorGroup.add(ballMesh);
+		}
+		
+
+
+	}
+
 
 }
