@@ -12,6 +12,7 @@ export class FishLOD extends THREE.LOD {
 		// animation params
 		this.clock = new THREE.Clock();
 		this.globalTime = 0;
+		this.speed = 1;
 
 		this.init();
 	}
@@ -21,9 +22,14 @@ export class FishLOD extends THREE.LOD {
 		const lowResFish = new Fish(1);
 		const emptyFish = new THREE.Object3D();
 
-		const bodyMaterial = new THREE.MeshStandardMaterial(this.bodyColor);
-		const finMaterial = new THREE.MeshStandardMaterial(this.bodyColor);
-
+		const bodyMaterial = new THREE.MeshPhongMaterial({
+			color: this.bodyColor,
+		});
+		const finMaterial = new THREE.MeshPhongMaterial({
+			color: this.finColor,
+		});
+		
+		
 		// low res model
 		const lowMesh = new THREE.Group();
 		lowMesh.isSkinned = false;
@@ -66,20 +72,20 @@ export class FishLOD extends THREE.LOD {
 
 	updateState() {
 		const delta = this.clock.getDelta();
-		this.globalTime += delta;
+		this.globalTime += delta * this.speed;
 
 		const visibleLOD = this.levels.find(level => level.object.visible);
 		if (!visibleLOD) return;
 
 		const fishGroup = visibleLOD.object;
-
+		const swimFreq = 4.0 * this.speed;
 		if (fishGroup.isSkinned) {
 			const skeleton = fishGroup.children[0].skeleton;
-			skeleton.bones[0].rotation.y = Math.sin(this.globalTime * 4.0) * 0.2; // front
-			skeleton.bones[1].rotation.y = Math.sin(this.globalTime * 4.0) * 0.3; // middle
-			skeleton.bones[2].rotation.y = Math.sin(this.globalTime * 4.0) * 0.4; // tail
+			skeleton.bones[0].rotation.y = Math.sin(this.globalTime * swimFreq) * 0.2; // front
+			skeleton.bones[1].rotation.y = Math.sin(this.globalTime * swimFreq) * 0.3; // middle
+			skeleton.bones[2].rotation.y = Math.sin(this.globalTime * swimFreq) * 0.4; // tail
 		} else {
-			fishGroup.rotation.y = Math.sin(this.globalTime * 4.0) * 0.2;
+			fishGroup.rotation.y = Math.sin(this.globalTime * swimFreq) * 0.2;
 		}
 
 		
