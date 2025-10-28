@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { Fish } from './Fish.js';
+import { FishLOD } from './FishLOD.js';
 
 // NOTE: Using instanced meshes disables the use of different fatFishScale, colors, etc.
 // (constructor attributes) per fish. Using an actual different mesh for every fish would be fine 
@@ -20,55 +20,75 @@ class FishGroup extends THREE.Object3D {
 
 		this.count = count;
 		this.fishes = [];
-		this.meshGroups = [];
 		this.init();
 	}
 
 	init() {
-		const fishTemplates = [
-			new Fish(0xdc143c, 1.0, 1.0, 1.0), // normal fish 
-			new Fish(0xba55d3, 1.2, 0.8, 1.0), // long fish
-			new Fish(0x7fff00, 0.8, 1.3, 1.2), // fat fish
-		];
+		/* const material = new THREE.MeshStandardMaterial({ color: 0xdc143c });
+		const finMaterial = new THREE.MeshStandardMaterial({color: 0x00ff55 });
+		const fatFish = new Fish(0xdc143c, 0.8, 1.3, 1.2);
+		const normalFish = new Fish(0xdc143c);
+		const thinFish = new Fish(0xdc143c, 1.3, 0.8, 1.1); */
 
-		const numTypes = fishTemplates.length;
-		const fishesPerType = Math.ceil(this.count / numTypes);
+		for (let i = 0; i < this.count; i++) {
+			const fishLOD = new FishLOD(0xdc143c, 0x00ff55);
 
-		const dummy = new THREE.Object3D();
-
-		for (let t = 0; t < numTypes; t++) {
-			const template = fishTemplates[t];
-			
-			const mesh = new THREE.InstancedMesh(
-				template.geometry,
-				template.material,
-				fishesPerType
+			fishLOD.position.set(
+				THREE.MathUtils.randFloatSpread(10),
+				THREE.MathUtils.randFloat(-1, 6),
+				THREE.MathUtils.randFloatSpread(10)
 			);
 
-			mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
+			fishLOD.rotation.y = THREE.MathUtils.randFloat(0, Math.PI * 2);
+			const scale = THREE.MathUtils.randFloat(0.8, 1.2);
+			fishLOD.scale.set(scale, scale, scale);
 
-			for (let i = 0; i < fishesPerType; i++) {
-				const position = new THREE.Vector3(
-					THREE.MathUtils.randFloatSpread(10),
-					THREE.MathUtils.randFloat(-1, 6),
-					THREE.MathUtils.randFloatSpread(10)
-				);
-
-				const scale = THREE.MathUtils.randFloat(0.8, 1.2);
-				dummy.scale.set(scale, scale, scale);
-				dummy.rotation.y = THREE.MathUtils.randFloat(0, Math.PI * 2);
-				dummy.position.copy(position);
-
-				dummy.updateMatrix();
-				mesh.setMatrixAt(i, dummy.matrix);
-			}
-
-			mesh.instanceMatrix.needsUpdate = true;
-			this.add(mesh);
-			this.meshGroups.push(mesh);
+			this.add(fishLOD);
+			this.fishes.push(fishLOD);
 		}
 	}
 
+	/* createFish(fishType, bodyMaterial, finMaterial) {
+		const bodyMesh = new THREE.Mesh(fishType.bodyGeometry, bodyMaterial);	
+		const tailMesh = new THREE.Mesh(fishType.tailGeometry, finMaterial);
+		const dorsalMesh = new THREE.Mesh(fishType.dorsalFinGeometry, finMaterial);
+
+		const xpos = THREE.MathUtils.randFloatSpread(10);
+		const ypos = THREE.MathUtils.randFloat(-1, 6);
+		const zpos = THREE.MathUtils.randFloatSpread(10);
+		
+		bodyMesh.position.set(xpos, ypos, zpos);
+		tailMesh.position.set(xpos, ypos, zpos);
+		dorsalMesh.position.set(xpos, ypos, zpos);
+
+		const yRot = THREE.MathUtils.randFloat(0, Math.PI * 2);
+
+		bodyMesh.rotation.y = yRot;
+		tailMesh.rotation.y = yRot;
+		dorsalMesh.rotation.y = yRot;
+
+		const scale = THREE.MathUtils.randFloat(0.8, 1.2);
+		bodyMesh.scale.set(scale, scale, scale);
+		tailMesh.scale.set(scale, scale, scale);
+		dorsalMesh.scale.set(scale, scale, scale);
+
+		this.add(bodyMesh);
+		this.add(tailMesh);
+		this.add(dorsalMesh);
+		this.fishes.push((bodyMesh, tailMesh, dorsalMesh));
+	} */
+	/*
+	updateLOD(camera) {
+		for (const fish of this.fishes) {
+			fish.update(camera);
+		}
+	}
+	*/
+	updateState() {
+		for (const fish of this.fishes) {
+			fish.updateState();
+		}
+	}
 }
 
 FishGroup.prototype.isGroup = true;
