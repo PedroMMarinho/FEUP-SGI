@@ -128,8 +128,33 @@ export class Submarine extends THREE.Object3D {
 	}
 
 	addEllipticalFins() {
-		this.createFinElipticalCylinder(+1); // right side
-		this.createFinElipticalCylinder(-1); // left side
+		this.createFinElipticalCylinder({ side: "right" }); // right side
+		this.createFinElipticalCylinder({ side: "left" }); // left side
+
+		this.createFinElipticalCylinder({
+			side: "left",
+			position: { x: 0.4, y: 0, z: 6.62 },
+			rotation: { x: 0, y: - Math.PI /140, z: - Math.PI / 110  },
+			scale: { x: 0.6, y: 1.41, z: 4.1 },
+		});
+		this.createFinElipticalCylinder({
+			side: "right",
+			position: { x: -0.4, y: 0, z: 6.62 },
+			rotation: { x: 0, y: Math.PI /140, z: Math.PI / 110  },
+			scale: { x: 0.6, y: 1.41, z: 4.1 },
+		});
+		this.createFinElipticalCylinder({
+			side: "top",
+			position: { x: 0, y: -0.255, z: 6.62 },
+			rotation: { x: 0, y: 0, z: 0 },
+			scale: { x: 0.6, y: 1.41, z: 4.1 },
+		});
+		this.createFinElipticalCylinder({
+			side: "bottom",
+			position: { x: 0, y: 0.255, z: 6.62 },
+			rotation: { x: 0, y: 0, z: 0 },
+			scale: { x: 0.6, y: 1.41, z: 4.1 },
+		});
 	}
 
 	createRectangleFin({
@@ -188,23 +213,59 @@ export class Submarine extends THREE.Object3D {
 	extrudedDiamond.rotation.x += rotation.x;
 	extrudedDiamond.rotation.y += rotation.y;
 	extrudedDiamond.rotation.z += rotation.z;
-
+	
 	this.bodyGroup.add(extrudedDiamond);
 }
 
 
-	createFinElipticalCylinder(side = 1) {
-		const finGeometry = new THREE.CylinderGeometry(this.height / 16, this.height / 16, this.height / 2 + 0.1, 64);
-		const finMesh = new THREE.Mesh(finGeometry, this.finMaterial);
+	createFinElipticalCylinder({
+	side = "right", // "left", "right", "top", "bottom"
+	position = { x: 0, y: 0, z: -3.21 },
+	rotation = { x: 0, y: 0, z: 0 },
+	scale = { x: 0.6, y: 1, z: 4.1 },
+}) {
+	const finGeometry = new THREE.CylinderGeometry(
+		this.height / 16,
+		this.height / 16,
+		this.height / 2 + 0.1,
+		64
+	);
+	const finMesh = new THREE.Mesh(finGeometry, this.finMaterial);
 
-		finMesh.rotation.z = Math.PI / 2;
-		finMesh.rotation.y = side === -1 ? Math.PI : 0;
-
-		finMesh.position.set(side * (this.height - 0.115), -0.01, -3.21);
-		finMesh.scale.set(0.6, 1, 4.1);
-
-		this.finGroup.add(finMesh);
+	// Base rotation/orientation per side
+	const offset = this.height - 0.115;
+	switch (side.toLowerCase()) {
+		case "right":
+			finMesh.position.set(offset, 0, 0);
+			finMesh.rotation.z = Math.PI / 2;
+			finMesh.rotation.y = 0;
+			break;
+		case "left":
+			finMesh.position.set(-offset, 0, 0);
+			finMesh.rotation.z = Math.PI / 2;
+			finMesh.rotation.y = Math.PI;
+			break;
+		case "top":
+			finMesh.position.set(0, offset, 0);
+			break;
+		case "bottom":
+			finMesh.position.set(0, -offset, 0);
+			break;
+		default:
+			console.warn(`Unknown side: ${side}. Defaulting to right.`);
+			finMesh.position.set(offset, 0, 0);
+			finMesh.rotation.z = -Math.PI / 2;
 	}
+
+	// Apply custom offsets and transformations
+	finMesh.position.add(new THREE.Vector3(position.x, position.y, position.z));
+	finMesh.rotation.x += rotation.x;
+	finMesh.rotation.y += rotation.y;
+	finMesh.rotation.z += rotation.z;
+	finMesh.scale.set(scale.x, scale.y, scale.z);
+	this.finGroup.add(finMesh);
+}
+
 
 	createHollowDiamondShape(width, height, thickness) {
 		const w2 = width / 2;
