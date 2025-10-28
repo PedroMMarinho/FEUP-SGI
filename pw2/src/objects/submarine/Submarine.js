@@ -102,8 +102,29 @@ export class Submarine extends THREE.Object3D {
 
 	// ========== FIN MANAGEMENT ==========
 	addRectangleFins() {
-		this.createRectangleFin(+1); // right side
-		this.createRectangleFin(-1); // left side
+		this.createRectangleFin({ side: "right" });
+		this.createRectangleFin({ side: "left" });
+
+		this.createRectangleFin({
+			side: "top",
+			position: { x: 0, y: -0.34, z: 6.62 },
+			rotation: { x: Math.PI / 12, y: 0, z: - Math.PI / 2 },
+		});
+		this.createRectangleFin({
+			side: "bottom",
+			position: { x: 0, y: 0.34, z: 6.62 },
+			rotation: { x: - Math.PI / 12, y: 0, z: Math.PI / 2 },
+		});
+		this.createRectangleFin({
+			side: "left",
+			position: { x: 0.4, y: 0, z: 6.62 },
+			rotation: { x: 0, y: Math.PI / 13, z: - Math.PI / 110 },
+		});
+		this.createRectangleFin({
+			side: "right",
+			position: { x: -0.4, y: 0, z: 6.62 },
+			rotation: { x: 0, y: - Math.PI / 13, z: Math.PI / 110 },
+		});
 	}
 
 	addEllipticalFins() {
@@ -111,32 +132,66 @@ export class Submarine extends THREE.Object3D {
 		this.createFinElipticalCylinder(-1); // left side
 	}
 
-	createRectangleFin(side = 1) {
-		const shapeWidth = 0.905;
-		const shapeHeight = 0.21;
-		const borderThickness = 0.03;
+	createRectangleFin({
+	side = "right",      
+	position = { x: 0, y: 0, z: -3.21 },
+	rotation = { x: 0, y: 0, z: 0 },
+}) {
+	const shapeWidth = 0.905;
+	const shapeHeight = 0.21;
+	const borderThickness = 0.03;
 
-		const diamondShape = this.createHollowDiamondShape(shapeWidth, shapeHeight, borderThickness);
-		const extrudeGeometry = new THREE.ExtrudeGeometry(diamondShape, {
-			steps: 1,
-			depth: 0.05,
-			bevelEnabled: false,
-		});
+	// Create the diamond shape
+	const diamondShape = this.createHollowDiamondShape(shapeWidth, shapeHeight, borderThickness);
+	const extrudeGeometry = new THREE.ExtrudeGeometry(diamondShape, {
+		steps: 1,
+		depth: 0.05,
+		bevelEnabled: false,
+	});
 
-		const extrudeMaterial = new THREE.MeshStandardMaterial({
-			color: 0x007bff,
-			roughness: 0.5,
-			metalness: 0.3,
-			side: THREE.DoubleSide,
-		});
+	const extrudeMaterial = new THREE.MeshStandardMaterial({
+		color: 0x007bff,
+		roughness: 0.5,
+		metalness: 0.3,
+		side: THREE.DoubleSide,
+	});
 
-		const extrudedDiamond = new THREE.Mesh(extrudeGeometry, extrudeMaterial);
-		extrudedDiamond.position.set(side * (this.height / 2 + 0.225), 0, -3.21);
-		extrudedDiamond.rotation.y = Math.PI / 2 * side;
-		extrudedDiamond.rotateX(-Math.PI / 50);
+	const extrudedDiamond = new THREE.Mesh(extrudeGeometry, extrudeMaterial);
 
-		this.finGroup.add(extrudedDiamond);
+	// Base offset depending on the side
+	const offset = this.height / 2 + 0.225;
+	switch (side.toLowerCase()) {
+		case "right":
+			extrudedDiamond.position.set(offset, 0, 0);
+			extrudedDiamond.rotation.y = Math.PI / 2;
+			break;
+		case "left":
+			extrudedDiamond.position.set(-offset, 0, 0);
+			extrudedDiamond.rotation.y = -Math.PI / 2;
+			break;
+		case "top":
+			extrudedDiamond.position.set(0, offset, 0);
+			extrudedDiamond.rotation.x = Math.PI / 2;
+			break;
+		case "bottom":
+			extrudedDiamond.position.set(0, -offset, 0);
+			extrudedDiamond.rotation.x = -Math.PI / 2;
+			break;
+		default:
+			console.warn(`Unknown side: ${side}. Defaulting to right.`);
+			extrudedDiamond.position.set(offset, 0, 0);
+			extrudedDiamond.rotation.y = Math.PI / 2;
 	}
+
+	// Apply custom position and rotation overrides
+	extrudedDiamond.position.add(new THREE.Vector3(position.x, position.y, position.z));
+	extrudedDiamond.rotation.x += rotation.x;
+	extrudedDiamond.rotation.y += rotation.y;
+	extrudedDiamond.rotation.z += rotation.z;
+
+	this.bodyGroup.add(extrudedDiamond);
+}
+
 
 	createFinElipticalCylinder(side = 1) {
 		const finGeometry = new THREE.CylinderGeometry(this.height / 16, this.height / 16, this.height / 2 + 0.1, 64);
