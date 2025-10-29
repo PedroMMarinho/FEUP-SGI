@@ -1,5 +1,4 @@
 import * as THREE from 'three';
-import propellerData from './propeller_data.js'; // Make sure your bundler can import JSON
 import { TextureManager } from '../../managers/TextureManager.js';
 
 export class Submarine extends THREE.Object3D {
