@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import propellerData from './propeller_data.js'; // Make sure your bundler can import JSON
 
 export class Submarine extends THREE.Object3D {
 	constructor(width = 7.42, height = 1.5, color = 0x000000) {
@@ -384,8 +385,32 @@ export class Submarine extends THREE.Object3D {
 	}
 
 	createCurvedBlade() {
-		
-	}
+		const vertices = new Float32Array(propellerData.propellerData);
+		const indices = new Uint16Array(propellerData.indices);
+
+		const geometry = new THREE.BufferGeometry();
+		geometry.setAttribute('position', new THREE.BufferAttribute(vertices, 3));
+		geometry.setIndex(new THREE.BufferAttribute(indices, 1));
+		geometry.computeVertexNormals();
+
+		geometry.applyMatrix4(new THREE.Matrix4().compose(
+			new THREE.Vector3(0.35, 0.397, 8.12),              
+			new THREE.Quaternion().setFromEuler(new THREE.Euler(Math.PI / 2, Math.PI / 4 , 0)), 
+			new THREE.Vector3(0.369, 0.0704, 0.273)             
+		));
+
+		const material = new THREE.MeshStandardMaterial({ color: 0x555555, side: THREE.DoubleSide });
+		const bladeMesh = new THREE.Mesh(geometry, material);
+
+		for (let i = 0; i < 5; i++) {
+			const bladeClone = bladeMesh.clone();
+			const angle = (i / 5) * Math.PI * 2;
+			bladeClone.rotation.z = angle;
+			this.motorGroup.add(bladeClone);
+		}
+
+}
+
 
 
 }
