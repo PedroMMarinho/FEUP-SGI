@@ -14,6 +14,7 @@ export class AssetManager {
     constructor() {
         // Create specialized loaders
         this.textureManager = new TextureManager();
+        console.log(this.textureManager);
         this.blenderManager = new BlenderManager();
 
     }
@@ -44,21 +45,24 @@ export class AssetManager {
     }
 
     initTextures() {
-        //const textureMap = {
-        //    'water': 'water.jpg',
-        //    'sand': 'sand.jpg',
-        //    'rock': 'rock.jpg',
-        //    'fish1': 'fish1.png',
-        //    'fish2': 'fish2.png',
-        //};
-        // return textureMap;
+        const textureMap = {
+            // Submarine Textures
+            'metal_color': 'submarine/Metal_2K_Color.jpg',
+            'metal_metalness': 'submarine/Metal_2K_Metalness.jpg',
+            'metal_roughness': 'submarine/Metal_2K_Roughness.jpg',
+            'metal_normal': 'submarine/Metal_2K_Normal.jpg',
+            'metal_NRM': 'submarine/MetalFasterners_NRM.png',
+            'metal_OCC': 'submarine/MetalFasterners_OCC.png',
+            'metal_SPEC': 'submarine/MetalFasterners_SPEC.png',
+        };
+        return textureMap;
     }
 
     loadTextures() {
         console.log('🌀 Loading textures...');
 
-        //const textureMap = this.initTextures();
-        //this.textureManager.preload(textureMap);
+        const textureMap = this.initTextures();
+        this.textureManager.preload(textureMap);
 
         console.log('✅ All textures loaded.');
     }

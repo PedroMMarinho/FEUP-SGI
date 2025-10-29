@@ -33,7 +33,7 @@ class MyContents {
 
         
         // Lights TODO
-        const ambientLight = new THREE.AmbientLight(0xFFFFFF, 0.5);
+        const ambientLight = new THREE.AmbientLight(0xFFFFFF, 2.5);
         const pointLight = new THREE.PointLight(0xFFFFFF, 40);
         const pointLightHelper = new THREE.PointLightHelper(pointLight, 0.5);
         pointLight.position.set(5, 5, 5);

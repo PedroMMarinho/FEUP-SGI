@@ -65,7 +65,6 @@ class MyGuiInterface {
 
 
         const submarine = this.contents.aquarium.submarine; // Make sure MyContents stores the submarine reference
-        console.log(submarine);
         if (submarine) {
             const submarineFolder = this.datgui.addFolder('Submarine Controls');
 
