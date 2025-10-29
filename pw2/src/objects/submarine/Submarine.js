@@ -2,11 +2,14 @@ import * as THREE from 'three';
 import propellerData from './propeller_data.js'; // Make sure your bundler can import JSON
 
 export class Submarine extends THREE.Object3D {
-	constructor(width = 7.42, height = 1.5, color = 0x000000) {
+	constructor(propellerBladeModel) {
 		super();
-		this.width = width;
-		this.height = height;
-		this.color = color;
+		this.width = 7.42;
+		this.height = 1.5;
+		this.color = 0x000000;
+
+		// Blender model
+		this.propellerBladeObject = propellerBladeModel.scene;
 
 		// --- Groups ---
 		this.bodyGroup = new THREE.Group();
@@ -347,7 +350,6 @@ export class Submarine extends THREE.Object3D {
 		// Propeller support
 		const totalHeight = this.height / 2;
 		const baseRadius = this.height / 10;
-
 		const points = [
 			new THREE.Vector2(0, totalHeight / 2 - 0.55),
 			new THREE.Vector2(baseRadius * 0.68, totalHeight / 2 - 0.53),
@@ -357,20 +359,20 @@ export class Submarine extends THREE.Object3D {
 			new THREE.Vector2(baseRadius * 1.2, totalHeight / 2 - 0.05),
 			new THREE.Vector2(this.height / 18, totalHeight / 2),
 		];
-
 		const geometry = new THREE.LatheGeometry(points, 64, 0, Math.PI * 2);
 		const material = new THREE.MeshStandardMaterial({ color: 0x00ff00, metalness: 0.2, roughness: 0.5, side: THREE.DoubleSide });
-
 		const lathe = new THREE.Mesh(geometry, material);
 		lathe.rotation.x = -Math.PI / 2;
 		lathe.position.set(0, 0, this.width + baseRadius + 0.67);
-
 		this.motorGroup.add(lathe);
+
+
 		// Propeller balls 6 around the support
 		const ballGeometry = new THREE.SphereGeometry(this.height / 34, 32, 32);
 		const ballMaterial = new THREE.MeshStandardMaterial({ color: 0xff0000, metalness: 0.3, roughness: 0.4 });
-		const rotationOffset = Math.PI / 5; // To stagger the balls
+		const rotationOffset = Math.PI / 5; 
 		const ballRadius = this.height / 10;
+
 		for (let i = 0; i < 6; i++) {
 			const angle = (i / 6) * Math.PI * 2 + rotationOffset;
 			const x = ballRadius * Math.cos(angle);
@@ -381,35 +383,26 @@ export class Submarine extends THREE.Object3D {
 		}
 
 		this.createCurvedBlade();
-
 	}
 
 	createCurvedBlade() {
-		const vertices = new Float32Array(propellerData.propellerData);
-		const indices = new Uint16Array(propellerData.indices);
+		const bladeCount = 5;
+		const basePos = new THREE.Vector3(0.324, 0.396, 8.106); 
+		const spacing = (2 * Math.PI) / bladeCount;
 
-		const geometry = new THREE.BufferGeometry();
-		geometry.setAttribute('position', new THREE.BufferAttribute(vertices, 3));
-		geometry.setIndex(new THREE.BufferAttribute(indices, 1));
-		geometry.computeVertexNormals();
+		for (let i = 0; i < bladeCount; i++) {
+			const pivot = new THREE.Object3D();            
+			pivot.position.set(0, 0, 0);
 
-		geometry.applyMatrix4(new THREE.Matrix4().compose(
-			new THREE.Vector3(0.35, 0.397, 8.12),              
-			new THREE.Quaternion().setFromEuler(new THREE.Euler(Math.PI / 2, Math.PI / 4 , 0)), 
-			new THREE.Vector3(0.369, 0.0704, 0.273)             
-		));
+			const blade = this.propellerBladeObject.clone(); 
+			blade.position.copy(basePos);                  
+			pivot.add(blade);
 
-		const material = new THREE.MeshStandardMaterial({ color: 0x555555, side: THREE.DoubleSide });
-		const bladeMesh = new THREE.Mesh(geometry, material);
-
-		for (let i = 0; i < 5; i++) {
-			const bladeClone = bladeMesh.clone();
-			const angle = (i / 5) * Math.PI * 2;
-			bladeClone.rotation.z = angle;
-			this.motorGroup.add(bladeClone);
+			pivot.rotation.z = i * spacing;                 
+			this.motorGroup.add(pivot);
 		}
+	}
 
-}
 
 
 

@@ -20,8 +20,6 @@ class MyContents {
         this.showAxis = true;
         this.assetManager = new AssetManager(); // Asset Manager
         this.aquarium = new Aquarium(this.assetManager); // Main Object of the scene
-        this.submarine = new Submarine();
-        this.app.scene.add(this.submarine);
     }
 
     /**
@@ -48,6 +46,10 @@ class MyContents {
         this.app.scene.add(this.axis);
         // Load aquarium
         this.app.scene.add(this.aquarium);
+
+        //this.submarine = new Submarine(this.assetManager.getBlenderManager().getAllLODs('propeller-blade')[0]);
+//
+        //this.app.scene.add(this.submarine);
     }
 
     enableAxis(value){

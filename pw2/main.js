@@ -11,7 +11,7 @@ app.init()
 // create the contents object
 let contents = new MyContents(app)
 // initializes the contents
-contents.init()
+await contents.init()
 // hooks the contents object in the application object
 app.setContents(contents);
 
