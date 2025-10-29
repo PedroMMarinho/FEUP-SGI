@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import propellerData from './propeller_data.js'; // Make sure your bundler can import JSON
+import { TextureManager } from '../../managers/TextureManager.js';
 
 export class Submarine extends THREE.Object3D {
 	constructor(propellerBladeModel) {
@@ -35,15 +36,50 @@ export class Submarine extends THREE.Object3D {
 	}
 
 	initMaterials() {
-		this.bodyMaterial = new THREE.MeshPhongMaterial({ color: this.color });
-		this.finMaterial = new THREE.MeshPhongMaterial({
-			color: 0x555555,
+		this.textureManager = TextureManager.getInstance();
+        // Load textures
+		const normalTex = this.textureManager.getTexture('metal_NRM');
+		const specTex = this.textureManager.getTexture('metal_SPEC');
+		const aoTex = this.textureManager.getTexture('metal_OCC');
+
+		const roughnessTex = this.textureManager.getTexture('metal_roughness');
+		const metalNormal = this.textureManager.getTexture('metal_normal');
+		const metalColor = this.textureManager.getTexture('metal_color');
+		const metalMetalness = this.textureManager.getTexture('metal_metalness');
+
+		this.bodyMaterial = new THREE.MeshPhysicalMaterial({
+			color:new THREE.Color(0x111111),
+			normalMap: normalTex,
+			metalnessMap: specTex,
+			aoMap: aoTex,
+			metalness: 0.1,
+			roughness: 0.4,
+			normalScale: new THREE.Vector2(0.5, 0.5),
+			ior: 1.5,
 			side: THREE.DoubleSide,
 		});
-	}
+
+	
+		this.finMaterial = new THREE.MeshPhysicalMaterial({
+			map : metalColor,
+			metalnessMap : metalMetalness,
+			roughnessMap : roughnessTex,
+			normalMap : metalNormal,
+			metalness : 0.82,
+			ior: 1.5,
+			side: THREE.DoubleSide,
+		});
+		this.motorMaterial = this.finMaterial.clone();
+}
+
 
 	// ========== BODY CREATION ==========
 	createBody() {
+		this.createBodyCore();
+		this.createBodyRearAssembly();
+	}
+
+	createBodyCore() {
 		// Capsule body
 		const bodyGeometry = new THREE.CapsuleGeometry(this.height / 2, this.width, 64, 64, 64);
 		const bodyMesh = new THREE.Mesh(bodyGeometry, this.bodyMaterial);
@@ -68,7 +104,9 @@ export class Submarine extends THREE.Object3D {
 		backMesh.rotation.x = -Math.PI / 2;
 		backMesh.scale.set(1, 4.85, 1);
 		this.bodyGroup.add(backMesh);
+	}
 
+	createBodyRearAssembly() {
 		// Cylinder extension
 		const cylinderHeight = this.height / 6 + 0.02;
 		const backExtensionGeometry = new THREE.CylinderGeometry(
@@ -77,7 +115,7 @@ export class Submarine extends THREE.Object3D {
 			cylinderHeight,
 			64
 		);
-		const backExtensionMesh = new THREE.Mesh(backExtensionGeometry, this.finMaterial);
+		const backExtensionMesh = new THREE.Mesh(backExtensionGeometry, this.bodyMaterial);
 		backExtensionMesh.rotation.x = Math.PI / 2;
 
 		const backDomeRadius = 1.31 * this.height / 2 * 4.85;
@@ -101,7 +139,7 @@ export class Submarine extends THREE.Object3D {
 			secondCylinderHeight,
 			64
 		);
-		const secondCylinderMesh = new THREE.Mesh(secondCylinderGeometry, this.finMaterial);
+		const secondCylinderMesh = new THREE.Mesh(secondCylinderGeometry, this.bodyMaterial);
 		secondCylinderMesh.rotation.x = Math.PI / 2;
 		secondCylinderMesh.position.set(0, 0, firstCylinderEndZ - secondCylinderHeight / 2 + torusTubeSize);
 		this.bodyGroup.add(secondCylinderMesh);
@@ -181,14 +219,7 @@ export class Submarine extends THREE.Object3D {
 			bevelEnabled: false,
 		});
 
-		const extrudeMaterial = new THREE.MeshStandardMaterial({
-			color: 0x007bff,
-			roughness: 0.5,
-			metalness: 0.3,
-			side: THREE.DoubleSide,
-		});
-
-		const extrudedDiamond = new THREE.Mesh(extrudeGeometry, extrudeMaterial);
+		const extrudedDiamond = new THREE.Mesh(extrudeGeometry, this.bodyMaterial);
 
 		// Base offset depending on the side
 		const offset = this.height / 2 + 0.225;
@@ -223,8 +254,6 @@ export class Submarine extends THREE.Object3D {
 
 		this.bodyGroup.add(extrudedDiamond);
 	}
-
-
 
 
 	createFinElipticalCylinder({
@@ -324,7 +353,7 @@ export class Submarine extends THREE.Object3D {
 		};
 
 		const geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
-		const mesh = new THREE.Mesh(geometry, this.finMaterial);
+		const mesh = new THREE.Mesh(geometry, this.bodyMaterial);
 		mesh.position.set(0, -0.04, - (this.width / 2 + this.height / 2) - 0.49);
 		mesh.rotation.x = - Math.PI / 40;
 		this.bodyGroup.add(mesh);
@@ -335,7 +364,13 @@ export class Submarine extends THREE.Object3D {
 	}
 
 	createMotor() {
-		// Motor cylinder
+		this.createMotorCylinder();
+		this.createMotorSupportLathe();
+		this.createMotorBalls();
+		this.createCurvedBlade();
+	}
+
+	createMotorCylinder() {
 		const motorGeometry = new THREE.CylinderGeometry(
 			this.height / 18,
 			this.height / 18,
@@ -346,8 +381,9 @@ export class Submarine extends THREE.Object3D {
 		motorMesh.rotation.x = Math.PI / 2;
 		motorMesh.position.set(0, 0, this.width + (this.height / 6));
 		this.motorGroup.add(motorMesh);
+	}
 
-		// Propeller support
+	createMotorSupportLathe() {
 		const totalHeight = this.height / 2;
 		const baseRadius = this.height / 10;
 		const points = [
@@ -360,16 +396,15 @@ export class Submarine extends THREE.Object3D {
 			new THREE.Vector2(this.height / 18, totalHeight / 2),
 		];
 		const geometry = new THREE.LatheGeometry(points, 64, 0, Math.PI * 2);
-		const material = new THREE.MeshStandardMaterial({ color: 0x00ff00, metalness: 0.2, roughness: 0.5, side: THREE.DoubleSide });
-		const lathe = new THREE.Mesh(geometry, material);
+		const lathe = new THREE.Mesh(geometry, this.motorMaterial);
 		lathe.rotation.x = -Math.PI / 2;
-		lathe.position.set(0, 0, this.width + baseRadius + 0.67);
+		const baseRadiusPos = this.height / 10;
+		lathe.position.set(0, 0, this.width + baseRadiusPos + 0.67);
 		this.motorGroup.add(lathe);
+	}
 
-
-		// Propeller balls 6 around the support
+	createMotorBalls() {
 		const ballGeometry = new THREE.SphereGeometry(this.height / 34, 32, 32);
-		const ballMaterial = new THREE.MeshStandardMaterial({ color: 0xff0000, metalness: 0.3, roughness: 0.4 });
 		const rotationOffset = Math.PI / 5; 
 		const ballRadius = this.height / 10;
 
@@ -377,12 +412,10 @@ export class Submarine extends THREE.Object3D {
 			const angle = (i / 6) * Math.PI * 2 + rotationOffset;
 			const x = ballRadius * Math.cos(angle);
 			const y = ballRadius * Math.sin(angle);
-			const ballMesh = new THREE.Mesh(ballGeometry, ballMaterial);
-			ballMesh.position.set(x, y, this.width + baseRadius + 0.646);
+			const ballMesh = new THREE.Mesh(ballGeometry, this.motorMaterial);
+			ballMesh.position.set(x, y, this.width + ballRadius + 0.646);
 			this.motorGroup.add(ballMesh);
 		}
-
-		this.createCurvedBlade();
 	}
 
 	createCurvedBlade() {
@@ -390,11 +423,19 @@ export class Submarine extends THREE.Object3D {
 		const basePos = new THREE.Vector3(0.324, 0.396, 8.106); 
 		const spacing = (2 * Math.PI) / bladeCount;
 
+		this.propellerBladeObject.traverse((child) => {
+			if (child.isMesh) {
+				child.material = this.motorMaterial;
+			}
+		});
+
 		for (let i = 0; i < bladeCount; i++) {
 			const pivot = new THREE.Object3D();            
 			pivot.position.set(0, 0, 0);
 
-			const blade = this.propellerBladeObject.clone(); 
+			const blade = this.propellerBladeObject.clone();
+			console.log(blade);
+			blade.material = this.motorMaterial; 
 			blade.position.copy(basePos);                  
 			pivot.add(blade);
 
