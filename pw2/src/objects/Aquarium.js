@@ -40,7 +40,7 @@ class Aquarium extends THREE.Object3D {
     init() {
         // Create aquarium geometry and material
         this.createAquariumGeometry();
-        // create terrain
+        ////create terrain
         //this.createTerrainSegments();
         //// Create bubbles
         //this.createBubbles();
@@ -53,7 +53,7 @@ class Aquarium extends THREE.Object3D {
         //// create shark
         this.createShark();
         // create submarine
-        //this.createSubmarine();
+        this.createSubmarine();
     }
 
     createBubbles() {
@@ -85,13 +85,13 @@ class Aquarium extends THREE.Object3D {
 	}
 
     createShark() {
-        const sharks = new SharkLOD('grey-shark', this.assetManager.blenderManager.getAllLODs('grey-shark'));
+        const sharks = new SharkLOD('grey-shark', this.assetManager.getBlenderManager().getAllLODs('grey-shark'));
         this.addToAquarium(sharks);
         
 
     }
     createSubmarine() {
-        this.submarine = new Submarine();
+        this.submarine = new Submarine(this.assetManager.getBlenderManager().getAllLODs('propeller-blade')[0]);
         this.submarine.position.set(0, 0, 0);
         this.addToAquarium(this.submarine);
     }

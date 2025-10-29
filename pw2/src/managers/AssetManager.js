@@ -23,6 +23,10 @@ export class AssetManager {
             { key: 'grey-shark', url: 'submarine.glb', lod: 0 },
             { key: 'grey-shark', url: 'sharks/grey/shark-medium.glb', lod: 1 },
             { key: 'grey-shark', url: 'sharks/grey/shark-low.glb', lod: 2 },
+            // Submarine Propeller Blade
+            { key: 'propeller-blade', url: 'submarine/propeller-blade-high.glb', lod: 0 },
+            //{ key: 'submarine-propeller-blade', url: 'submarine/propeller-blade-medium.glb', lod: 1 },
+            //{ key: 'submarine-propeller-blade', url: 'submarine/propeller-blade-low.glb', lod: 2 },
         ];
         return modelList;
     }
@@ -71,6 +75,14 @@ export class AssetManager {
 
     getModel(key, lodLevel = 0) {
         return this.blenderManager.getModel(key, lodLevel);
+    }
+
+    getBlenderManager() {
+        return this.blenderManager;
+    }
+
+    getTextureManager() {
+        return this.textureManager;
     }
 
     /**
