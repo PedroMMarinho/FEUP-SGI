@@ -2,11 +2,12 @@ import * as THREE from 'three';
 import { Seaweed } from "./Seaweed.js"; 
 
 class SeaweedLOD extends THREE.LOD {
-    constructor(){
+    constructor(material){
         super();
         this.seaweeds = [];
         this.startDistance = 0;
         this.distanceOffset = 20;
+        this.material = material
         this.createLODs();
     }
     createLODs(){
