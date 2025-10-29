@@ -1,7 +1,8 @@
 import * as THREE from 'three';
 
 export class Coral {
-    constructor(complexity = 5) {
+    constructor(complexity = 5,material) {
+        this.material = material;
         return this.createObject(complexity)
     }
 
@@ -94,6 +95,9 @@ export class Coral {
         const branchMatrices = [];
         const leafMatrices = [];
 
+        // don't add branches shorter than this to the final InstancedMesh
+        const minBranchLength = 0.02;
+
         const axisX = new THREE.Vector3(1, 0, 0);
         const axisY = new THREE.Vector3(0, 1, 0);
         const axisZ = new THREE.Vector3(0, 0, 1);
@@ -109,6 +113,9 @@ export class Coral {
                         .applyQuaternion(turtle.quaternion)
                         .multiplyScalar(branchLength);
                     turtle.position.add(forward);
+
+                    // skip very small branches (still advance the turtle but don't create geometry)
+                    if (branchLength < minBranchLength) break;
 
                     const instanceMatrix = new THREE.Matrix4();
                     const orientation = new THREE.Quaternion().setFromUnitVectors(axisY, forward.clone().normalize());
@@ -157,6 +164,9 @@ export class Coral {
                         .multiplyScalar(branchLength);
                     turtle.position.add(forward);
 
+                    // Z generates a branch as well — skip if below threshold
+                    if (branchLength < minBranchLength) break;
+
                     const instanceMatrix = new THREE.Matrix4();
                     const orientation = new THREE.Quaternion().setFromUnitVectors(axisY, forward.clone().normalize());
                     const scale = new THREE.Vector3(1, branchLength, 1);
@@ -176,7 +186,7 @@ export class Coral {
         branchGeo.translate(0, 0.5, 0);
         //const branchMat = this.material;
             
-        const branchMat = new THREE.MeshPhongMaterial({ specular: 0x222222, shininess: 25, color: 0xff7f50 });
+        const branchMat = this.material;
         
         const branchMesh = new THREE.InstancedMesh(branchGeo, branchMat, branchMatrices.length);
         branchMesh.name = "branches";
