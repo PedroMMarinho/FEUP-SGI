@@ -202,6 +202,21 @@ export class Submarine extends THREE.Object3D {
 			rotation: { x: 0, y: 0, z: 0 },
 			scale: { x: 0.6, y: 1.41, z: 4.1 },
 		});
+
+        // Top rear fin
+		this.createFinElipticalCylinder({
+			side: "right",
+			position: { x: -0.618, y: 1.44, z: -2.338 },
+			rotation: { x: 0, y: 0, z: 0 },
+			scale: { x: 0.6, y: 1, z: 4.1 },
+		});
+		this.createFinElipticalCylinder({
+			side: "left",
+			position: { x: 0.618, y: 1.44, z: -2.338 },
+			rotation: { x: 0, y: 0, z: 0 },
+			scale: { x: 0.6, y: 1, z: 4.1 },
+		});
+
 	}
 
 	createRectangleFin({
@@ -451,7 +466,84 @@ export class Submarine extends THREE.Object3D {
 		this.createBodyTopBase();
 		this.createTopCylinders();
 		this.createFrontCylinder();
+		this.createWaterTanks();
+		this.createScopeBody();
 	}
+
+
+	createScopeBody() {
+		// --- Base cylinder ---
+		const geometry = new THREE.CylinderGeometry(1, 1, 1, 64);
+		const scopeCylinder = new THREE.Mesh(geometry, this.bodyMaterial);
+		scopeCylinder.scale.set(0.39, 1.09, 0.98);
+		scopeCylinder.position.set(0, 1.05, -2.33);
+		this.upperBodyGroup.add(scopeCylinder);
+
+		// --- Hollow outer shell on top ---
+		const shellGeometry = new THREE.CylinderGeometry(1, 1, 1, 64, 1, true);
+		const shellMesh = new THREE.Mesh(shellGeometry, this.bodyMaterial);
+		shellMesh.scale.set(0.39 + 0.00001, 1.5, 0.98 + 0.00001);
+		shellMesh.position.set(
+			scopeCylinder.position.x,
+			scopeCylinder.scale.y,
+			scopeCylinder.position.z
+		);
+		this.upperBodyGroup.add(shellMesh);
+
+		const innerMesh = new THREE.Mesh(shellGeometry, this.bodyMaterial);
+		innerMesh.scale.set(0.32, 1.5, 0.85);
+		innerMesh.position.copy(shellMesh.position);
+		this.upperBodyGroup.add(innerMesh);
+
+		const ringGeometry = new THREE.RingGeometry(0.32, 0.39, 64);
+		const ringMesh = new THREE.Mesh(ringGeometry, this.bodyMaterial);
+		ringMesh.rotation.x = Math.PI / 2;
+		ringMesh.scale.set(1, 0.98 / 0.39, 1);
+		ringMesh.position.set(
+			shellMesh.position.x,
+			shellMesh.position.y + (1.5 / 2),
+			shellMesh.position.z
+		);
+		this.upperBodyGroup.add(ringMesh);
+	}
+
+
+	createWaterTanks() {
+		const makeTank = () => {
+			const group = new THREE.Group();
+			const radius = this.height / 8;
+			const height = this.height / 2 + 0.2;
+
+			// --- Cylinder core ---
+			const cylinderGeometry = new THREE.CylinderGeometry(radius, radius, height, 64);
+			const cylinderMesh = new THREE.Mesh(cylinderGeometry, this.bodyMaterial);
+			group.add(cylinderMesh);
+
+			// --- Top hemisphere ---
+			const sphereGeometryTop = new THREE.SphereGeometry(radius, 64, 64, 0, Math.PI * 2, 0, Math.PI / 2);
+			const sphereTop = new THREE.Mesh(sphereGeometryTop, this.bodyMaterial);
+			sphereTop.position.y = height / 2;
+			group.add(sphereTop);
+
+			// --- Bottom hemisphere ---
+			const sphereGeometryBottom = new THREE.SphereGeometry(radius, 64, 64, 0, Math.PI * 2, Math.PI / 2, Math.PI / 2);
+			const sphereBottom = new THREE.Mesh(sphereGeometryBottom, this.bodyMaterial);
+			sphereBottom.position.y = -height / 2;
+			group.add(sphereBottom);
+
+			return group;
+		};
+
+		const tank1 = makeTank();
+		tank1.position.set((this.height / 1.85 + 0.1) / 4, 1.06, -0.18);
+		tank1.rotation.x = Math.PI / 2;
+		this.upperBodyGroup.add(tank1);
+
+		const tank2 = tank1.clone(true);
+		tank2.position.x *= -1;
+		this.upperBodyGroup.add(tank2);
+	}
+
 
 	createFrontCylinder() {
 		const cylinderHeight = 0.3;
@@ -489,7 +581,7 @@ export class Submarine extends THREE.Object3D {
 
 		// --- Front smaller cylinder ---
 		const semiSphereRadius = this.height / 14;
-		const smallCylinderHeight = semiSphereRadius; 
+		const smallCylinderHeight = semiSphereRadius;
 		const sphereGeometry = new THREE.CylinderGeometry(
 			semiSphereRadius,
 			semiSphereRadius,
