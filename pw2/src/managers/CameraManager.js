@@ -2,8 +2,8 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 class CameraManager {
-    constructor(aspect,keyManager, frustumSize = 20) {
-        
+    constructor(aspect, keyManager, frustumSize = 20) {
+
         this.keyManager = keyManager;
         console.log(this.keyManager);
         this.aspect = aspect;
@@ -84,7 +84,7 @@ class CameraManager {
         return this.activeCamera;
     }
 
-    update(renderer) {
+    update(renderer, submarine) {
         if (this.activeCameraName === 'Underwater View' && !this.controls) {
             this.controls = new OrbitControls(this.activeCamera, renderer.domElement);
             this.controls.target.set(0, 1, 0); // orbit around this point
@@ -99,7 +99,8 @@ class CameraManager {
         }
 
         if (this.controls) this.controls.update();
-        if( this.activeCameraName === 'Free Fly') this.updateFreeFly();
+        if (this.activeCameraName === 'Free Fly') this.updateFreeFly();
+        if (this.activeCameraName === 'Submarine View' && submarine) this.updateSubmarineFollow(submarine);
     }
 
 
@@ -140,45 +141,57 @@ class CameraManager {
 
     }
 
+    updateSubmarineFollow(submarine) {
+        const camera = this.cameras['Submarine View'];
 
-   updateFreeFly() {
-    
-    const keyManager = this.keyManager;
+        const offset = new THREE.Vector3(0, 3, 12);
 
-    const camera = this.activeCamera;
-    const moveSpeed = this.moveSpeed;
+        const relativeOffset = offset.clone().applyMatrix4(submarine.matrixWorld);
 
-    const { x: deltaX, y: deltaY } = keyManager.getDelta();
+        camera.position.lerp(relativeOffset, 0.1);
 
-    this.yaw = camera.rotation.y;
-    this.pitch = camera.rotation.x;
-
-    if( keyManager.isMousePressed() ) {
-        this.yaw -= deltaX * this.lookSpeed;
-        this.pitch -= deltaY * this.lookSpeed;
+        const lookAtOffset = new THREE.Vector3(0, 1, -5).applyMatrix4(submarine.matrixWorld);
+        camera.lookAt(lookAtOffset);
     }
 
-    const limit = Math.PI / 2 - 0.01;
-    this.pitch = Math.max(-limit, Math.min(limit, this.pitch));
+    updateFreeFly() {
 
-    camera.rotation.order = 'YXZ';
-    camera.rotation.y = this.yaw;
-    camera.rotation.x = this.pitch;
+        const keyManager = this.keyManager;
 
-    const forward = new THREE.Vector3();
-    const right = new THREE.Vector3();
+        const camera = this.activeCamera;
+        const moveSpeed = this.moveSpeed;
 
-    camera.getWorldDirection(forward);
-    forward.normalize();
+        const { x: deltaX, y: deltaY } = keyManager.getDelta();
 
-    right.crossVectors(forward, camera.up).normalize();
+        this.yaw = camera.rotation.y;
+        this.pitch = camera.rotation.x;
 
-    if (keyManager.isKeyPressed('KeyW')) camera.position.addScaledVector(forward, moveSpeed);
-    if (keyManager.isKeyPressed('KeyS')) camera.position.addScaledVector(forward, -moveSpeed);
-    if (keyManager.isKeyPressed('KeyA')) camera.position.addScaledVector(right, -moveSpeed);
-    if (keyManager.isKeyPressed('KeyD')) camera.position.addScaledVector(right, moveSpeed);
-    if (keyManager.isKeyPressed('Space')) camera.position.y += moveSpeed;
-    if (keyManager.isKeyPressed('ShiftLeft')) camera.position.y -= moveSpeed;
+        if (keyManager.isMousePressed()) {
+            this.yaw -= deltaX * this.lookSpeed;
+            this.pitch -= deltaY * this.lookSpeed;
+        }
+
+        const limit = Math.PI / 2 - 0.01;
+        this.pitch = Math.max(-limit, Math.min(limit, this.pitch));
+
+        camera.rotation.order = 'YXZ';
+        camera.rotation.y = this.yaw;
+        camera.rotation.x = this.pitch;
+
+        const forward = new THREE.Vector3();
+        const right = new THREE.Vector3();
+
+        camera.getWorldDirection(forward);
+        forward.normalize();
+
+        right.crossVectors(forward, camera.up).normalize();
+
+        if (keyManager.isKeyPressed('KeyW')) camera.position.addScaledVector(forward, moveSpeed);
+        if (keyManager.isKeyPressed('KeyS')) camera.position.addScaledVector(forward, -moveSpeed);
+        if (keyManager.isKeyPressed('KeyA')) camera.position.addScaledVector(right, -moveSpeed);
+        if (keyManager.isKeyPressed('KeyD')) camera.position.addScaledVector(right, moveSpeed);
+        if (keyManager.isKeyPressed('Space')) camera.position.y += moveSpeed;
+        if (keyManager.isKeyPressed('ShiftLeft')) camera.position.y -= moveSpeed;
 
     }
 

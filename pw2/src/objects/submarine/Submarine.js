@@ -2,31 +2,38 @@ import * as THREE from 'three';
 import { TextureManager } from '../../managers/TextureManager.js';
 
 export class Submarine extends THREE.Object3D {
-	constructor(propellerBladeModel, keyManager) {
+	constructor(propellerBladeModel, keyManager, cameraManager) {
 		super();
 		this.width = 7.42;
 		this.height = 1.5;
 		this.color = 0x000000;
 		this.keyManager = keyManager;
+		this.cameraManager = cameraManager;
 
 		// Blender model
 		this.propellerBladeObject = propellerBladeModel.scene;
 
 
-		// Movement speeds 
-        this.GLOBAL_SPEED = 1.0; // Master speed multiplier
-        this.FORWARD_SPEED = 0.02;
-        this.TURN_SPEED = 0.02;
-        this.VERTICAL_SPEED = 0.05;
-        
-        // Motor animation
-        this.motorTime = 0;
-        this.MOTOR_SPEED = 0.01;
-        
-        // Rotor animation
-        this.rotorSpeed = 0; // Current rotor speed
-        this.ROTOR_MAX_SPEED = 0.1;
-        this.ROTOR_ACCELERATION = 0.0001;
+		// --- Movement Settings ---
+		this.GLOBAL_SPEED = 1.5; // master multiplier for overall scaling
+
+		this.BASE_SPEED = 0.000001;         // slow cruising speed
+		this.TURN_RATE = 0.0035;         // how fast it rotates left/right
+		this.VERTICAL_RATE = 0.008;      // ascend/descend rate
+
+		// Acceleration behavior
+		this.ACCELERATION_RATE = 0.00004; // how fast the sub gains speed
+		this.DECELERATION_RATE = 0.00008; // how fast it slows down
+		this.MAX_SPEED = 0.04;           // top forward speed
+		this.REVERSE_SPEED = 0.01;       // top reverse speed (slower)
+		this.currentSpeed = 0;           // dynamic forward/backward velocity
+
+		// Rotor + Motor
+		this.ROTOR_ACCEL = 0.00028;      // how quickly the rotor speeds up
+		this.ROTOR_DECEL = 0.00076;      // how quickly it slows down
+		this.ROTOR_MAX = 0.05;           // top rotor rotation speed
+		this.rotorSpeed = 0;             // current rotor spin velocity
+
 
 		// --- Groups ---
 		this.bodyGroup = new THREE.Group();
@@ -490,56 +497,56 @@ export class Submarine extends THREE.Object3D {
 	}
 
 	addHatch() {
-    const hatchRadius = this.height / 7;
-    const hatchGeometry = new THREE.CylinderGeometry(hatchRadius, hatchRadius, 0.05, 64);
-    const hatchMesh = new THREE.Mesh(hatchGeometry, this.finMaterial);
-    hatchMesh.position.set(0, 1.6, -2.66);
-    this.upperBodyGroup.add(hatchMesh);
-    
-    // Semicircle using SphereGeometry
-    const semicircleRadius = hatchRadius * 0.9;
-    const semicircleGeometry = new THREE.SphereGeometry(
-        semicircleRadius, 
-        64, 
-        32, 
-        0, 
-        Math.PI * 2, 
-        0, 
-        Math.PI / 2
-    );
-    const semicircleMesh = new THREE.Mesh(semicircleGeometry, this.finMaterial);
-    semicircleMesh.position.set(0, 1.6, -2.66);
-    this.upperBodyGroup.add(semicircleMesh);
-    
-    const handleGroup = new THREE.Group();
-    const outerTorusGeometry = new THREE.TorusGeometry(hatchRadius * 0.58, 0.01, 16, 64);
-    const outerTorus = new THREE.Mesh(outerTorusGeometry, this.finMaterial);
-    handleGroup.add(outerTorus);
-    const innerTorusGeometry = new THREE.TorusGeometry(hatchRadius * 0.3, 0.01, 16, 64);
-    const innerTorus = new THREE.Mesh(innerTorusGeometry, this.finMaterial);
-    handleGroup.add(innerTorus);
-    const circleGeometry = new THREE.CircleGeometry(hatchRadius * 0.3, 64);
-    const circleMesh = new THREE.Mesh(circleGeometry, this.bodyMaterial);
-    handleGroup.add(circleMesh);
-    const numCylinders = 5;
-    const outerRadius = hatchRadius * 0.58;
-    const innerRadius = hatchRadius * 0.3;
-    const connectionLength = outerRadius - innerRadius;
-    for (let i = 0; i < numCylinders; i++) {
-        const angle = (i / numCylinders) * Math.PI * 2;
-        const cylinderGeometry = new THREE.CylinderGeometry(0.008, 0.008, connectionLength, 16);
-        const cylinder = new THREE.Mesh(cylinderGeometry, this.bodyMaterial);
-        const midRadius = (outerRadius + innerRadius) / 2;
-        cylinder.position.x = Math.cos(angle) * midRadius;
-        cylinder.position.y = Math.sin(angle) * midRadius;
-        cylinder.rotation.z = angle + Math.PI / 2;
-        handleGroup.add(cylinder);
-    }
-    // Position handle at the top of the hemisphere
-    handleGroup.position.set(0, 1.6 + semicircleRadius, -2.66);
-    handleGroup.rotation.x = Math.PI / 2; 
-    this.upperBodyGroup.add(handleGroup);
-}
+		const hatchRadius = this.height / 7;
+		const hatchGeometry = new THREE.CylinderGeometry(hatchRadius, hatchRadius, 0.05, 64);
+		const hatchMesh = new THREE.Mesh(hatchGeometry, this.finMaterial);
+		hatchMesh.position.set(0, 1.6, -2.66);
+		this.upperBodyGroup.add(hatchMesh);
+
+		// Semicircle using SphereGeometry
+		const semicircleRadius = hatchRadius * 0.9;
+		const semicircleGeometry = new THREE.SphereGeometry(
+			semicircleRadius,
+			64,
+			32,
+			0,
+			Math.PI * 2,
+			0,
+			Math.PI / 2
+		);
+		const semicircleMesh = new THREE.Mesh(semicircleGeometry, this.finMaterial);
+		semicircleMesh.position.set(0, 1.6, -2.66);
+		this.upperBodyGroup.add(semicircleMesh);
+
+		const handleGroup = new THREE.Group();
+		const outerTorusGeometry = new THREE.TorusGeometry(hatchRadius * 0.58, 0.01, 16, 64);
+		const outerTorus = new THREE.Mesh(outerTorusGeometry, this.finMaterial);
+		handleGroup.add(outerTorus);
+		const innerTorusGeometry = new THREE.TorusGeometry(hatchRadius * 0.3, 0.01, 16, 64);
+		const innerTorus = new THREE.Mesh(innerTorusGeometry, this.finMaterial);
+		handleGroup.add(innerTorus);
+		const circleGeometry = new THREE.CircleGeometry(hatchRadius * 0.3, 64);
+		const circleMesh = new THREE.Mesh(circleGeometry, this.bodyMaterial);
+		handleGroup.add(circleMesh);
+		const numCylinders = 5;
+		const outerRadius = hatchRadius * 0.58;
+		const innerRadius = hatchRadius * 0.3;
+		const connectionLength = outerRadius - innerRadius;
+		for (let i = 0; i < numCylinders; i++) {
+			const angle = (i / numCylinders) * Math.PI * 2;
+			const cylinderGeometry = new THREE.CylinderGeometry(0.008, 0.008, connectionLength, 16);
+			const cylinder = new THREE.Mesh(cylinderGeometry, this.bodyMaterial);
+			const midRadius = (outerRadius + innerRadius) / 2;
+			cylinder.position.x = Math.cos(angle) * midRadius;
+			cylinder.position.y = Math.sin(angle) * midRadius;
+			cylinder.rotation.z = angle + Math.PI / 2;
+			handleGroup.add(cylinder);
+		}
+		// Position handle at the top of the hemisphere
+		handleGroup.position.set(0, 1.6 + semicircleRadius, -2.66);
+		handleGroup.rotation.x = Math.PI / 2;
+		this.upperBodyGroup.add(handleGroup);
+	}
 
 	createVisionScope() {
 		// --- Base cylinder ---
@@ -774,49 +781,79 @@ export class Submarine extends THREE.Object3D {
 	}
 
 	updateState() {
-        let isMoving = false;
-        
-        // Forward/Backward (W/S) - moves along local -Z axis (front of submarine)
-        if (this.keyManager.isKeyPressed('KeyW')) {
-            this.translateZ(-this.FORWARD_SPEED * this.GLOBAL_SPEED);
-            isMoving = true;
-        }
-        if (this.keyManager.isKeyPressed('KeyS')) {
-            this.translateZ(this.FORWARD_SPEED * this.GLOBAL_SPEED);
-            isMoving = true;
-        }
-        
-        // Turn Left/Right (A/D) - rotates around Y axis
-        if (this.keyManager.isKeyPressed('KeyA')) {
-            this.rotation.y += this.TURN_SPEED * this.GLOBAL_SPEED;
-        }
-        if (this.keyManager.isKeyPressed('KeyD')) {
-            this.rotation.y -= this.TURN_SPEED * this.GLOBAL_SPEED;
-        }
-        
-        // Up/Down (P/L) - moves along Y axis
-        if (this.keyManager.isKeyPressed('KeyP')) {
-            this.position.y += this.VERTICAL_SPEED * this.GLOBAL_SPEED;
-            isMoving = true;
-        }
-        if (this.keyManager.isKeyPressed('KeyL')) {
-            this.position.y -= this.VERTICAL_SPEED * this.GLOBAL_SPEED;
-            isMoving = true;
-        }
-        
-        if (isMoving) {
-            this.rotorSpeed = Math.min(this.rotorSpeed + this.ROTOR_ACCELERATION, this.ROTOR_MAX_SPEED);
-            
-            this.motorTime += this.MOTOR_SPEED * this.GLOBAL_SPEED;
-            this.motorGroup.rotateZ(this.rotorSpeed * this.GLOBAL_SPEED);
-        } else {
-            this.rotorSpeed = Math.max(this.rotorSpeed - this.ROTOR_ACCELERATION * 2, 0);
-            
-            if (this.rotorSpeed > 0) {
-                this.motorGroup.rotateZ(this.rotorSpeed * this.GLOBAL_SPEED);
-            }
-        }
-    }
+		if (this.cameraManager.activeCameraName !== 'Submarine View') return;
+
+		let isAccelerating = false;
+
+		// --- FORWARD / BACKWARD INPUT ---
+		if (this.keyManager.isKeyPressed('KeyW')) {
+			this.currentSpeed = Math.min(this.currentSpeed + this.ACCELERATION_RATE, this.MAX_SPEED);
+			isAccelerating = true;
+		}
+		else if (this.keyManager.isKeyPressed('KeyS')) {
+			this.currentSpeed = Math.max(this.currentSpeed - this.ACCELERATION_RATE, -this.REVERSE_SPEED);
+			isAccelerating = true;
+		}
+		else {
+			if (this.currentSpeed > 0) {
+				this.currentSpeed = Math.max(this.currentSpeed - this.DECELERATION_RATE, 0);
+			} else if (this.currentSpeed < 0) {
+				this.currentSpeed = Math.min(this.currentSpeed + this.DECELERATION_RATE, 0);
+			}
+		}
+
+		// --- TRANSLATION (move forward/backward) ---
+		this.translateZ(-this.currentSpeed * this.GLOBAL_SPEED);
+
+		// --- TURNING (A/D) ---
+		if (this.keyManager.isKeyPressed('KeyA')) {
+			this.rotation.y += this.TURN_RATE * this.GLOBAL_SPEED;
+		}
+		if (this.keyManager.isKeyPressed('KeyD')) {
+			this.rotation.y -= this.TURN_RATE * this.GLOBAL_SPEED;
+		}
+
+		// --- ASCEND / DESCEND (P/L) ---
+		if (this.keyManager.isKeyPressed('KeyP')) {
+			this.position.y += this.VERTICAL_RATE * this.GLOBAL_SPEED;
+		}
+		if (this.keyManager.isKeyPressed('KeyL')) {
+			this.position.y -= this.VERTICAL_RATE * this.GLOBAL_SPEED;
+		}
+
+		// --- ROTOR ANIMATION (linked to movement) ---
+		if (Math.abs(this.currentSpeed) > 0.0001 || isAccelerating) {
+			const targetDirection = (this.currentSpeed >= 0) ? 1 : -1;
+
+			// Gradually rotate rotorSpeed toward desired direction and magnitude
+			const targetRotorSpeed = this.ROTOR_MAX * Math.min(Math.abs(this.currentSpeed) / this.MAX_SPEED, 1);
+
+			// Smoothly approach target rotor speed
+			if (Math.sign(this.rotorSpeed) !== targetDirection && Math.abs(this.rotorSpeed) > 0.0001) {
+				// First slow down before changing direction
+				this.rotorSpeed -= Math.sign(this.rotorSpeed) * this.ROTOR_DECEL;
+			} else {
+				// Then accelerate in the target direction
+				const accel = this.ROTOR_ACCEL * (this.currentSpeed !== 0 ? 1 : 0.5);
+				this.rotorSpeed += targetDirection * accel;
+			}
+
+			// Clamp rotorSpeed within ±ROTOR_MAX
+			this.rotorSpeed = Math.max(-this.ROTOR_MAX, Math.min(this.rotorSpeed, this.ROTOR_MAX));
+
+			this.motorGroup.rotateZ(this.rotorSpeed * this.GLOBAL_SPEED);
+		} else {
+			// Decelerate rotor when idle (no movement)
+			if (Math.abs(this.rotorSpeed) > 0.00001) {
+				this.rotorSpeed -= Math.sign(this.rotorSpeed) * this.ROTOR_DECEL;
+				this.motorGroup.rotateZ(this.rotorSpeed * this.GLOBAL_SPEED);
+			} else {
+				this.rotorSpeed = 0;
+			}
+		}
+
+	}
+
 
 
 }

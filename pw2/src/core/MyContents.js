@@ -20,8 +20,8 @@ class MyContents {
         this.showAxis = true;
         this.assetManager = new AssetManager(); // Asset Manager
         this.keyManager = this.app.keyManager;
-
-        this.aquarium = new Aquarium(this.assetManager, this.keyManager); // Main Object of the scene
+        this.cameraManager = this.app.cameraManager;
+        this.aquarium = new Aquarium(this.assetManager, this.keyManager, this.cameraManager); // Main Object of the scene
     }
 
     /**
