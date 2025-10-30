@@ -3,6 +3,7 @@ import { MyAxis } from '../objects/MyAxis.js';
 import { Aquarium } from '../objects/Aquarium.js';
 import { TextureManager } from '../managers/TextureManager.js';
 import { AssetManager } from '../managers/AssetManager.js';
+import { Submarine } from '../objects/submarine/Submarine.js';
 
 /**
  *  This class contains the contents of out application
@@ -18,7 +19,9 @@ class MyContents {
         this.axis = new MyAxis(this);
         this.showAxis = true;
         this.assetManager = new AssetManager(); // Asset Manager
-        this.aquarium = new Aquarium(this.assetManager); // Main Object of the scene
+        this.keyManager = this.app.keyManager;
+        this.cameraManager = this.app.cameraManager;
+        this.aquarium = new Aquarium(this.assetManager, this.keyManager, this.cameraManager); // Main Object of the scene
     }
 
     /**
@@ -32,7 +35,7 @@ class MyContents {
 
         
         // Lights TODO
-        const ambientLight = new THREE.AmbientLight(0xFFFFFF, 0.5);
+        const ambientLight = new THREE.AmbientLight(0xFFFFFF, 2.5);
         const pointLight = new THREE.PointLight(0xFFFFFF, 40);
         const pointLightHelper = new THREE.PointLightHelper(pointLight, 0.5);
         pointLight.position.set(5, 5, 5);
@@ -45,6 +48,10 @@ class MyContents {
         this.app.scene.add(this.axis);
         // Load aquarium
         this.app.scene.add(this.aquarium);
+
+        //this.submarine = new Submarine(this.assetManager.getBlenderManager().getAllLODs('propeller-blade')[0]);
+//
+        //this.app.scene.add(this.submarine);
     }
 
     enableAxis(value){
