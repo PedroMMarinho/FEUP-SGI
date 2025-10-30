@@ -15,23 +15,23 @@ export class Submarine extends THREE.Object3D {
 
 
 		// --- Movement Settings ---
-		this.GLOBAL_SPEED = 1.5; // master multiplier for overall scaling
+		this.GLOBAL_SPEED = 100; // master multiplier for overall scaling
 
 		this.BASE_SPEED = 0.000001;         // slow cruising speed
 		this.TURN_RATE = 0.0035;         // how fast it rotates left/right
 		this.VERTICAL_RATE = 0.008;      // ascend/descend rate
 
 		// Acceleration behavior
-		this.ACCELERATION_RATE = 0.00004; // how fast the sub gains speed
-		this.DECELERATION_RATE = 0.00008; // how fast it slows down
-		this.MAX_SPEED = 0.04;           // top forward speed
+		this.ACCELERATION_RATE = 0.0004; // how fast the sub gains speed
+		this.DECELERATION_RATE = 0.0008; // how fast it slows down
+		this.MAX_SPEED = 0.02;           // top forward speed
 		this.REVERSE_SPEED = 0.01;       // top reverse speed (slower)
 		this.currentSpeed = 0;           // dynamic forward/backward velocity
 
 		// Rotor + Motor
-		this.ROTOR_ACCEL = 0.00028;      // how quickly the rotor speeds up
-		this.ROTOR_DECEL = 0.00076;      // how quickly it slows down
-		this.ROTOR_MAX = 0.05;           // top rotor rotation speed
+		this.ROTOR_ACCEL = 0.00078;      // how quickly the rotor speeds up
+		this.ROTOR_DECEL = 0.00200;      // how quickly it slows down
+		this.ROTOR_MAX = 0.003;           // top rotor rotation speed
 		this.rotorSpeed = 0;             // current rotor spin velocity
 
 
@@ -41,11 +41,15 @@ export class Submarine extends THREE.Object3D {
 		this.motorGroup = new THREE.Group();
 		this.upperBodyGroup = new THREE.Group();
 
+
+		this.clock = new THREE.Clock();
+
 		// Add both groups to the main object
 		this.add(this.bodyGroup);
 		this.add(this.finGroup);
 		this.add(this.motorGroup);
 		this.add(this.upperBodyGroup);
+
 
 		this.init();
 	}
@@ -783,59 +787,56 @@ export class Submarine extends THREE.Object3D {
 	updateState() {
 		if (this.cameraManager.activeCameraName !== 'Submarine View') return;
 
+		const delta = this.clock.getDelta();
+
 		let isAccelerating = false;
 
-		// --- FORWARD / BACKWARD INPUT ---
 		if (this.keyManager.isKeyPressed('KeyW')) {
-			this.currentSpeed = Math.min(this.currentSpeed + this.ACCELERATION_RATE, this.MAX_SPEED);
+			this.currentSpeed = Math.min(this.currentSpeed + this.ACCELERATION_RATE * delta, this.MAX_SPEED);
 			isAccelerating = true;
 		}
 		else if (this.keyManager.isKeyPressed('KeyS')) {
-			this.currentSpeed = Math.max(this.currentSpeed - this.ACCELERATION_RATE, -this.REVERSE_SPEED);
+			this.currentSpeed = Math.max(this.currentSpeed - this.ACCELERATION_RATE * delta, -this.REVERSE_SPEED);
 			isAccelerating = true;
 		}
 		else {
 			if (this.currentSpeed > 0) {
-				this.currentSpeed = Math.max(this.currentSpeed - this.DECELERATION_RATE, 0);
+				this.currentSpeed = Math.max(this.currentSpeed - this.DECELERATION_RATE * delta, 0);
 			} else if (this.currentSpeed < 0) {
-				this.currentSpeed = Math.min(this.currentSpeed + this.DECELERATION_RATE, 0);
+				this.currentSpeed = Math.min(this.currentSpeed + this.DECELERATION_RATE * delta, 0);
 			}
 		}
 
-		// --- TRANSLATION (move forward/backward) ---
 		this.translateZ(-this.currentSpeed * this.GLOBAL_SPEED);
 
 		// --- TURNING (A/D) ---
 		if (this.keyManager.isKeyPressed('KeyA')) {
-			this.rotation.y += this.TURN_RATE * this.GLOBAL_SPEED;
+			this.rotation.y += delta * this.TURN_RATE * this.GLOBAL_SPEED;
 		}
 		if (this.keyManager.isKeyPressed('KeyD')) {
-			this.rotation.y -= this.TURN_RATE * this.GLOBAL_SPEED;
+			this.rotation.y -= delta * this.TURN_RATE * this.GLOBAL_SPEED;
 		}
 
 		// --- ASCEND / DESCEND (P/L) ---
 		if (this.keyManager.isKeyPressed('KeyP')) {
-			this.position.y += this.VERTICAL_RATE * this.GLOBAL_SPEED;
+			this.position.y += delta * this.VERTICAL_RATE * this.GLOBAL_SPEED;
 		}
 		if (this.keyManager.isKeyPressed('KeyL')) {
-			this.position.y -= this.VERTICAL_RATE * this.GLOBAL_SPEED;
+			this.position.y -= delta * this.VERTICAL_RATE * this.GLOBAL_SPEED;
 		}
 
-		// --- ROTOR ANIMATION (linked to movement) ---
 		if (Math.abs(this.currentSpeed) > 0.0001 || isAccelerating) {
 			const targetDirection = (this.currentSpeed >= 0) ? 1 : -1;
 
-			// Gradually rotate rotorSpeed toward desired direction and magnitude
-			const targetRotorSpeed = this.ROTOR_MAX * Math.min(Math.abs(this.currentSpeed) / this.MAX_SPEED, 1);
 
-			// Smoothly approach target rotor speed
+
 			if (Math.sign(this.rotorSpeed) !== targetDirection && Math.abs(this.rotorSpeed) > 0.0001) {
 				// First slow down before changing direction
-				this.rotorSpeed -= Math.sign(this.rotorSpeed) * this.ROTOR_DECEL;
+				this.rotorSpeed -= Math.sign(this.rotorSpeed) * this.ROTOR_DECEL * delta;
 			} else {
 				// Then accelerate in the target direction
 				const accel = this.ROTOR_ACCEL * (this.currentSpeed !== 0 ? 1 : 0.5);
-				this.rotorSpeed += targetDirection * accel;
+				this.rotorSpeed += targetDirection * accel * delta;
 			}
 
 			// Clamp rotorSpeed within ±ROTOR_MAX
@@ -845,7 +846,7 @@ export class Submarine extends THREE.Object3D {
 		} else {
 			// Decelerate rotor when idle (no movement)
 			if (Math.abs(this.rotorSpeed) > 0.00001) {
-				this.rotorSpeed -= Math.sign(this.rotorSpeed) * this.ROTOR_DECEL;
+				this.rotorSpeed -= Math.sign(this.rotorSpeed) * this.ROTOR_DECEL * delta;
 				this.motorGroup.rotateZ(this.rotorSpeed * this.GLOBAL_SPEED);
 			} else {
 				this.rotorSpeed = 0;
