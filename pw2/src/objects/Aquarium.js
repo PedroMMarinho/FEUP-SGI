@@ -11,9 +11,10 @@ import { Submarine } from './submarine/Submarine.js';
  * Main Aquarium class
  */
 class Aquarium extends THREE.Object3D {
-    constructor(assetManager) {
+    constructor(assetManager, keyManager) {
         super();
         this.assetManager = assetManager;
+        this.keyManager = keyManager;
         // Load aquarium features
         this.width = 1000;
         this.height = 1000;
@@ -91,7 +92,7 @@ class Aquarium extends THREE.Object3D {
 
     }
     createSubmarine() {
-        this.submarine = new Submarine(this.assetManager.getBlenderManager().getAllLODs('propeller-blade')[0]);
+        this.submarine = new Submarine(this.assetManager.getBlenderManager().getAllLODs('propeller-blade')[0],this.keyManager);
         this.submarine.position.set(0, 0, 0);
         this.addToAquarium(this.submarine);
     }

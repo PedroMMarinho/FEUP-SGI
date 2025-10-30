@@ -2,14 +2,31 @@ import * as THREE from 'three';
 import { TextureManager } from '../../managers/TextureManager.js';
 
 export class Submarine extends THREE.Object3D {
-	constructor(propellerBladeModel) {
+	constructor(propellerBladeModel, keyManager) {
 		super();
 		this.width = 7.42;
 		this.height = 1.5;
 		this.color = 0x000000;
+		this.keyManager = keyManager;
 
 		// Blender model
 		this.propellerBladeObject = propellerBladeModel.scene;
+
+
+		// Movement speeds 
+        this.GLOBAL_SPEED = 1.0; // Master speed multiplier
+        this.FORWARD_SPEED = 0.02;
+        this.TURN_SPEED = 0.02;
+        this.VERTICAL_SPEED = 0.05;
+        
+        // Motor animation
+        this.motorTime = 0;
+        this.MOTOR_SPEED = 0.01;
+        
+        // Rotor animation
+        this.rotorSpeed = 0; // Current rotor speed
+        this.ROTOR_MAX_SPEED = 0.1;
+        this.ROTOR_ACCELERATION = 0.0001;
 
 		// --- Groups ---
 		this.bodyGroup = new THREE.Group();
@@ -755,6 +772,51 @@ export class Submarine extends THREE.Object3D {
 		mesh.position.set(0, 0.854, -3.78);
 		this.upperBodyGroup.add(mesh);
 	}
+
+	updateState() {
+        let isMoving = false;
+        
+        // Forward/Backward (W/S) - moves along local -Z axis (front of submarine)
+        if (this.keyManager.isKeyPressed('KeyW')) {
+            this.translateZ(-this.FORWARD_SPEED * this.GLOBAL_SPEED);
+            isMoving = true;
+        }
+        if (this.keyManager.isKeyPressed('KeyS')) {
+            this.translateZ(this.FORWARD_SPEED * this.GLOBAL_SPEED);
+            isMoving = true;
+        }
+        
+        // Turn Left/Right (A/D) - rotates around Y axis
+        if (this.keyManager.isKeyPressed('KeyA')) {
+            this.rotation.y += this.TURN_SPEED * this.GLOBAL_SPEED;
+        }
+        if (this.keyManager.isKeyPressed('KeyD')) {
+            this.rotation.y -= this.TURN_SPEED * this.GLOBAL_SPEED;
+        }
+        
+        // Up/Down (P/L) - moves along Y axis
+        if (this.keyManager.isKeyPressed('KeyP')) {
+            this.position.y += this.VERTICAL_SPEED * this.GLOBAL_SPEED;
+            isMoving = true;
+        }
+        if (this.keyManager.isKeyPressed('KeyL')) {
+            this.position.y -= this.VERTICAL_SPEED * this.GLOBAL_SPEED;
+            isMoving = true;
+        }
+        
+        if (isMoving) {
+            this.rotorSpeed = Math.min(this.rotorSpeed + this.ROTOR_ACCELERATION, this.ROTOR_MAX_SPEED);
+            
+            this.motorTime += this.MOTOR_SPEED * this.GLOBAL_SPEED;
+            this.motorGroup.rotateZ(this.rotorSpeed * this.GLOBAL_SPEED);
+        } else {
+            this.rotorSpeed = Math.max(this.rotorSpeed - this.ROTOR_ACCELERATION * 2, 0);
+            
+            if (this.rotorSpeed > 0) {
+                this.motorGroup.rotateZ(this.rotorSpeed * this.GLOBAL_SPEED);
+            }
+        }
+    }
 
 
 }
