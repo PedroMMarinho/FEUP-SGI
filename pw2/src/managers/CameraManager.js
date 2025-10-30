@@ -51,6 +51,9 @@ class CameraManager {
         UnderwaterCam.position.set(0, 2, 5);
         this.cameras['Underwater View'] = UnderwaterCam;
 
+        const submarineCam = new THREE.PerspectiveCamera(75, this.aspect, 0.1, 1000);
+        this.cameras['Submarine View'] = submarineCam;
+
         this.setActiveCamera('Free Fly');
     }
 
