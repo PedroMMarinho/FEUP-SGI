@@ -21,6 +21,7 @@ export class Submarine extends THREE.Object3D {
 		this.add(this.bodyGroup);
 		this.add(this.finGroup);
 		this.add(this.motorGroup);
+		this.add(this.upperBodyGroup);
 
 		this.init();
 	}
@@ -219,7 +220,7 @@ export class Submarine extends THREE.Object3D {
 			depth: 0.05,
 			bevelEnabled: false,
 		});
-
+		extrudeGeometry.computeVertexNormals();
 		const extrudedDiamond = new THREE.Mesh(extrudeGeometry, this.bodyMaterial);
 
 		// Base offset depending on the side
@@ -354,6 +355,7 @@ export class Submarine extends THREE.Object3D {
 		};
 
 		const geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
+		geometry.computeVertexNormals();
 		const mesh = new THREE.Mesh(geometry, this.bodyMaterial);
 		mesh.position.set(0, -0.04, - (this.width / 2 + this.height / 2) - 0.49);
 		mesh.rotation.x = - Math.PI / 40;
@@ -447,11 +449,107 @@ export class Submarine extends THREE.Object3D {
 
 	createBodyTopDetails() {
 		this.createBodyTopBase();
+		this.createTopCylinders();
+		this.createFrontCylinder();
 	}
+
+	createFrontCylinder() {
+		const cylinderHeight = 0.3;
+		const cylinderRadius = this.height / 22;
+
+		// --- Cylinder ---
+		const geometry = new THREE.CylinderGeometry(
+			cylinderRadius,
+			cylinderRadius,
+			cylinderHeight,
+			64
+		);
+		const frontCylinder = new THREE.Mesh(geometry, this.finMaterial);
+
+		// Position the cylinder
+		frontCylinder.position.set(0, 1.03, -4.1);
+		this.upperBodyGroup.add(frontCylinder);
+
+		// --- Lathe top cap ---
+		const lathePoints = [
+			new THREE.Vector2(0, 0.05),
+			new THREE.Vector2(cylinderRadius * 0.3, 0.05),
+			new THREE.Vector2(cylinderRadius * 1, 0),
+		];
+		const latheGeometry = new THREE.LatheGeometry(lathePoints, 64);
+		latheGeometry.computeVertexNormals(); // smooth shading
+
+		const latheMesh = new THREE.Mesh(latheGeometry, this.finMaterial);
+
+		const cylinderTopY = 1.03 + cylinderHeight / 2;
+		latheMesh.position.set(0, cylinderTopY, -4.1);
+
+		this.upperBodyGroup.add(latheMesh);
+
+
+		// --- Front smaller cylinder ---
+		const semiSphereRadius = this.height / 14;
+		const smallCylinderHeight = semiSphereRadius; 
+		const sphereGeometry = new THREE.CylinderGeometry(
+			semiSphereRadius,
+			semiSphereRadius,
+			smallCylinderHeight,
+			64
+		);
+		const sphereMesh = new THREE.Mesh(sphereGeometry, this.finMaterial);
+
+		// The smaller cylinder's center position
+		sphereMesh.position.set(0, cylinderTopY - 0.12, -3.61);
+		this.upperBodyGroup.add(sphereMesh);
+
+		const otherLathePoints = [
+			new THREE.Vector2(0, 0.07),
+			new THREE.Vector2(semiSphereRadius * 0.5, 0.07),
+			new THREE.Vector2(semiSphereRadius * 0.7, 0.05),
+			new THREE.Vector2(semiSphereRadius * 1, 0),
+		];
+		const otherLatheGeometry = new THREE.LatheGeometry(otherLathePoints, 64);
+		otherLatheGeometry.computeVertexNormals();
+
+		const otherLatheMesh = new THREE.Mesh(otherLatheGeometry, this.finMaterial);
+
+		const smallCylinderTopY = sphereMesh.position.y + smallCylinderHeight / 2;
+		otherLatheMesh.position.set(0, smallCylinderTopY, -3.61);
+
+		this.upperBodyGroup.add(otherLatheMesh);
+
+
+	}
+
+
+	createTopCylinders() {
+		const cylinderHeight = 0.05;
+		const cylinderRadius = this.height / 18;
+
+
+		const geometry = new THREE.CylinderGeometry(cylinderRadius, cylinderRadius, cylinderHeight, 64);
+		// BackMost cylinder
+		const blackCylinder = new THREE.Mesh(geometry, this.bodyMaterial);
+		blackCylinder.position.set(0, 1.05, 4.14 + cylinderHeight / 2);
+		this.upperBodyGroup.add(blackCylinder);
+
+		// Grey cylinders
+		const positions = [
+			{ x: 0, y: 0, z: 1.864 },
+			{ x: 0, y: 0, z: 1.462 },
+		];
+		positions.forEach((pos) => {
+			const greyCylinder = new THREE.Mesh(geometry, this.finMaterial);
+			greyCylinder.position.set(pos.x, pos.y + 1.05, pos.z + cylinderHeight / 2);
+			this.upperBodyGroup.add(greyCylinder);
+		});
+
+	}
+
 
 	createBodyTopBase() {
 		const shapeWidth = this.height / 1.85 + 0.1;
-		const shapeHeight = this.width + 0.4; 
+		const shapeHeight = this.width + 0.4;
 		const topRadius = shapeWidth / 2;
 
 		const shape = new THREE.Shape();
@@ -462,7 +560,7 @@ export class Submarine extends THREE.Object3D {
 
 		shape.lineTo(topRadius, shapeHeight);
 
-		shape.absarc(0, shapeHeight, topRadius, 0, Math.PI, false); 
+		shape.absarc(0, shapeHeight, topRadius, 0, Math.PI, false);
 
 		shape.lineTo(-topRadius, 0);
 
@@ -473,11 +571,11 @@ export class Submarine extends THREE.Object3D {
 		};
 
 		const geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
-
+		geometry.computeVertexNormals();
 		const mesh = new THREE.Mesh(geometry, this.bodyMaterial);
 		mesh.rotation.x = Math.PI / 2;
 		mesh.position.set(0, 0.854, -3.78);
-		this.add(mesh);
+		this.upperBodyGroup.add(mesh);
 	}
 
 
