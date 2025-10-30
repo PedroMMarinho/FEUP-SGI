@@ -468,6 +468,39 @@ export class Submarine extends THREE.Object3D {
 		this.createFrontCylinder();
 		this.createWaterTanks();
 		this.createScopeBody();
+		this.createVisionScope();
+	}
+
+	createVisionScope() {
+		// --- Base cylinder ---
+		const geometry = new THREE.CylinderGeometry(1, 1, 1, 64);
+		const visionCylinder = new THREE.Mesh(geometry, this.finMaterial);
+		visionCylinder.position.set(0, 2.2, -1.975);
+		visionCylinder.scale.set(0.073, 0.97, 0.12);
+
+		// Add two small cilinders on the sides
+		const sideCylinderGeometry = new THREE.CylinderGeometry(1, 1, 1, 64);
+		const sideCylinder1 = new THREE.Mesh(sideCylinderGeometry, this.finMaterial);
+		sideCylinder1.rotation.x = Math.PI / 2;
+
+		sideCylinder1.scale.set(0.45, 1.3, 0.03);
+		sideCylinder1.position.set(0.05, 0.32, -1.61);
+		visionCylinder.add(sideCylinder1);
+
+		const sideCylinder2 = new THREE.Mesh(sideCylinderGeometry, this.finMaterial);
+		sideCylinder2.rotation.x = Math.PI / 2;
+		sideCylinder2.scale.set(0.38, 1.3, 0.022);
+		sideCylinder2.position.set(0.05, 0.32, -1.7);
+		visionCylinder.add(sideCylinder2);
+		
+		this.upperBodyGroup.add(visionCylinder);
+
+		// Add tube 
+		const tubeGeometry = new THREE.CylinderGeometry(1, 1, 1, 64);
+		const tubeMesh = new THREE.Mesh(tubeGeometry, this.finMaterial);
+		tubeMesh.position.set(0, 0.52, 0.32);
+		tubeMesh.scale.set(0.54, 0.52, 0.36);
+		visionCylinder.add(tubeMesh);
 	}
 
 
