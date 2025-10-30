@@ -18,7 +18,7 @@ class SeaweedLOD extends THREE.LOD {
         ];
 
         lodLevels.forEach((level) => {
-            const seaweed = new Seaweed(level.complexity);
+            const seaweed = new Seaweed(level.complexity,this.material);
             this.addLevel(seaweed, level.distance);
             this.seaweeds.push(seaweed);
         });
