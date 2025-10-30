@@ -73,7 +73,9 @@ class MyApp {
     render() {
         this.stats.begin();
 
-        this.cameraManager.update(this.renderer);
+        const submarine = this.contents?.aquarium?.submarine;
+
+        this.cameraManager.update(this.renderer, submarine);
 
         if (this.contents) this.contents.update();
 

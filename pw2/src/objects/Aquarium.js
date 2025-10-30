@@ -11,10 +11,11 @@ import { Submarine } from './submarine/Submarine.js';
  * Main Aquarium class
  */
 class Aquarium extends THREE.Object3D {
-    constructor(assetManager, keyManager) {
+    constructor(assetManager, keyManager, cameraManager) {
         super();
         this.assetManager = assetManager;
         this.keyManager = keyManager;
+        this.cameraManager = cameraManager;
         // Load aquarium features
         this.width = 1000;
         this.height = 1000;
@@ -41,17 +42,17 @@ class Aquarium extends THREE.Object3D {
     init() {
         // Create aquarium geometry and material
         this.createAquariumGeometry();
-        ////create terrain
-        //this.createTerrainSegments();
-        //// Create bubbles
-        //this.createBubbles();
-        //// create rocks
-        //this.createRocks();
-		//// create corals
-		//this.createCorals();
-		//// create fishes
-		//this.createFishes();
-        //// create shark
+        //create terrain
+        this.createTerrainSegments();
+        // Create bubbles
+        this.createBubbles();
+        // create rocks
+        this.createRocks();
+		// create corals
+		this.createCorals();
+		// create fishes
+		this.createFishes();
+        // create shark
         this.createShark();
         // create submarine
         this.createSubmarine();
@@ -64,19 +65,19 @@ class Aquarium extends THREE.Object3D {
 
 
     createRocks() {
-        const rockGroup = new RockGroup(180, this.terrainWidth, this.terrainHeight);
+        const rockGroup = new RockGroup(1500, this.terrainWidth, this.terrainHeight);
         this.addToAquarium(rockGroup);
     }
 
     createTerrainSegments() {
-        this.terrainWidth = 100;
-        this.terrainHeight = 100;
+        this.terrainWidth = 300;
+        this.terrainHeight = 300;
         const terrainGroup = new TerrainSegment(this.terrainWidth, this.terrainHeight);
         this.addToAquarium(terrainGroup);
     }
 
 	createCorals() {
-		const coralGroup = new CoralGroup(40, this.terrainWidth/2, this.terrainHeight/2);
+		const coralGroup = new CoralGroup(100, this.terrainWidth/2, this.terrainHeight/2);
 		this.addToAquarium(coralGroup);
 	}
 
@@ -92,7 +93,7 @@ class Aquarium extends THREE.Object3D {
 
     }
     createSubmarine() {
-        this.submarine = new Submarine(this.assetManager.getBlenderManager().getAllLODs('propeller-blade')[0],this.keyManager);
+        this.submarine = new Submarine(this.assetManager.getBlenderManager().getAllLODs('propeller-blade')[0], this.keyManager, this.cameraManager);
         this.submarine.position.set(0, 0, 0);
         this.addToAquarium(this.submarine);
     }
