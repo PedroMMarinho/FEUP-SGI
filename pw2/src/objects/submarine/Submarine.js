@@ -203,7 +203,7 @@ export class Submarine extends THREE.Object3D {
 			scale: { x: 0.6, y: 1.41, z: 4.1 },
 		});
 
-        // Top rear fin
+		// Top rear fin
 		this.createFinElipticalCylinder({
 			side: "right",
 			position: { x: -0.618, y: 1.44, z: -2.338 },
@@ -469,7 +469,60 @@ export class Submarine extends THREE.Object3D {
 		this.createWaterTanks();
 		this.createScopeBody();
 		this.createVisionScope();
+		this.addHatch();
 	}
+
+	addHatch() {
+    const hatchRadius = this.height / 7;
+    const hatchGeometry = new THREE.CylinderGeometry(hatchRadius, hatchRadius, 0.05, 64);
+    const hatchMesh = new THREE.Mesh(hatchGeometry, this.finMaterial);
+    hatchMesh.position.set(0, 1.6, -2.66);
+    this.upperBodyGroup.add(hatchMesh);
+    
+    // Semicircle using SphereGeometry
+    const semicircleRadius = hatchRadius * 0.9;
+    const semicircleGeometry = new THREE.SphereGeometry(
+        semicircleRadius, 
+        64, 
+        32, 
+        0, 
+        Math.PI * 2, 
+        0, 
+        Math.PI / 2
+    );
+    const semicircleMesh = new THREE.Mesh(semicircleGeometry, this.finMaterial);
+    semicircleMesh.position.set(0, 1.6, -2.66);
+    this.upperBodyGroup.add(semicircleMesh);
+    
+    const handleGroup = new THREE.Group();
+    const outerTorusGeometry = new THREE.TorusGeometry(hatchRadius * 0.58, 0.01, 16, 64);
+    const outerTorus = new THREE.Mesh(outerTorusGeometry, this.finMaterial);
+    handleGroup.add(outerTorus);
+    const innerTorusGeometry = new THREE.TorusGeometry(hatchRadius * 0.3, 0.01, 16, 64);
+    const innerTorus = new THREE.Mesh(innerTorusGeometry, this.finMaterial);
+    handleGroup.add(innerTorus);
+    const circleGeometry = new THREE.CircleGeometry(hatchRadius * 0.3, 64);
+    const circleMesh = new THREE.Mesh(circleGeometry, this.bodyMaterial);
+    handleGroup.add(circleMesh);
+    const numCylinders = 5;
+    const outerRadius = hatchRadius * 0.58;
+    const innerRadius = hatchRadius * 0.3;
+    const connectionLength = outerRadius - innerRadius;
+    for (let i = 0; i < numCylinders; i++) {
+        const angle = (i / numCylinders) * Math.PI * 2;
+        const cylinderGeometry = new THREE.CylinderGeometry(0.008, 0.008, connectionLength, 16);
+        const cylinder = new THREE.Mesh(cylinderGeometry, this.bodyMaterial);
+        const midRadius = (outerRadius + innerRadius) / 2;
+        cylinder.position.x = Math.cos(angle) * midRadius;
+        cylinder.position.y = Math.sin(angle) * midRadius;
+        cylinder.rotation.z = angle + Math.PI / 2;
+        handleGroup.add(cylinder);
+    }
+    // Position handle at the top of the hemisphere
+    handleGroup.position.set(0, 1.6 + semicircleRadius, -2.66);
+    handleGroup.rotation.x = Math.PI / 2; 
+    this.upperBodyGroup.add(handleGroup);
+}
 
 	createVisionScope() {
 		// --- Base cylinder ---
@@ -492,7 +545,7 @@ export class Submarine extends THREE.Object3D {
 		sideCylinder2.scale.set(0.38, 1.3, 0.022);
 		sideCylinder2.position.set(0.05, 0.32, -1.7);
 		visionCylinder.add(sideCylinder2);
-		
+
 		this.upperBodyGroup.add(visionCylinder);
 
 		// Add tube 
