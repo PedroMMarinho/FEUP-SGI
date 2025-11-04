@@ -1,6 +1,6 @@
 export class KeyframedAnimation {
 	static interpolationFunctions = {
-		discrete: (start, _, _) => start,
+		discrete: (start, end, progress) => start,
 		linear: (start, end, progress) => start + (end - start) * progress,
 		quadratic: (start, end, progress) => {
 			const p = progress < 0.5
@@ -78,6 +78,7 @@ export class KeyframedAnimation {
 		}
 		
 		time = time % this.animLength; // wrap around to start of animation
+
 		for (let i = 0; i < this.keyframes.length - 1; i++) {
 			if (time >= this.keyframes[i].time && time < this.keyframes[i+1].time) {
 				const start = this.keyframes[i];				
@@ -87,12 +88,18 @@ export class KeyframedAnimation {
 				return { start, end, progress, i };
 			}
 		}
-		return {
+		/*return {
 			start: this.keyframes[this.keyframes.length - 1],
 			end: this.keyframes[this.keyframes.length - 1], 
 			progress: 1, 
 			i: this.keyframes.length - 2 
-		};
+		};*/
+		// Wrap-around: last → first
+		const start = this.keyframes[this.keyframes.length - 1];
+		const end = this.keyframes[0];
+		const duration = this.animLength - start.time;
+		const progress = duration === 0 ? 1 : (time - start.time) / duration;
+		return { start, end, progress, i: this.keyframes.length - 1 };
 	}
 
 	getInterpolatedValue(time, property) {
