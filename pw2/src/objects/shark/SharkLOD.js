@@ -3,9 +3,8 @@ import { Shark } from './Shark.js';
 import { SharkBehaviour } from './SharkBehaviour.js';
 
 export class SharkLOD extends THREE.LOD {
-  constructor(key, lods, position = new THREE.Vector3(0, 0, 0), texture = null, aiOptions = {}) {
+  constructor(lods, position = new THREE.Vector3(0, 0, 0), texture = null, aiOptions = {}) {
     super();
-    this.key = key;
     this.lods = lods;
     this.distanceOffset = 15;
     this.distanceStart = 40;
@@ -41,7 +40,7 @@ export class SharkLOD extends THREE.LOD {
 
 
     for (let i = 0; i < lodCount; i++) {
-      const shark = new Shark(this.key, this.lods[i], i);
+      const shark = new Shark(this.lods[i], i);
 
       if (this.texture) {
         
