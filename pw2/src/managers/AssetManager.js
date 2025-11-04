@@ -21,9 +21,9 @@ export class AssetManager {
 
     initBlenderModels() {
         const modelList = [
-            { key: 'grey-shark', url: 'sharks/grey/shark-high.glb', lod: 0 },
-            { key: 'grey-shark', url: 'sharks/grey/shark-medium.glb', lod: 1 },
-            { key: 'grey-shark', url: 'sharks/grey/shark-low.glb', lod: 2 },
+            { key: 'shark', url: 'sharks/grey/shark-high.glb', lod: 0 },
+            { key: 'shark', url: 'sharks/grey/shark-medium.glb', lod: 1 },
+            { key: 'shark', url: 'sharks/grey/shark-low.glb', lod: 2 },
             // Submarine Propeller Blade
             { key: 'propeller-blade', url: 'submarine/propeller-blade-high.glb', lod: 0 },
             { key: 'propeller-blade', url: 'submarine/propeller-blade-medium.glb', lod: 1 },
@@ -54,6 +54,8 @@ export class AssetManager {
             'metal_NRM': 'submarine/MetalFasterners_NRM.png',
             'metal_OCC': 'submarine/MetalFasterners_OCC.png',
             'metal_SPEC': 'submarine/MetalFasterners_SPEC.png',
+            // Shark Textures
+            'shark-blue': 'shark/shark-blue.png',
         };
         return textureMap;
     }

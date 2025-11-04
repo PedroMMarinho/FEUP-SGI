@@ -476,7 +476,6 @@ export class Submarine extends THREE.Object3D {
 		const basePos = new THREE.Vector3(0.324, 0.396, 8.106);
 		const spacing = (2 * Math.PI) / bladeCount;
 
-		console.log(this.propellerBladeObject);
 		this.propellerBladeObject.traverse((child) => {
 			if (child.isMesh) {
 				child.material = this.motorMaterial;
@@ -488,7 +487,6 @@ export class Submarine extends THREE.Object3D {
 			pivot.position.set(0, 0, 0);
 
 			const blade = this.propellerBladeObject.clone();
-			console.log(blade);
 			blade.material = this.motorMaterial;
 			blade.position.copy(basePos);
 			pivot.add(blade);
