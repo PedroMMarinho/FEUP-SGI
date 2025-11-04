@@ -7,8 +7,8 @@ export class SharkLOD extends THREE.LOD {
     super();
     this.key = key;
     this.lods = lods;
-    this.distanceOffset = 15;
-    this.distanceStart = 60;
+    this.distanceOffset = 5;
+    this.distanceStart = 20;
     this.animationFrameRateStart = 120;
     this.animationFrameRateOffset = 40;
     this.clock = new THREE.Clock();
@@ -59,6 +59,8 @@ export class SharkLOD extends THREE.LOD {
   this.levels.forEach(level => {
     const obj = level.object;
     if (!obj.mixer) return;
+    
+    obj.mixer.setTime(this.globalTime);
 
     if (obj === visibleLOD.object && this.timeSinceLastUpdate >= updateInterval) {
       const effectiveDelta = this.timeSinceLastUpdate * animSpeedFactor;
