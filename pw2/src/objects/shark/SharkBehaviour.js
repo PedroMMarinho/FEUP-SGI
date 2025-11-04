@@ -16,8 +16,8 @@ export class SharkBehaviour {
     this.wanderRadius = options.wanderRadius || 120;
     
     // Environment bounds
-    this.terrainWidth = options.terrainWidth ?? 300;
-    this.terrainHeight = options.terrainHeight ?? 300;
+    this.terrainWidth = options.terrainWidth ?? 100;
+    this.terrainHeight = options.terrainHeight ?? 100;
     this.minY = options.minY ?? 0;
     this.maxY = options.maxY ?? 20;
 
