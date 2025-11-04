@@ -265,7 +265,7 @@ export class Submarine extends THREE.Object3D {
 		// Create the diamond shape
 		const diamondShape = this.createHollowDiamondShape(shapeWidth, shapeHeight, borderThickness);
 		const extrudeGeometry = new THREE.ExtrudeGeometry(diamondShape, {
-			steps: 1,
+			steps: this.cutNumber,
 			depth: 0.05,
 			bevelEnabled: false,
 		});
@@ -398,9 +398,10 @@ export class Submarine extends THREE.Object3D {
 		shape.closePath();
 
 		const extrudeSettings = {
-			steps: 1,
+			steps: this.cutNumber,
 			depth: 0.6,
 			bevelEnabled: false,
+
 		};
 
 		const geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
@@ -778,13 +779,16 @@ export class Submarine extends THREE.Object3D {
 		shape.lineTo(-topRadius, 0);
 
 		const extrudeSettings = {
-			steps: 1,
+			steps: this.cutNumber,
 			depth: 0.2,
-			bevelEnabled: true
+			bevelEnabled: true,
+			bevelSegments: this.cutNumber,
 		};
 
 		const geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
 		geometry.computeVertexNormals();
+		geometry.normalizeNormals(); 
+
 		const mesh = new THREE.Mesh(geometry, this.bodyMaterial);
 		mesh.rotation.x = Math.PI / 2;
 		mesh.position.set(0, 0.854, -3.78);
