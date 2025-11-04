@@ -14,6 +14,8 @@ export class FishLOD extends THREE.LOD {
 		this.globalTime = 0;
 		this.speed = 1;
 
+		this.keyframedAnimation = null;
+
 		this.init();
 	}
 
@@ -70,6 +72,10 @@ export class FishLOD extends THREE.LOD {
 		this.addLevel(emptyFish, this.distanceStart + 2 * this.distanceOffset);
 	}
 
+	attachAnimation(keyframedAnimation) {
+		this.keyframedAnimation = keyframedAnimation;
+	}
+
 	updateState() {
 		const delta = this.clock.getDelta();
 		this.globalTime += delta * this.speed;
@@ -89,6 +95,18 @@ export class FishLOD extends THREE.LOD {
 		}
 
 		
+	}
+
+	updateAnimation() {
+		const delta = this.clock.getDelta();
+		this.globalTime += delta * this.speed;
+
+		const timeMS = (this.globalTime * 1000);
+		const pose = this.keyframedAnimation.getPose(timeMS);
+		
+		//set self position and rotation.
+		this.position.set(pose.x, pose.y, pose.z);
+  		this.rotation.y = pose.angle;
 	}
 
 }
