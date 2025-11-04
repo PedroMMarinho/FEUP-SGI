@@ -82,16 +82,25 @@ class Aquarium extends THREE.Object3D {
 	}
 
 	createFishes() {
-		const fishGroup = new FishGroup(30);
-		this.addToAquarium(fishGroup);
+        this.fishGroups = [
+            new FishGroup(20),
+            new FishGroup(15),
+            new FishGroup(10),
+        ];
+		for (const group of this.fishGroups) {
+            const randomCord = () => THREE.MathUtils.randFloat(5, 60);
+            group.position.set(randomCord(), 10, randomCord());
+            this.addToAquarium(group);
+        }
 	}
 
     createShark() {
-        const sharks = new SharkLOD('grey-shark', this.assetManager.getBlenderManager().getAllLODs('grey-shark'));
-        this.addToAquarium(sharks);
-        
-
+        const position = new THREE.Vector3(0, 5, 0);
+        const shark = new SharkLOD('grey-shark', this.assetManager.getBlenderManager().getAllLODs('grey-shark'), position);
+        shark.scale.set(0.5, 0.5, 0.5);
+        this.addToAquarium(shark);
     }
+
     createSubmarine() {
         this.submarine = new Submarine(this.assetManager.getBlenderManager().getAllLODs('propeller-blade')[0], this.keyManager, this.cameraManager);
         this.submarine.position.set(0, 0, 0);

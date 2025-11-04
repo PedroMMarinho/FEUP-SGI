@@ -1,20 +1,25 @@
 import * as THREE from 'three';
 import { Shark } from './Shark.js';
+import { SharkBehaviour } from './SharkBehaviour.js';
 
 export class SharkLOD extends THREE.LOD {
-  constructor(key, lods) {
+  constructor(key, lods, position = new THREE.Vector3(0, 0, 0), aiOptions = {}) {
     super();
     this.key = key;
     this.lods = lods;
-    this.distanceOffset = 10;
-    this.distanceStart = 15;
+    this.distanceOffset = 15;
+    this.distanceStart = 60;
     this.animationFrameRateStart = 120;
     this.animationFrameRateOffset = 40;
     this.clock = new THREE.Clock();
     this.globalTime = 0;
     this.timeSinceLastUpdate = 0;
+    this.position.set(position.x, position.y, position.z);
+
+    this.ai = new SharkBehaviour(this, aiOptions);
 
     this.setupLODs();
+    
   }
 
   setupLODs() {
@@ -30,15 +35,17 @@ export class SharkLOD extends THREE.LOD {
       distance += distanceOffset;
     }
 
-
     // Add a final empty LOD to avoid popping
     const emptyObject = new THREE.Object3D();
     this.addLevel(emptyObject, distance);
   }
  
-updateState() {
+  updateState() {
   const delta = this.clock.getDelta();
   this.globalTime += delta;
+
+  // Update AI behaviour
+  this.ai.update(delta);
 
   const visibleLOD = this.levels.find(level => level.object.visible);
   const lodIndex = this.levels.indexOf(visibleLOD);
@@ -47,19 +54,20 @@ updateState() {
   const updateInterval = 1 / targetFrameRate;
   this.timeSinceLastUpdate += delta;
 
+  const animSpeedFactor = Math.log10(1 + this.ai.currentSpeed * 2) * 0.6 + 0.15;
+
   this.levels.forEach(level => {
     const obj = level.object;
     if (!obj.mixer) return;
 
-    obj.mixer.setTime(this.globalTime);
-
     if (obj === visibleLOD.object && this.timeSinceLastUpdate >= updateInterval) {
-      const effectiveDelta = this.timeSinceLastUpdate;
-      obj.mixer.update(effectiveDelta); // advance bones
+      const effectiveDelta = this.timeSinceLastUpdate * animSpeedFactor;
+      obj.mixer.update(effectiveDelta);
       this.timeSinceLastUpdate = 0;
     }
   });
 }
+
 
 
 }
