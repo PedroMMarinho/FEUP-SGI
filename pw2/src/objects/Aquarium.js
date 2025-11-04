@@ -5,7 +5,7 @@ import { CoralGroup } from './coral/CoralGroup.js';
 import { FishGroup } from './fish/FishGroup.js';
 import { TerrainSegment } from './terrainSegment/TerrainSegment.js';
 import { SharkLOD } from './shark/SharkLOD.js';
-import { Submarine } from './submarine/Submarine.js';
+import { SubmarineLOD } from './submarine/SubmarineLOD.js';
 
 /**
  * Main Aquarium class
@@ -102,8 +102,7 @@ class Aquarium extends THREE.Object3D {
     }
 
     createSubmarine() {
-        this.submarine = new Submarine(this.assetManager.getBlenderManager().getAllLODs('propeller-blade')[0], this.keyManager, this.cameraManager);
-        this.submarine.position.set(0, 0, 0);
+        this.submarine = new SubmarineLOD(this.assetManager.getBlenderManager().getAllLODs('propeller-blade'), this.keyManager, this.cameraManager);
         this.addToAquarium(this.submarine);
     }
 

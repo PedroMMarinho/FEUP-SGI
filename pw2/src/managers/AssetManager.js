@@ -26,8 +26,8 @@ export class AssetManager {
             { key: 'grey-shark', url: 'sharks/grey/shark-low.glb', lod: 2 },
             // Submarine Propeller Blade
             { key: 'propeller-blade', url: 'submarine/propeller-blade-high.glb', lod: 0 },
-            //{ key: 'submarine-propeller-blade', url: 'submarine/propeller-blade-medium.glb', lod: 1 },
-            //{ key: 'submarine-propeller-blade', url: 'submarine/propeller-blade-low.glb', lod: 2 },
+            { key: 'propeller-blade', url: 'submarine/propeller-blade-medium.glb', lod: 1 },
+            { key: 'propeller-blade', url: 'submarine/propeller-blade-low.glb', lod: 2 },
         ];
         return modelList;
     }

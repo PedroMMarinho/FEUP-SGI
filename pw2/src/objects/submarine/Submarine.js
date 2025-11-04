@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import { TextureManager } from '../../managers/TextureManager.js';
 
 export class Submarine extends THREE.Object3D {
-	constructor(propellerBladeModel, keyManager, cameraManager) {
+	constructor(propellerBladeModel, keyManager, cameraManager, lodLevel) {
 		super();
 		this.width = 7.42;
 		this.height = 1.5;
@@ -40,6 +40,8 @@ export class Submarine extends THREE.Object3D {
 		this.targetRotationY = this.rotation.y;
 
 
+		this.cutNumber = lodLevel == 0 ? 64 : lodLevel == 1 ? 16 : lodLevel == 2 ? 4 : 1;
+
 		// --- Groups ---
 		this.bodyGroup = new THREE.Group();
 		this.finGroup = new THREE.Group();
@@ -54,7 +56,6 @@ export class Submarine extends THREE.Object3D {
 		this.add(this.finGroup);
 		this.add(this.motorGroup);
 		this.add(this.upperBodyGroup);
-
 
 		this.init();
 	}
@@ -116,7 +117,7 @@ export class Submarine extends THREE.Object3D {
 
 	createBodyCore() {
 		// Capsule body
-		const bodyGeometry = new THREE.CapsuleGeometry(this.height / 2, this.width, 64, 64, 64);
+	const bodyGeometry = new THREE.CapsuleGeometry(this.height / 2, this.width, this.cutNumber, this.cutNumber, this.cutNumber);
 		const bodyMesh = new THREE.Mesh(bodyGeometry, this.bodyMaterial);
 		bodyMesh.rotation.x = Math.PI / 2;
 		bodyMesh.scale.set(1.31, 1, 1.31);
@@ -125,7 +126,7 @@ export class Submarine extends THREE.Object3D {
 		this.body = bodyMesh;
 
 		// Front dome
-		const frontGeometry = new THREE.SphereGeometry(1.31 * this.height / 2, 64, 64, 0, Math.PI * 2, 0, Math.PI / 2);
+	const frontGeometry = new THREE.SphereGeometry(1.31 * this.height / 2, this.cutNumber, this.cutNumber, 0, Math.PI * 2, 0, Math.PI / 2);
 		const frontMesh = new THREE.Mesh(frontGeometry, this.bodyMaterial);
 		frontMesh.position.set(0, 0, -(this.width / 2 + this.height / 2));
 		frontMesh.rotation.x = -Math.PI / 2;
@@ -133,7 +134,7 @@ export class Submarine extends THREE.Object3D {
 		this.bodyGroup.add(frontMesh);
 
 		// Back dome
-		const backGeometry = new THREE.SphereGeometry(1.31 * this.height / 2, 64, 64, 0, Math.PI * 2, Math.PI / 2, Math.PI / 2);
+	const backGeometry = new THREE.SphereGeometry(1.31 * this.height / 2, this.cutNumber, this.cutNumber, 0, Math.PI * 2, Math.PI / 2, Math.PI / 2);
 		const backMesh = new THREE.Mesh(backGeometry, this.bodyMaterial);
 		backMesh.position.set(0, 0, this.width / 2 - 0.8);
 		backMesh.rotation.x = -Math.PI / 2;
@@ -148,7 +149,7 @@ export class Submarine extends THREE.Object3D {
 			this.height / 12,
 			0.368 * this.height / 2 + 0.008,
 			cylinderHeight,
-			64
+			this.cutNumber
 		);
 		const backExtensionMesh = new THREE.Mesh(backExtensionGeometry, this.bodyMaterial);
 		backExtensionMesh.rotation.x = Math.PI / 2;
@@ -160,7 +161,7 @@ export class Submarine extends THREE.Object3D {
 
 		// Torus ring
 		const torusTubeSize = 0.008;
-		const torusGeometry = new THREE.TorusGeometry(this.height / 12, torusTubeSize, 16, 100);
+		const torusGeometry = new THREE.TorusGeometry(this.height / 12, torusTubeSize, this.cutNumber, this.cutNumber);
 		const torusMesh = new THREE.Mesh(torusGeometry, this.bodyMaterial);
 		const firstCylinderEndZ = backExtensionMesh.position.z + cylinderHeight / 2;
 		torusMesh.position.set(0, 0, firstCylinderEndZ);
@@ -172,7 +173,7 @@ export class Submarine extends THREE.Object3D {
 			this.height / 15,
 			this.height / 12,
 			secondCylinderHeight,
-			64
+			this.cutNumber
 		);
 		const secondCylinderMesh = new THREE.Mesh(secondCylinderGeometry, this.bodyMaterial);
 		secondCylinderMesh.rotation.x = Math.PI / 2;
@@ -316,7 +317,7 @@ export class Submarine extends THREE.Object3D {
 			this.height / 16,
 			this.height / 16,
 			this.height / 2 + 0.1,
-			64
+			this.cutNumber
 		);
 		const finMesh = new THREE.Mesh(finGeometry, this.finMaterial);
 
@@ -426,7 +427,7 @@ export class Submarine extends THREE.Object3D {
 			this.height / 18,
 			this.height / 18,
 			this.height / 3,
-			64
+			this.cutNumber
 		);
 		const motorMesh = new THREE.Mesh(motorGeometry, this.finMaterial);
 		motorMesh.rotation.x = Math.PI / 2;
@@ -446,7 +447,7 @@ export class Submarine extends THREE.Object3D {
 			new THREE.Vector2(baseRadius * 1.2, totalHeight / 2 - 0.05),
 			new THREE.Vector2(this.height / 18, totalHeight / 2),
 		];
-		const geometry = new THREE.LatheGeometry(points, 64, 0, Math.PI * 2);
+		const geometry = new THREE.LatheGeometry(points, this.cutNumber, 0, Math.PI * 2);
 		const lathe = new THREE.Mesh(geometry, this.motorMaterial);
 		lathe.rotation.x = -Math.PI / 2;
 		const baseRadiusPos = this.height / 10;
@@ -455,7 +456,7 @@ export class Submarine extends THREE.Object3D {
 	}
 
 	createMotorBalls() {
-		const ballGeometry = new THREE.SphereGeometry(this.height / 34, 32, 32);
+		const ballGeometry = new THREE.SphereGeometry(this.height / 34, this.cutNumber, this.cutNumber);
 		const rotationOffset = Math.PI / 5;
 		const ballRadius = this.height / 10;
 
@@ -474,6 +475,7 @@ export class Submarine extends THREE.Object3D {
 		const basePos = new THREE.Vector3(0.324, 0.396, 8.106);
 		const spacing = (2 * Math.PI) / bladeCount;
 
+		console.log(this.propellerBladeObject);
 		this.propellerBladeObject.traverse((child) => {
 			if (child.isMesh) {
 				child.material = this.motorMaterial;
@@ -507,7 +509,7 @@ export class Submarine extends THREE.Object3D {
 
 	addHatch() {
 		const hatchRadius = this.height / 7;
-		const hatchGeometry = new THREE.CylinderGeometry(hatchRadius, hatchRadius, 0.05, 64);
+		const hatchGeometry = new THREE.CylinderGeometry(hatchRadius, hatchRadius, 0.05, this.cutNumber);
 		const hatchMesh = new THREE.Mesh(hatchGeometry, this.finMaterial);
 		hatchMesh.position.set(0, 1.6, -2.66);
 		this.upperBodyGroup.add(hatchMesh);
@@ -516,8 +518,8 @@ export class Submarine extends THREE.Object3D {
 		const semicircleRadius = hatchRadius * 0.9;
 		const semicircleGeometry = new THREE.SphereGeometry(
 			semicircleRadius,
-			64,
-			32,
+			this.cutNumber,
+			this.cutNumber,
 			0,
 			Math.PI * 2,
 			0,
@@ -528,13 +530,13 @@ export class Submarine extends THREE.Object3D {
 		this.upperBodyGroup.add(semicircleMesh);
 
 		const handleGroup = new THREE.Group();
-		const outerTorusGeometry = new THREE.TorusGeometry(hatchRadius * 0.58, 0.01, 16, 64);
+		const outerTorusGeometry = new THREE.TorusGeometry(hatchRadius * 0.58, 0.01, this.cutNumber, this.cutNumber);
 		const outerTorus = new THREE.Mesh(outerTorusGeometry, this.finMaterial);
 		handleGroup.add(outerTorus);
-		const innerTorusGeometry = new THREE.TorusGeometry(hatchRadius * 0.3, 0.01, 16, 64);
+		const innerTorusGeometry = new THREE.TorusGeometry(hatchRadius * 0.3, 0.01, this.cutNumber, this.cutNumber);
 		const innerTorus = new THREE.Mesh(innerTorusGeometry, this.finMaterial);
 		handleGroup.add(innerTorus);
-		const circleGeometry = new THREE.CircleGeometry(hatchRadius * 0.3, 64);
+		const circleGeometry = new THREE.CircleGeometry(hatchRadius * 0.3, this.cutNumber);
 		const circleMesh = new THREE.Mesh(circleGeometry, this.bodyMaterial);
 		handleGroup.add(circleMesh);
 		const numCylinders = 5;
@@ -543,7 +545,7 @@ export class Submarine extends THREE.Object3D {
 		const connectionLength = outerRadius - innerRadius;
 		for (let i = 0; i < numCylinders; i++) {
 			const angle = (i / numCylinders) * Math.PI * 2;
-			const cylinderGeometry = new THREE.CylinderGeometry(0.008, 0.008, connectionLength, 16);
+			const cylinderGeometry = new THREE.CylinderGeometry(0.008, 0.008, connectionLength, this.cutNumber);
 			const cylinder = new THREE.Mesh(cylinderGeometry, this.bodyMaterial);
 			const midRadius = (outerRadius + innerRadius) / 2;
 			cylinder.position.x = Math.cos(angle) * midRadius;
@@ -559,13 +561,13 @@ export class Submarine extends THREE.Object3D {
 
 	createVisionScope() {
 		// --- Base cylinder ---
-		const geometry = new THREE.CylinderGeometry(1, 1, 1, 64);
+		const geometry = new THREE.CylinderGeometry(1, 1, 1, this.cutNumber);
 		const visionCylinder = new THREE.Mesh(geometry, this.finMaterial);
 		visionCylinder.position.set(0, 2.2, -1.975);
 		visionCylinder.scale.set(0.073, 0.97, 0.12);
 
 		// Add two small cilinders on the sides
-		const sideCylinderGeometry = new THREE.CylinderGeometry(1, 1, 1, 64);
+		const sideCylinderGeometry = new THREE.CylinderGeometry(1, 1, 1, this.cutNumber);
 		const sideCylinder1 = new THREE.Mesh(sideCylinderGeometry, this.finMaterial);
 		sideCylinder1.rotation.x = Math.PI / 2;
 
@@ -582,7 +584,7 @@ export class Submarine extends THREE.Object3D {
 		this.upperBodyGroup.add(visionCylinder);
 
 		// Add tube 
-		const tubeGeometry = new THREE.CylinderGeometry(1, 1, 1, 64);
+		const tubeGeometry = new THREE.CylinderGeometry(1, 1, 1, this.cutNumber);
 		const tubeMesh = new THREE.Mesh(tubeGeometry, this.finMaterial);
 		tubeMesh.position.set(0, 0.52, 0.32);
 		tubeMesh.scale.set(0.54, 0.52, 0.36);
@@ -592,14 +594,14 @@ export class Submarine extends THREE.Object3D {
 
 	createScopeBody() {
 		// --- Base cylinder ---
-		const geometry = new THREE.CylinderGeometry(1, 1, 1, 64);
+		const geometry = new THREE.CylinderGeometry(1, 1, 1, this.cutNumber);
 		const scopeCylinder = new THREE.Mesh(geometry, this.bodyMaterial);
 		scopeCylinder.scale.set(0.39, 1.09, 0.98);
 		scopeCylinder.position.set(0, 1.05, -2.33);
 		this.upperBodyGroup.add(scopeCylinder);
 
 		// --- Hollow outer shell on top ---
-		const shellGeometry = new THREE.CylinderGeometry(1, 1, 1, 64, 1, true);
+		const shellGeometry = new THREE.CylinderGeometry(1, 1, 1, this.cutNumber, 1, true);
 		const shellMesh = new THREE.Mesh(shellGeometry, this.bodyMaterial);
 		shellMesh.scale.set(0.39 + 0.00001, 1.5, 0.98 + 0.00001);
 		shellMesh.position.set(
@@ -614,7 +616,7 @@ export class Submarine extends THREE.Object3D {
 		innerMesh.position.copy(shellMesh.position);
 		this.upperBodyGroup.add(innerMesh);
 
-		const ringGeometry = new THREE.RingGeometry(0.32, 0.39, 64);
+		const ringGeometry = new THREE.RingGeometry(0.32, 0.39, this.cutNumber);
 		const ringMesh = new THREE.Mesh(ringGeometry, this.bodyMaterial);
 		ringMesh.rotation.x = Math.PI / 2;
 		ringMesh.scale.set(1, 0.98 / 0.39, 1);
@@ -634,18 +636,18 @@ export class Submarine extends THREE.Object3D {
 			const height = this.height / 2 + 0.2;
 
 			// --- Cylinder core ---
-			const cylinderGeometry = new THREE.CylinderGeometry(radius, radius, height, 64);
+			const cylinderGeometry = new THREE.CylinderGeometry(radius, radius, height, this.cutNumber);
 			const cylinderMesh = new THREE.Mesh(cylinderGeometry, this.bodyMaterial);
 			group.add(cylinderMesh);
 
 			// --- Top hemisphere ---
-			const sphereGeometryTop = new THREE.SphereGeometry(radius, 64, 64, 0, Math.PI * 2, 0, Math.PI / 2);
+			const sphereGeometryTop = new THREE.SphereGeometry(radius, this.cutNumber, this.cutNumber, 0, Math.PI * 2, 0, Math.PI / 2);
 			const sphereTop = new THREE.Mesh(sphereGeometryTop, this.bodyMaterial);
 			sphereTop.position.y = height / 2;
 			group.add(sphereTop);
 
 			// --- Bottom hemisphere ---
-			const sphereGeometryBottom = new THREE.SphereGeometry(radius, 64, 64, 0, Math.PI * 2, Math.PI / 2, Math.PI / 2);
+			const sphereGeometryBottom = new THREE.SphereGeometry(radius, this.cutNumber, this.cutNumber, 0, Math.PI * 2, Math.PI / 2, Math.PI / 2);
 			const sphereBottom = new THREE.Mesh(sphereGeometryBottom, this.bodyMaterial);
 			sphereBottom.position.y = -height / 2;
 			group.add(sphereBottom);
@@ -673,7 +675,7 @@ export class Submarine extends THREE.Object3D {
 			cylinderRadius,
 			cylinderRadius,
 			cylinderHeight,
-			64
+			this.cutNumber
 		);
 		const frontCylinder = new THREE.Mesh(geometry, this.finMaterial);
 
@@ -687,7 +689,7 @@ export class Submarine extends THREE.Object3D {
 			new THREE.Vector2(cylinderRadius * 0.3, 0.05),
 			new THREE.Vector2(cylinderRadius * 1, 0),
 		];
-		const latheGeometry = new THREE.LatheGeometry(lathePoints, 64);
+		const latheGeometry = new THREE.LatheGeometry(lathePoints, this.cutNumber);
 		latheGeometry.computeVertexNormals(); // smooth shading
 
 		const latheMesh = new THREE.Mesh(latheGeometry, this.finMaterial);
@@ -705,7 +707,7 @@ export class Submarine extends THREE.Object3D {
 			semiSphereRadius,
 			semiSphereRadius,
 			smallCylinderHeight,
-			64
+			this.cutNumber
 		);
 		const sphereMesh = new THREE.Mesh(sphereGeometry, this.finMaterial);
 
@@ -719,7 +721,7 @@ export class Submarine extends THREE.Object3D {
 			new THREE.Vector2(semiSphereRadius * 0.7, 0.05),
 			new THREE.Vector2(semiSphereRadius * 1, 0),
 		];
-		const otherLatheGeometry = new THREE.LatheGeometry(otherLathePoints, 64);
+		const otherLatheGeometry = new THREE.LatheGeometry(otherLathePoints, this.cutNumber);
 		otherLatheGeometry.computeVertexNormals();
 
 		const otherLatheMesh = new THREE.Mesh(otherLatheGeometry, this.finMaterial);
@@ -738,7 +740,7 @@ export class Submarine extends THREE.Object3D {
 		const cylinderRadius = this.height / 18;
 
 
-		const geometry = new THREE.CylinderGeometry(cylinderRadius, cylinderRadius, cylinderHeight, 64);
+		const geometry = new THREE.CylinderGeometry(cylinderRadius, cylinderRadius, cylinderHeight, this.cutNumber);
 		// BackMost cylinder
 		const blackCylinder = new THREE.Mesh(geometry, this.bodyMaterial);
 		blackCylinder.position.set(0, 1.05, 4.14 + cylinderHeight / 2);
