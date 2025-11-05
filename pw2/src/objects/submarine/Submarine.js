@@ -105,6 +105,17 @@ export class Submarine extends THREE.Object3D {
 			side: THREE.DoubleSide,
 		});
 		this.motorMaterial = this.finMaterial.clone();
+
+		this.glassMaterial = new THREE.MeshPhysicalMaterial({
+		color: 0xffffff,          
+		transparent: true,
+		opacity: 0.15,            
+		roughness: 0.05,         
+		metalness: 0.0,
+		thickness: 0.2,
+		side: THREE.DoubleSide,
+		});
+		
 	}
 
 
@@ -565,11 +576,11 @@ export class Submarine extends THREE.Object3D {
 		visionCylinder.position.set(0, 2.2, -1.975);
 		visionCylinder.scale.set(0.073, 0.97, 0.12);
 
-		// Add two small cilinders on the sides
+		// --- Side cylinders ---
 		const sideCylinderGeometry = new THREE.CylinderGeometry(1, 1, 1, this.cutNumber);
+
 		const sideCylinder1 = new THREE.Mesh(sideCylinderGeometry, this.finMaterial);
 		sideCylinder1.rotation.x = Math.PI / 2;
-
 		sideCylinder1.scale.set(0.45, 1.3, 0.03);
 		sideCylinder1.position.set(0.05, 0.32, -1.61);
 		visionCylinder.add(sideCylinder1);
@@ -580,15 +591,25 @@ export class Submarine extends THREE.Object3D {
 		sideCylinder2.position.set(0.05, 0.32, -1.7);
 		visionCylinder.add(sideCylinder2);
 
-		this.upperBodyGroup.add(visionCylinder);
+		// --- Transparent glass dome (half-sphere) ---
+		const glassGeometry = new THREE.SphereGeometry(1, this.cutNumber, this.cutNumber, 0, Math.PI * 2, 0, Math.PI / 2);
 
-		// Add tube 
+		const glassDome = new THREE.Mesh(glassGeometry, this.glassMaterial);
+		glassDome.rotation.x = Math.PI;      
+		glassDome.position.set(0, -0.35, 0);    
+		glassDome.scale.set(1.14, 0.38, 1.3);
+		sideCylinder2.add(glassDome);
+
+		// --- Tube connection to the main body ---
 		const tubeGeometry = new THREE.CylinderGeometry(1, 1, 1, this.cutNumber);
 		const tubeMesh = new THREE.Mesh(tubeGeometry, this.finMaterial);
 		tubeMesh.position.set(0, 0.52, 0.32);
 		tubeMesh.scale.set(0.54, 0.52, 0.36);
 		visionCylinder.add(tubeMesh);
+
+		this.upperBodyGroup.add(visionCylinder);
 	}
+
 
 
 	createScopeBody() {
