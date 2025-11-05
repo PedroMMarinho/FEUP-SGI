@@ -16,10 +16,13 @@ export class SharkBehaviour {
     this.wanderRadius = options.wanderRadius || 120;
     
     // Environment bounds
-    this.terrainWidth = options.terrainWidth ?? 100;
-    this.terrainHeight = options.terrainHeight ?? 100;
+    this.terrainWidth = options.terrainWidth ?? 120;
+    this.terrainHeight = options.terrainHeight ?? 120;
     this.minY = options.minY ?? 0;
     this.maxY = options.maxY ?? 20;
+    this.horizontalBoundBuffer = options.horizontalBoundBuffer ?? 10;
+    this.verticalBoundBuffer = options.verticalBoundBuffer ?? 5;
+
 
     // Navigation
     this.targetTolerance = options.targetTolerance ?? 5.0;
@@ -98,15 +101,15 @@ export class SharkBehaviour {
       const depthChange = THREE.MathUtils.randFloat(-8, 8);
       this.targetDepth = THREE.MathUtils.clamp(
         this.shark.position.y + depthChange,
-        this.minY + 10,
-        this.maxY - 10
+        this.minY + this.verticalBoundBuffer,
+        this.maxY - this.verticalBoundBuffer
       );
       newTarget.y = this.targetDepth;
     } else {
       // Initial random target
       newTarget = new THREE.Vector3(
         THREE.MathUtils.randFloat(-halfWidth + 20, halfWidth - 20),
-        THREE.MathUtils.randFloat(this.minY + 10, this.maxY - 10),
+        THREE.MathUtils.randFloat(this.minY + this.verticalBoundBuffer, this.maxY - this.verticalBoundBuffer),
         THREE.MathUtils.randFloat(-halfHeight + 20, halfHeight - 20)
       );
       this.targetDepth = newTarget.y;
@@ -114,7 +117,7 @@ export class SharkBehaviour {
 
     // Clamp to bounds with larger buffer
     newTarget.x = THREE.MathUtils.clamp(newTarget.x, -halfWidth + 30, halfWidth - 30);
-    newTarget.y = THREE.MathUtils.clamp(newTarget.y, this.minY + 10, this.maxY - 10);
+    newTarget.y = THREE.MathUtils.clamp(newTarget.y, this.minY + this.verticalBoundBuffer, this.maxY - this.verticalBoundBuffer);
     newTarget.z = THREE.MathUtils.clamp(newTarget.z, -halfHeight + 30, halfHeight - 30);
 
     this.currentTarget = newTarget;
@@ -144,10 +147,15 @@ export class SharkBehaviour {
       this.metrics.timeSinceLastTurn = 0;
     }
 
-    // Calculate desired direction
+    // Calculate desired *horizontal* direction
     const desiredDir = new THREE.Vector3()
-      .subVectors(this.currentTarget, this.shark.position)
-      .normalize();
+      .subVectors(this.currentTarget, this.shark.position);
+    desiredDir.y = 0; 
+
+    if (desiredDir.lengthSq() < 0.0001) {
+      desiredDir.set(this.smoothedDir.x, 0, this.smoothedDir.z);
+    }
+    desiredDir.normalize();
 
     // Calculate turn angle
     this.metrics.turnAngle = Math.acos(
@@ -182,12 +190,8 @@ export class SharkBehaviour {
     // Update swim phase for tail animation
     this.swimPhase += clampedDelta * this.swimFrequency * (this.currentSpeed / this.baseSpeed);
 
-    // Calculate movement with gradual depth change
-    const forward = this.smoothedDir.clone();
-    
-    // Separate horizontal and vertical movement
-    const horizontalDir = new THREE.Vector3(forward.x, 0, forward.z).normalize();
-    const moveDelta = horizontalDir.multiplyScalar(this.currentSpeed * clampedDelta);
+   // Calculate movement with gradual depth change
+    const moveDelta = this.smoothedDir.clone().multiplyScalar(this.currentSpeed * clampedDelta);
     
     // Gradual depth adjustment
     const depthDiff = this.targetDepth - this.shark.position.y;
@@ -206,35 +210,13 @@ export class SharkBehaviour {
     this.metrics.totalDistanceTraveled += previousPos.distanceTo(this.shark.position);
     this.metrics.currentSpeed = this.currentSpeed;
 
-    // Calculate banking for turns (fish bank into turns, don't roll)
-    const rightVector = new THREE.Vector3(1, 0, 0)
-      .applyQuaternion(this.shark.quaternion);
-    const turnDirection = rightVector.dot(desiredDir.clone().cross(this.smoothedDir));
-    const targetBank = -turnDirection * turnSharpness * this.maxBankAngle;
-    
-    // Smooth banking
-    this.currentBank = THREE.MathUtils.lerp(
-      this.currentBank,
-      targetBank,
-      clampedDelta * 3
-    );
 
-    // Smooth rotation - point in direction of movement
-    const lookDir = this.smoothedDir.clone();
-    lookDir.y *= 0.3; // Reduce pitch influence for more natural swimming
-    lookDir.normalize();
-    
+    // Smooth rotation - point in *horizontal* direction of movement
     const targetQuat = new THREE.Quaternion().setFromUnitVectors(
-      new THREE.Vector3(0, 0, -1),
-      lookDir
+      new THREE.Vector3(0, 0, -1), 
+      this.smoothedDir             
     );
     
-    // Apply subtle banking
-    const bankQuat = new THREE.Quaternion().setFromAxisAngle(
-      new THREE.Vector3(0, 0, 1),
-      this.currentBank
-    );
-    targetQuat.multiply(bankQuat);
 
     // Slower rotation for more realistic movement
     this.shark.quaternion.slerp(targetQuat, clampedDelta * 2);
@@ -242,50 +224,54 @@ export class SharkBehaviour {
     // Keep within bounds
     this.keepWithinBounds();
 
-    // Update metrics
     this.metrics.altitude = this.shark.position.y;
     this.metrics.averageSpeed = this.metrics.pathSegments > 0 
       ? this.metrics.totalDistanceTraveled / (this.metrics.pathSegments * 10)
       : this.currentSpeed;
   }
 
-  keepWithinBounds() {
+ keepWithinBounds() {
     const halfWidth = this.terrainWidth / 2;
     const halfHeight = this.terrainHeight / 2;
     const pos = this.shark.position;
-    const buffer = 20;
+
     let needsNewTarget = false;
 
-    // Smooth boundary handling
-    if (pos.x < -halfWidth + buffer) {
-      pos.x = -halfWidth + buffer;
+
+    if (pos.x < -halfWidth) {
+      pos.x = -halfWidth;
       this.smoothedDir.x = Math.abs(this.smoothedDir.x);
       needsNewTarget = true;
     }
-    if (pos.x > halfWidth - buffer) {
-      pos.x = halfWidth - buffer;
+
+    if (pos.x > halfWidth) {
+      pos.x = halfWidth;
       this.smoothedDir.x = -Math.abs(this.smoothedDir.x);
       needsNewTarget = true;
     }
-    if (pos.z < -halfHeight + buffer) {
-      pos.z = -halfHeight + buffer;
+
+    if (pos.z < -halfHeight) {
+      pos.z = -halfHeight;
       this.smoothedDir.z = Math.abs(this.smoothedDir.z);
       needsNewTarget = true;
     }
-    if (pos.z > halfHeight - buffer) {
-      pos.z = halfHeight - buffer;
+
+    if (pos.z > halfHeight) {
+      pos.z = halfHeight;
       this.smoothedDir.z = -Math.abs(this.smoothedDir.z);
       needsNewTarget = true;
     }
 
-    if (pos.y < this.minY + buffer / 2) {
-      pos.y = this.minY + buffer / 2;
-      this.targetDepth = pos.y + 5;
+
+    if (pos.y < this.minY) {
+      pos.y = this.minY;
+      this.targetDepth = pos.y + 5; // Aim slightly up
       needsNewTarget = true;
     }
-    if (pos.y > this.maxY - buffer / 2) {
-      pos.y = this.maxY - buffer / 2;
-      this.targetDepth = pos.y - 5;
+
+    if (pos.y > this.maxY) {
+      pos.y = this.maxY;
+      this.targetDepth = pos.y - 5; // Aim slightly down
       needsNewTarget = true;
     }
 
