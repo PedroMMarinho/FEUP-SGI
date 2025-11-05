@@ -121,8 +121,8 @@ class CameraManager {
         const camera = this.cameras['Submarine View'];
         const offset = new THREE.Vector3(0, 3, 12);
         const relativeOffset = offset.clone().applyMatrix4(submarine.matrixWorld);
-
         camera.position.lerp(relativeOffset, 2 * deltaTime);
+
 
         const lookAtOffset = new THREE.Vector3(0, 1, -5).applyMatrix4(submarine.matrixWorld);
         camera.lookAt(lookAtOffset);
