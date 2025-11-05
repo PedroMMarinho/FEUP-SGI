@@ -73,7 +73,7 @@ class MyApp {
     render() {
         this.stats.begin();
         // If camera active then we can pass the best submarine LOD to it
-        const submarine = this.contents?.aquarium?.submarine.levels[0].object;
+        const submarine = this.contents?.aquarium?.submarine
         
 
         this.cameraManager.update(this.renderer, submarine);
