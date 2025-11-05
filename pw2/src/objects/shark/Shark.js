@@ -2,13 +2,11 @@ import * as THREE from 'three';
 
 export class Shark extends THREE.Object3D {
   /**
-   * @param {string} key - model identifier (for logging)
    * @param {GLTF} [gltfModel] - optional preloaded GLTF model
    */
-  constructor(key, gltfModel,lodLevel) {
+  constructor(gltfModel,lodLevel) {
     super();
 
-    this.key = key;
     this.model = null;
     this.mixer = null;
     this.animations = {};

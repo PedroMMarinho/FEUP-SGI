@@ -3,23 +3,32 @@ import { Shark } from './Shark.js';
 import { SharkBehaviour } from './SharkBehaviour.js';
 
 export class SharkLOD extends THREE.LOD {
-  constructor(key, lods, position = new THREE.Vector3(0, 0, 0), aiOptions = {}) {
+  constructor(lods, position = new THREE.Vector3(0, 0, 0), texture = null, aiOptions = {}) {
     super();
-    this.key = key;
     this.lods = lods;
-    this.distanceOffset = 5;
-    this.distanceStart = 20;
+    this.distanceOffset = 15;
+    this.distanceStart = 40;
     this.animationFrameRateStart = 120;
     this.animationFrameRateOffset = 40;
     this.clock = new THREE.Clock();
     this.globalTime = 0;
     this.timeSinceLastUpdate = 0;
-    this.position.set(position.x, position.y, position.z);
+		this.position.copy(position);
 
     this.ai = new SharkBehaviour(this, aiOptions);
 
+
+    this.initTexture(texture);
+
     this.setupLODs();
     
+  }
+
+  initTexture(texture) {
+      if (texture == null) return;
+      this.texture = texture;
+      this.texture.flipY = false;
+      texture.colorSpace = THREE.SRGBColorSpace;
   }
 
   setupLODs() {
@@ -29,8 +38,20 @@ export class SharkLOD extends THREE.LOD {
     let distance = this.distanceStart;
     const distanceOffset = this.distanceOffset;
 
+
     for (let i = 0; i < lodCount; i++) {
-      const shark = new Shark(this.key, this.lods[i], i);
+      const shark = new Shark(this.lods[i], i);
+
+      if (this.texture) {
+        
+        shark.traverse((child) => {
+          if (child.isMesh && child.material.name === 'Material') {
+            child.material.map = this.texture;
+            child.material.needsUpdate = true;
+          }
+        });
+      }
+
       this.addLevel(shark, distance);
       distance += distanceOffset;
     }
