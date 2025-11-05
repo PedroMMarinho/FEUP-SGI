@@ -2,17 +2,17 @@ import * as THREE from 'three';
 import { Submarine } from './Submarine.js';
 
 export class SubmarineLOD extends THREE.LOD {
-	constructor(propellerBladeModel, keyManager, cameraManager, position = new THREE.Vector3(0, 5, 0)) {
-		super();
+    constructor(propellerBladeModel, keyManager, cameraManager, position = new THREE.Vector3(0, 5, 0)) {
+        super();
 
-		this.propellerBladeModel = propellerBladeModel;
-		this.keyManager = keyManager;
-		this.cameraManager = cameraManager;
+        this.propellerBladeModel = propellerBladeModel;
+        this.keyManager = keyManager;
+        this.cameraManager = cameraManager;
 
-		this.distanceOffset = 15;
-		this.distanceStart = 40;
+        this.distanceOffset = 15;
+        this.distanceStart = 40;
 
-		this.position.copy(position);
+        this.position.copy(position);
 
 		this.setupLODs();
 		this.clock = new THREE.Clock();
@@ -33,7 +33,7 @@ export class SubmarineLOD extends THREE.LOD {
 		this.ROTOR_DECEL = 9.5;
 		this.ROTOR_MAX = 9;
 
-	}
+    }
 
 	setupLODs() {
 		const lodCount = this.lods?.length || 3;
@@ -45,9 +45,9 @@ export class SubmarineLOD extends THREE.LOD {
 				i
 			);
 
-			this.addLevel(submarine, distance);
-			distance += this.distanceOffset;
-		}
+            this.addLevel(submarine, distance);
+            distance += this.distanceOffset;
+        }
 
 		const emptyObject = new THREE.Object3D();
 		this.addLevel(emptyObject, distance);
@@ -126,5 +126,24 @@ export class SubmarineLOD extends THREE.LOD {
 			}
 		}
 	}
+    getSubmarineCameraPosition() {
+        return this.levels[0].object.getSubmarineCameraPosition();
+    }
 
+    getSubmarineOrientation() {
+
+    // Fall back to the first level if nothing visible
+    const submarine = this.levels[0].object;
+
+    // Get the world quaternion (rotation)
+    const quaternion = new THREE.Quaternion();
+    submarine.getWorldQuaternion(quaternion);
+
+    // Derive direction vectors from the quaternion
+    const forward = new THREE.Vector3(0, 0, -1).applyQuaternion(quaternion).normalize();
+    const up = new THREE.Vector3(0, 1, 0).applyQuaternion(quaternion).normalize();
+    const right = new THREE.Vector3(1, 0, 0).applyQuaternion(quaternion).normalize();
+
+    return { quaternion, forward, up, right };
+}
 }
