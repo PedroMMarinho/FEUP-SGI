@@ -29,6 +29,8 @@ export class Submarine extends THREE.Object3D {
 		this.add(this.motorGroup);
 		this.add(this.upperBodyGroup);
 
+		this.glassDome = null;
+
 		this.init();
 	}
 
@@ -571,6 +573,7 @@ export class Submarine extends THREE.Object3D {
 		glassDome.position.set(0, -0.35, 0);    
 		glassDome.scale.set(1.14, 0.38, 1.3);
 		sideCylinder2.add(glassDome);
+		this.glassDome = glassDome;
 
 		// --- Tube connection to the main body ---
 		const tubeGeometry = new THREE.CylinderGeometry(1, 1, 1, this.cutNumber);
@@ -786,5 +789,21 @@ export class Submarine extends THREE.Object3D {
 		this.upperBodyGroup.add(mesh);
 	}
 
+getSubmarineCameraPosition() {
+    // 1️⃣ Get glass dome world position
+    const worldPos = this.glassDome.getWorldPosition(new THREE.Vector3());
 
+    // 2️⃣ Get submarine's world quaternion (rotation)
+    const worldQuat = this.getWorldQuaternion(new THREE.Quaternion());
+
+    // 3️⃣ Move slightly forward in the submarine's local forward direction
+    //    (0, 0, -1) is forward in Three.js local space
+    const forwardOffset = new THREE.Vector3(0, 0, -0.5); // move 0.5 units forward
+    forwardOffset.applyQuaternion(worldQuat); // rotate offset into world space
+
+    // 4️⃣ Combine position + offset
+    worldPos.add(forwardOffset);
+
+    return worldPos;
+}
 }

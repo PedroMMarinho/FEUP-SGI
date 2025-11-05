@@ -28,6 +28,7 @@ class CameraManager {
         this.bottom = -frustumSize / 2;
         this.near = -frustumSize / 2;
         this.far = frustumSize;
+        this.canvasDiv = document.getElementById('canvas');    
     }
 
     init() {
@@ -84,19 +85,20 @@ class CameraManager {
 
         if (this.controls) this.controls.update();
         if (this.activeCameraName === 'Free Fly') this.updateFreeFly(deltaTime);
-        if (this.activeCameraName === 'Submarine View') this.updateSubmarineView(submarine, deltaTime);
+        if (this.activeCameraName === 'Submarine View') this.updateSubmarineView(submarine);
 
     }
 
-     updateSubmarineView(submarine, deltaTime) {
+     updateSubmarineView(submarine) {
         const camera = this.cameras['Submarine View'];
 
-        const offset = new THREE.Vector3(0, 3, 2);
-        const relativeOffset = offset.clone().applyMatrix4(submarine.matrixWorld);
+        const position = submarine.getSubmarineCameraPosition();
+        camera.position.copy(position);
 
-        camera.position.lerp(relativeOffset, 2 * deltaTime);
-        const lookAtOffset = new THREE.Vector3(0, 1, -5).applyMatrix4(submarine.matrixWorld);
-        camera.lookAt(lookAtOffset);
+        const orientation = submarine.getSubmarineOrientation();    
+        const lookAt = new THREE.Vector3().addVectors(position, orientation.forward);
+        camera.lookAt(lookAt);
+
     }
 
 
@@ -129,6 +131,53 @@ class CameraManager {
         if (oldName === 'Free Fly') {
             this.freeFlyActive = false;
         }
+        if (newName === 'Submarine View') {
+    this.canvasDiv.style = `
+        width: 50vw;
+        height: 50vw;
+        border-radius: 50%;
+        overflow: hidden;
+        border: 2px solid #000;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        position: relative;
+    `;
+
+    // Add the overlay if it doesn't exist yet
+    if (!this.canvasOverlay) {
+        const overlay = document.createElement('div');
+        overlay.className = 'submarine-overlay';
+        overlay.style = `
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 10;
+            background: radial-gradient(
+                circle at center,
+                rgba(255,255,255,0.15) 0%,
+                rgba(255,255,255,0.08) 20%,
+                rgba(0,0,0,1) 100%
+            );
+        `;
+        this.canvasDiv.appendChild(overlay);
+        this.canvasOverlay = overlay;
+    }
+} else {
+    this.canvasDiv.style = `
+        width: 100%;
+        height: 100%;
+        border-radius: 0;
+        overflow: visible;
+        position: relative;
+    `;
+    if (this.canvasOverlay) this.canvasOverlay.remove();
+    this.canvasOverlay = null;
+}
     }
 
     updateSubmarineFollow(submarine, deltaTime) {
