@@ -65,13 +65,13 @@ class Aquarium extends THREE.Object3D {
 
 
     createRocks() {
-        const rockGroup = new RockGroup(1500, this.terrainWidth, this.terrainHeight);
+        const rockGroup = new RockGroup(1000, this.terrainWidth, this.terrainHeight);
         this.addToAquarium(rockGroup);
     }
 
     createTerrainSegments() {
-        this.terrainWidth = 300;
-        this.terrainHeight = 300;
+        this.terrainWidth = 200;
+        this.terrainHeight = 200;
         const terrainGroup = new TerrainSegment(this.terrainWidth, this.terrainHeight);
         this.addToAquarium(terrainGroup);
     }
@@ -95,12 +95,22 @@ class Aquarium extends THREE.Object3D {
 	}
 
     createShark() {
-        const position = new THREE.Vector3(0, 0, 0);
-        this.blueSharkTex = this.assetManager.getTextureManager().getTexture('shark-blue');
-        const shark = new SharkLOD( this.assetManager.getBlenderManager().getAllLODs('shark'), position, this.blueSharkTex);
-        shark.scale.set(0.5, 0.5, 0.5);
-        this.addToAquarium(shark);
+        const sharkGLTF1 = this.assetManager.getBlenderManager().getAllLODs('shark1');
+        const sharkGLTF2 = this.assetManager.getBlenderManager().getAllLODs('shark2');
+        // Blue Shark
+        const position1 = new THREE.Vector3(5, 4, 0);
+        const blueSharkTex = this.assetManager.getTextureManager().getTexture('shark-blue');
+        const shark1 = new SharkLOD(sharkGLTF1, position1, blueSharkTex);
+        shark1.scale.set(0.5, 0.5, 0.5);
+        this.addToAquarium(shark1);
+
+        // Grey Shark
+        const position2 = new THREE.Vector3(5, 6, -10);
+        const shark2 = new SharkLOD(sharkGLTF2, position2);
+        shark2.scale.set(0.5, 0.5, 0.5);
+        this.addToAquarium(shark2);
     }
+
 
     createSubmarine() {
         this.submarine = new SubmarineLOD(this.assetManager.getBlenderManager().getAllLODs('propeller-blade'), this.keyManager, this.cameraManager);

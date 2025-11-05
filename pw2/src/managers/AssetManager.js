@@ -14,16 +14,20 @@ export class AssetManager {
     constructor() {
         // Create specialized loaders
         this.textureManager = new TextureManager();
-        console.log(this.textureManager);
         this.blenderManager = new BlenderManager();
 
     }
 
     initBlenderModels() {
         const modelList = [
-            { key: 'shark', url: 'sharks/grey/shark-high.glb', lod: 0 },
-            { key: 'shark', url: 'sharks/grey/shark-medium.glb', lod: 1 },
-            { key: 'shark', url: 'sharks/grey/shark-low.glb', lod: 2 },
+            { key: 'shark1', url: 'sharks/shark-high.glb', lod: 0 },
+            { key: 'shark1', url: 'sharks/shark-medium.glb', lod: 1 },
+            { key: 'shark1', url: 'sharks/shark-low.glb', lod: 2 },
+
+            { key: 'shark2', url: 'sharks/shark-high.glb', lod: 0 },
+            { key: 'shark2', url: 'sharks/shark-medium.glb', lod: 1 },
+            { key: 'shark2', url: 'sharks/shark-low.glb', lod: 2 },
+
             // Submarine Propeller Blade
             { key: 'propeller-blade', url: 'submarine/propeller-blade-high.glb', lod: 0 },
             { key: 'propeller-blade', url: 'submarine/propeller-blade-medium.glb', lod: 1 },
