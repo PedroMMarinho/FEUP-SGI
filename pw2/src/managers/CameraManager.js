@@ -46,7 +46,7 @@ class CameraManager {
         UnderwaterCam.position.set(0, 2, 5);
         this.cameras['Underwater View'] = UnderwaterCam;
 
-        const submarineCam = new THREE.PerspectiveCamera(75, this.aspect, 0.1, 1000);
+        const submarineCam = new THREE.PerspectiveCamera(100, this.aspect, 0.1, 1000);
         this.cameras['Submarine View'] = submarineCam;
 
         this.setActiveCamera('Free Fly');
@@ -58,6 +58,7 @@ class CameraManager {
         this.lastCameraName = previous;
         this.activeCameraName = name;
         this.activeCamera = this.cameras[name];
+        console.log("Last position:", this.cameras[this.lastCameraName]?.position);
         this.changeCamera(previous, name);
     }
 
@@ -83,8 +84,21 @@ class CameraManager {
 
         if (this.controls) this.controls.update();
         if (this.activeCameraName === 'Free Fly') this.updateFreeFly(deltaTime);
-        if (this.activeCameraName === 'Submarine View' && submarine) this.updateSubmarineFollow(submarine, deltaTime);
+        if (this.activeCameraName === 'Submarine View') this.updateSubmarineView(submarine, deltaTime);
+
     }
+
+     updateSubmarineView(submarine, deltaTime) {
+        const camera = this.cameras['Submarine View'];
+
+        const offset = new THREE.Vector3(0, 3, 2);
+        const relativeOffset = offset.clone().applyMatrix4(submarine.matrixWorld);
+
+        camera.position.lerp(relativeOffset, 2 * deltaTime);
+        const lookAtOffset = new THREE.Vector3(0, 1, -5).applyMatrix4(submarine.matrixWorld);
+        camera.lookAt(lookAtOffset);
+    }
+
 
     onResize(renderer) {
         if (!this.activeCamera) return;
@@ -117,16 +131,6 @@ class CameraManager {
         }
     }
 
-    updateSubmarineFollow(submarine, deltaTime) {
-        const camera = this.cameras['Submarine View'];
-        const offset = new THREE.Vector3(0, 3, 12);
-        const relativeOffset = offset.clone().applyMatrix4(submarine.matrixWorld);
-
-        camera.position.lerp(relativeOffset, 2 * deltaTime);
-
-        const lookAtOffset = new THREE.Vector3(0, 1, -5).applyMatrix4(submarine.matrixWorld);
-        camera.lookAt(lookAtOffset);
-    }
 
     updateFreeFly(deltaTime) {
         const keyManager = this.keyManager;

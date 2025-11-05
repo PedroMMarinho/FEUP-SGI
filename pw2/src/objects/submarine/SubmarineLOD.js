@@ -38,13 +38,12 @@ export class SubmarineLOD extends THREE.LOD {
 	}
 
 	updateState() {
-
 		const visibleLOD = this.levels.find(level => level.object.visible);
 		if (!visibleLOD) return;
 
 		for (const level of this.levels) {
 			if (level.object.updateState) {
-				level.object.updateState(visibleLOD.object.lodLevel);
+				level.object.updateState(level.object);
 			}
 		}
 	}
