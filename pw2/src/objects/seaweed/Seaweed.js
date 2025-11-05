@@ -157,7 +157,7 @@ export class Seaweed {
 
         const group = new THREE.Group();
 
-        const branchGeo = new THREE.CylinderGeometry(0.05, 0.05, 1, 3);
+        const branchGeo = new THREE.CylinderGeometry(0.05, 0.05, 1, 3,4);
         branchGeo.translate(0, 0.5, 0);
             
         const branchMat = this.material;
@@ -167,12 +167,11 @@ export class Seaweed {
         for (let i = 0; i < branchMatrices.length; i++) {
             branchMesh.setMatrixAt(i, branchMatrices[i]);
         }
-        group.add(branchMesh);
+        branchMesh.scale.setScalar(0.4);
 
 
-        group.scale.setScalar(0.4);
 
-        return group;
+        return branchMesh;
     }
 
 
