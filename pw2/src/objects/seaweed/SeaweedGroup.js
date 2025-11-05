@@ -37,6 +37,16 @@ class SeaweedGroup extends THREE.Object3D {
             const seaweed = seaweedTemplate.clone(true);
             seaweed.position.copy(position);
 
+            const basePhase = Math.random() * Math.PI * 2;
+
+            seaweed.levels.forEach(level => {
+                level.object.onBeforeRender = (renderer, scene, camera, geometry, material, group) => {
+                    if (material.userData.shader) {
+                        material.userData.shader.uniforms.uBasePhase.value = basePhase;
+                    }
+                };
+            });
+
             this.add(seaweed);
             this.seaweeds.push({ position, object: seaweed });
         }
@@ -49,8 +59,9 @@ class SeaweedGroup extends THREE.Object3D {
             shininess: 25,
             onBeforeCompile: (shader) => {
                 shader.uniforms.uTime = { value: 0.0 };
-                shader.uniforms.uAmplitude = { value: 0.08 };
+                shader.uniforms.uAmplitude = { value: 0.8 };
                 shader.uniforms.uFrequency = { value: 1.0 };
+                shader.uniforms.uBasePhase = { value: 0.0 };
 
                 // GLSL random helper
                 const hashGLSL = `
@@ -65,6 +76,7 @@ class SeaweedGroup extends THREE.Object3D {
                     uniform float uTime;
                     uniform float uAmplitude;
                     uniform float uFrequency;
+                    uniform float uBasePhase;
                     varying vec2 vUv;
                     ${hashGLSL}
                 ` + shader.vertexShader;
@@ -79,22 +91,37 @@ class SeaweedGroup extends THREE.Object3D {
 
                 // Replace vertex transformation logic
                 shader.vertexShader = shader.vertexShader.replace(
-                    '#include <begin_vertex>',
-                    `
-                    vec3 transformed = vec3(position);
+                    '#include <project_vertex>',
+                    `vec4 mvPosition = vec4( transformed, 1.0 );
 
-                    // Compute pseudo-random phase based on world-space position
-                    vec3 worldPos = (modelMatrix * vec4(position, 1.0)).xyz;
-                    float phase = hash(floor(worldPos * 0.5)); // stable per object variation
+                    #ifdef USE_BATCHING
 
-                    // Weight displacement by height so the base stays anchored
-                    float heightFactor = smoothstep(0.0, 1.0, position.y + 1.0);
-                    float wave = sin(uTime * 2.0 * uFrequency + phase * 6.2831)
-                               * uAmplitude * heightFactor;
+                        mvPosition = batchingMatrix * mvPosition;
 
-                    transformed.x += wave;
-                    `
+                    #endif
+
+                    #ifdef USE_INSTANCING
+
+                        mvPosition = instanceMatrix * mvPosition;
+
+                    #endif
+
+
+                    // Apply waving effect
+                    float wave = sin(uBasePhase + uFrequency * uTime + mvPosition.y * 0.3) * uAmplitude;
+
+                    // Displace vertices along the X axis based on their Y position
+                    mvPosition.x += wave * pow(mvPosition.y / 5.0, 2.0); // Adjust divisor for height influence
+
+                    // Standard transformations 
+
+                    mvPosition = modelViewMatrix * mvPosition;
+
+                    gl_Position = projectionMatrix * mvPosition;
+`
                 );
+
+                console.log(shader.vertexShader);
 
                 // Keep shader reference for external updates
                 material.userData.shader = shader;
