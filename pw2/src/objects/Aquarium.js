@@ -6,20 +6,22 @@ import { FishGroup } from './fish/FishGroup.js';
 import { TerrainSegment } from './terrainSegment/TerrainSegment.js';
 import { SharkLOD } from './shark/SharkLOD.js';
 import { SubmarineLOD } from './submarine/SubmarineLOD.js';
+import { GlassTank } from './glassTank/GlassTank.js';
 
 /**
  * Main Aquarium class
  */
 class Aquarium extends THREE.Object3D {
-    constructor(assetManager, keyManager, cameraManager) {
+    constructor(assetManager, keyManager, cameraManager, scene) {
         super();
         this.assetManager = assetManager;
         this.keyManager = keyManager;
         this.cameraManager = cameraManager;
-        // Load aquarium features
-        this.width = 1000;
-        this.height = 1000;
-        this.depth = 1000;
+        this.scene = scene;
+
+        // Terrain dimensions
+        this.terrainWidth = 200;
+        this.terrainHeight = 200;
 
         this.objects = [];
     }
@@ -29,11 +31,30 @@ class Aquarium extends THREE.Object3D {
         this.add(object);
     }
 
-    createAquariumGeometry() {
-        const geometry = new THREE.BoxGeometry(this.width, this.height, this.depth);
-        const material = new THREE.MeshBasicMaterial({ color: 0xFFFFFF, opacity: 0.5, transparent: true, side: THREE.DoubleSide });
-        const aquariumMesh = new THREE.Mesh(geometry, material);
-        this.addToAquarium(aquariumMesh);
+    createWaterFog() {
+        // Blue cyan color
+        const backgroundColor = 0x003d5c;
+        this.scene.background = new THREE.Color(backgroundColor);
+        this.scene.fog = new THREE.FogExp2(backgroundColor, 0.009);
+    }
+
+    createGlassTank() {
+        const glassTank = new GlassTank(this.terrainWidth, this.terrainHeight / 4, this.terrainWidth);
+        this.addToAquarium(glassTank);
+    }
+
+    createWaterTopLayer() {
+        const texture = this.assetManager.getTextureManager().getTexture('water-normal');
+        texture.wrapS = THREE.RepeatWrapping;
+        texture.wrapT = THREE.RepeatWrapping;
+        const water = new Water(texture, this.terrainWidth, this.terrainWidth, this.terrainHeight / 4);
+
+        if (this.scene.environment) {
+            water.setEnvMap(this.scene.environment);
+        } else {
+            console.warn("Water surface has no environment map! Reflections/refractions will be black.");
+        }
+        this.addToAquarium(water);
     }
 
     /**
@@ -41,17 +62,21 @@ class Aquarium extends THREE.Object3D {
      */
     init() {
         // Create aquarium geometry and material
-        this.createAquariumGeometry();
+        this.createGlassTank();
+        // Create water fog
+        this.createWaterFog();
+        // Create water top layer
+        //this.createWaterTopLayer();
         //create terrain
         this.createTerrainSegments();
         // Create bubbles
         this.createBubbles();
         // create rocks
         this.createRocks();
-		// create corals
-		this.createCorals();
-		// create fishes
-		this.createFishes();
+        // create corals
+        this.createCorals();
+        // create fishes
+        this.createFishes();
         // create shark
         this.createShark();
         // create submarine
@@ -65,34 +90,32 @@ class Aquarium extends THREE.Object3D {
 
 
     createRocks() {
-        const rockGroup = new RockGroup(1000, this.terrainWidth, this.terrainHeight);
+        const rockGroup = new RockGroup(1000, this.terrainWidth - this.terrainWidth / 10, this.terrainHeight - this.terrainHeight / 10);
         this.addToAquarium(rockGroup);
     }
 
     createTerrainSegments() {
-        this.terrainWidth = 200;
-        this.terrainHeight = 200;
         const terrainGroup = new TerrainSegment(this.terrainWidth, this.terrainHeight);
         this.addToAquarium(terrainGroup);
     }
 
-	createCorals() {
-		const coralGroup = new CoralGroup(100, this.terrainWidth/2, this.terrainHeight/2);
-		this.addToAquarium(coralGroup);
-	}
+    createCorals() {
+        const coralGroup = new CoralGroup(100, this.terrainWidth / 2, this.terrainHeight / 2);
+        this.addToAquarium(coralGroup);
+    }
 
-	createFishes() {
+    createFishes() {
         this.fishGroups = [
             new FishGroup(20),
             new FishGroup(15),
             new FishGroup(10),
         ];
-		for (const group of this.fishGroups) {
+        for (const group of this.fishGroups) {
             const randomCord = () => THREE.MathUtils.randFloat(5, 60);
             group.position.set(randomCord(), 10, randomCord());
             this.addToAquarium(group);
         }
-	}
+    }
 
     createShark() {
         const sharkGLTF1 = this.assetManager.getBlenderManager().getAllLODs('shark1');

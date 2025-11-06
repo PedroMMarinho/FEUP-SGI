@@ -60,6 +60,8 @@ export class AssetManager {
             'metal_SPEC': 'submarine/MetalFasterners_SPEC.png',
             // Shark Textures
             'shark-blue': 'shark/shark-blue.png',
+            // Water Texture
+            'water-normal': 'water/waternormals.jpg',
         };
         return textureMap;
     }
