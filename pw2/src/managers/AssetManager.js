@@ -32,6 +32,11 @@ export class AssetManager {
             { key: 'propeller-blade', url: 'submarine/propeller-blade-high.glb', lod: 0 },
             { key: 'propeller-blade', url: 'submarine/propeller-blade-medium.glb', lod: 1 },
             { key: 'propeller-blade', url: 'submarine/propeller-blade-low.glb', lod: 2 },
+
+            // Rocks
+            { key: 'granite', url: 'rocks/granite-high.glb', lod: 0 },
+            { key: 'granite', url: 'rocks/granite-medium.glb', lod: 1 },
+            { key: 'granite', url: 'rocks/granite-low.glb', lod: 2 },
         ];
         return modelList;
     }
