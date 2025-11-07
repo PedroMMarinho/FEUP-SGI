@@ -9,8 +9,6 @@ class Rock extends THREE.Object3D {
 
 	getModel() {
 		const model = this.gltf.scene.clone();
-        console.log(this.gltf.scene);
-		model.scale.set(0.3, 0.3, 0.3);
 		return model;
 	}
 }

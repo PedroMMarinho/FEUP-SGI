@@ -11,9 +11,10 @@ export class RockLOD extends THREE.LOD {
 	}
 
 	init() {
-
+		const randomScale = THREE.MathUtils.randFloat(0.2, 0.8);
 		for (const level of this.lods) {
 			const rock = new Rock(level);
+			rock.scale.set(randomScale, randomScale, randomScale);
 			this.addLevel(rock, this.distanceStart + this.distanceOffset * this.lods.indexOf(level));
 		}
 
