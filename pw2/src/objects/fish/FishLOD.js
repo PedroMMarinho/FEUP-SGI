@@ -13,6 +13,7 @@ export class FishLOD extends THREE.LOD {
 		this.clock = new THREE.Clock();
 		this.globalTime = 0;
 		this.speed = 1;
+		this.animationOffset = Math.random() * Math.PI * 2; 
 
 		this.init();
 	}
@@ -79,16 +80,17 @@ export class FishLOD extends THREE.LOD {
 
 		const fishGroup = visibleLOD.object;
 		const swimFreq = 4.0 * this.speed;
+
+		const time = this.globalTime * swimFreq + this.animationOffset;
+
 		if (fishGroup.isSkinned) {
 			const skeleton = fishGroup.children[0].skeleton;
-			skeleton.bones[0].rotation.y = Math.sin(this.globalTime * swimFreq) * 0.2; // front
-			skeleton.bones[1].rotation.y = Math.sin(this.globalTime * swimFreq) * 0.3; // middle
-			skeleton.bones[2].rotation.y = Math.sin(this.globalTime * swimFreq) * 0.4; // tail
+			skeleton.bones[0].rotation.y = Math.sin(time) * 0.2; // front
+			skeleton.bones[1].rotation.y = Math.sin(time) * 0.3; // middle
+			skeleton.bones[2].rotation.y = Math.sin(time) * 0.4; // tail
 		} else {
-			fishGroup.rotation.y = Math.sin(this.globalTime * swimFreq) * 0.2;
+			fishGroup.rotation.y = Math.sin(time) * 0.2;
 		}
-
-		
 	}
 
 }
