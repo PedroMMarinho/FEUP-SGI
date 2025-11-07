@@ -15,6 +15,9 @@ export class SharkLOD extends THREE.LOD {
     this.timeSinceLastUpdate = 0;
 		this.position.copy(position);
 
+
+    this.animationOffset = Math.random() * Math.PI * 2; 
+
     this.ai = new SharkBehaviour(this, aiOptions);
 
 
@@ -80,8 +83,10 @@ export class SharkLOD extends THREE.LOD {
   this.levels.forEach(level => {
     const obj = level.object;
     if (!obj.mixer) return;
-    
-    obj.mixer.setTime(this.globalTime);
+
+    const time = this.globalTime + this.animationOffset;
+
+    obj.mixer.setTime(time);
 
     if (obj === visibleLOD.object && this.timeSinceLastUpdate >= updateInterval) {
       const effectiveDelta = this.timeSinceLastUpdate * animSpeedFactor;
