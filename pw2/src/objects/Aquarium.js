@@ -44,16 +44,7 @@ class Aquarium extends THREE.Object3D {
     }
 
     createWaterTopLayer() {
-        const texture = this.assetManager.getTextureManager().getTexture('water-normal');
-        texture.wrapS = THREE.RepeatWrapping;
-        texture.wrapT = THREE.RepeatWrapping;
-        const water = new Water(texture, this.terrainWidth, this.terrainWidth, this.terrainHeight / 4);
-
-        if (this.scene.environment) {
-            water.setEnvMap(this.scene.environment);
-        } else {
-            console.warn("Water surface has no environment map! Reflections/refractions will be black.");
-        }
+        const water = new Water(this.assetManager.getTextureManager().getTexture('water-normal'), this.terrainWidth, this.terrainWidth, this.terrainHeight / 4);
         this.addToAquarium(water);
     }
 
@@ -90,7 +81,11 @@ class Aquarium extends THREE.Object3D {
 
 
     createRocks() {
-        const rockGroup = new RockGroup(1000, this.terrainWidth - this.terrainWidth / 10, this.terrainHeight - this.terrainHeight / 10);
+        const rockModels = [
+            this.assetManager.getBlenderManager().getAllLODs('granite'),
+        ]
+
+        const rockGroup = new RockGroup(1000, this.terrainWidth - this.terrainWidth / 10, this.terrainHeight - this.terrainHeight / 10, rockModels);
         this.addToAquarium(rockGroup);
     }
 
