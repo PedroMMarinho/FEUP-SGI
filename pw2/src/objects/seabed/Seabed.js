@@ -15,6 +15,7 @@ class Seabed extends THREE.Object3D {
 		distanceRange = [0.005, 0.1],
 	) {
 		super();
+		this.terrain = null;
 		this.terrainSize = terrainSize;
 
         // Counts of various objects
@@ -45,6 +46,7 @@ class Seabed extends THREE.Object3D {
 
 	createTerrain() {
 		const terrain = new TerrainSegment(this.terrainSize, this.terrainSize);
+		this.terrain = terrain;
 		this.add(terrain);
 	}
 
@@ -82,10 +84,12 @@ class Seabed extends THREE.Object3D {
 			let pos, tries = 0;
 
 			do {
+				const x = THREE.MathUtils.randFloat(-halfSize, halfSize);
+				const z = THREE.MathUtils.randFloat(-halfSize, halfSize);
 				pos = new THREE.Vector3(
-					THREE.MathUtils.randFloat(-halfSize, halfSize),
-					0,
-					THREE.MathUtils.randFloat(-halfSize, halfSize)
+					x,
+					this.terrain.getHeightAt(x, z),
+					z
 				);
 				tries++;
 			} while (!this.isFarEnough(pos, minDist) && tries < maxTries);

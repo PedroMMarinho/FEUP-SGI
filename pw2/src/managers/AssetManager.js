@@ -73,6 +73,9 @@ export class AssetManager {
             'shark-blue': 'shark/shark-blue.png',
             // Water Texture
             'water-normal': 'water/waternormals.jpg',
+            'sand': 'sand/sandwaves.png',
+            'sand-normal': 'sand/sandwavesNormal.png',
+            'sand-noise': 'sand/sandNoise.png',
         };
         return textureMap;
     }
