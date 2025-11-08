@@ -27,11 +27,6 @@ export class Shark extends THREE.Object3D {
     
     // Setup animation mixer
     this.mixer = new THREE.AnimationMixer(this.model);
-    this.model.traverse((child) => {
-      if (child.isMesh) {
-        console.log(child.material)
-      }
-    });
 
     // Store animation clips by name
     gltf.animations.forEach((clip) => {

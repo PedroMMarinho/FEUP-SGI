@@ -66,7 +66,6 @@ class Seabed extends THREE.Object3D {
 
     createShellGroup() {
         const shellPositions = this.computePositions(this.shellCount);
-        console.log("Shell Positions:", this.shellModels);
         const shellGroup = new ShellGroup(shellPositions, this.shellModels);
         this.add(shellGroup);
         this.globalPositions.push(...shellPositions);
