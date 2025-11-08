@@ -1,49 +1,44 @@
 import * as THREE from 'three';
-import { CoralLOD } from "./CoralLOD.js";
+import { CoralLOD } from './CoralLOD.js';
 
 class CoralGroup extends THREE.Object3D {
-	constructor(count = 40, spreadX = 15, spreadZ = 15) {
+	constructor(positions = []) {
 		super();
 
-		if (count <= 0) {
-			console.warn("CoralGroup: count must be > 0");
-			return;
-		}
-
-		this.type = "Group";
-		this.count = count;
+		this.type = 'Group';
+		this.positions = positions;
 		this.corals = [];
-
-        this.spreadX = spreadX;
-        this.spreadZ = spreadZ;
 
 		this.init();
 	}
 
-    init() {
-        const coralTemplate = new CoralLOD();
+	init() {
+		if (this.positions.length === 0) {
+			console.warn('CoralGroup: No positions provided');
+			return;
+		}
 
-        const dummy = new THREE.Object3D();
+		for (const position of this.positions) {
+			const coral = new CoralLOD();
 
-        for (let i = 0; i < this.count; i++) {
-            const position = new THREE.Vector3(
-                THREE.MathUtils.randFloatSpread(this.spreadX),
-                0,
-                THREE.MathUtils.randFloatSpread(this.spreadZ)
-            );
+			coral.position.copy(position);
 
-            const coral = coralTemplate.clone(true);
-            coral.position.copy(position);
-            coral.traverse((child) => {
-                if (child.isInstancedMesh) child.instanceMatrix.needsUpdate = true;
-            });
-            this.add(coral);
-            this.corals.push({ position, object: coral });
-        }
-    }
+			coral.rotation.y = THREE.MathUtils.randFloat(0, Math.PI * 2);
+
+			const scale = THREE.MathUtils.randFloat(0.9, 1.2);
+			coral.scale.set(scale, scale, scale);
+
+			coral.traverse((child) => {
+				if (child.isInstancedMesh) child.instanceMatrix.needsUpdate = true;
+			});
+
+			this.add(coral);
+			this.corals.push(coral);
+		}
+	}
 
 	update() {
-		// Static for now
+		// Static for now (could animate later)
 	}
 }
 
