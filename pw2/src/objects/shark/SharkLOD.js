@@ -16,7 +16,6 @@ export class SharkLOD extends THREE.LOD {
 
     // use singleton TimeManager
     this.timeManager = TimeManager.getInstance();
-    this.globalTime = 0;
     this.timeSinceLastUpdate = 0;
 
     this.position.copy(position);
@@ -63,34 +62,34 @@ export class SharkLOD extends THREE.LOD {
     this.addLevel(emptyObject, distance);
   }
 
-  updateState() {
+ updateState() {
     const delta = this.timeManager.getDeltaTime();
-    this.globalTime += delta;
 
     // Update AI behaviour
     this.ai.update(delta);
 
     const visibleLOD = this.levels.find(level => level.object.visible);
+    
     const lodIndex = this.levels.indexOf(visibleLOD);
 
     const targetFrameRate = Math.max(5, this.animationFrameRateStart - lodIndex * this.animationFrameRateOffset);
     const updateInterval = 1 / targetFrameRate;
     this.timeSinceLastUpdate += delta;
 
-    const animSpeedFactor = Math.log10(1 + this.ai.currentSpeed * 2) * 0.6 + 0.15;
+    if (this.timeSinceLastUpdate >= updateInterval) {
+      
+      const animSpeedFactor = Math.log10(1 + this.ai.currentSpeed * 6) * 0.6 + 0.15;
+      
+      const effectiveDelta = this.timeSinceLastUpdate * animSpeedFactor;
 
-    this.levels.forEach(level => {
-      const obj = level.object;
-      if (!obj.mixer) return;
+      this.levels.forEach(level => {
+        const obj = level.object;
+        if (obj.mixer) {
+          obj.mixer.update(effectiveDelta);
+        }
+      });
 
-      const time = this.globalTime + this.animationOffset;
-      obj.mixer.setTime(time);
-
-      if (obj === visibleLOD.object && this.timeSinceLastUpdate >= updateInterval) {
-        const effectiveDelta = this.timeSinceLastUpdate * animSpeedFactor;
-        obj.mixer.update(effectiveDelta);
-        this.timeSinceLastUpdate = 0;
-      }
-    });
+      this.timeSinceLastUpdate = 0;
+    }
   }
 }
