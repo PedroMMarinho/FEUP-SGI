@@ -32,11 +32,15 @@ class Aquarium extends THREE.Object3D {
         this.add(object);
     }
 
+    createOutsideEnvironment() {
+        const hdri = this.assetManager.getHDRI('fin-hall');
+        this.scene.environment = hdri.hdr;
+        this.scene.background = hdri.envMap;
+    }
+
     createWaterFog() {
         // Blue cyan color
-        const backgroundColor = 0x003d5c;
-        this.scene.background = new THREE.Color(backgroundColor);
-        this.scene.fog = new THREE.FogExp2(backgroundColor, 0.009);
+        this.scene.fog = new THREE.FogExp2(0x003d5c, 0.009);
     }
 
     createGlassTank() {
@@ -53,6 +57,8 @@ class Aquarium extends THREE.Object3D {
      * Initializes and adds all aquarium elements
      */
     init() {
+        // Create outside environment
+        this.createOutsideEnvironment();
         // Create aquarium geometry and material
         this.createGlassTank();
         // Create water fog
