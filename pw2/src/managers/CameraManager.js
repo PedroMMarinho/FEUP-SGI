@@ -59,7 +59,6 @@ class CameraManager {
         this.lastCameraName = previous;
         this.activeCameraName = name;
         this.activeCamera = this.cameras[name];
-        console.log("Last position:", this.cameras[this.lastCameraName]?.position);
         this.changeCamera(previous, name);
     }
 
