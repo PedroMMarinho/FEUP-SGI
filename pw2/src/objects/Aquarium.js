@@ -8,6 +8,7 @@ import { SharkLOD } from './shark/SharkLOD.js';
 import { SubmarineLOD } from './submarine/SubmarineLOD.js';
 import { GlassTank } from './glassTank/GlassTank.js';
 import { Seabed } from './seabed/Seabed.js';
+import { Water } from './water/Water.js';
 
 /**
  * Main Aquarium class
@@ -35,6 +36,7 @@ class Aquarium extends THREE.Object3D {
     createOutsideEnvironment() {
         const hdri = this.assetManager.getHDRI('fin-hall');
         this.scene.environment = hdri.hdr;
+        this.scene.environment.intensity = 0.01;
         this.scene.background = hdri.envMap;
     }
 
@@ -49,7 +51,7 @@ class Aquarium extends THREE.Object3D {
     }
 
     createWaterTopLayer() {
-        const water = new Water(this.assetManager.getTextureManager().getTexture('water-normal'), this.terrainWidth, this.terrainWidth, this.terrainHeight / 4);
+        const water = new Water(this.assetManager.getTextureManager().getTexture('water-normal'), this.terrainWidth, 4*this.terrainHeight / 4 / 5, this.terrainWidth);
         this.addToAquarium(water);
     }
 
@@ -64,7 +66,7 @@ class Aquarium extends THREE.Object3D {
         // Create water fog
         this.createWaterFog();
         // Create water top layer
-        //this.createWaterTopLayer();
+        this.createWaterTopLayer();
         //create terrain
         this.createTerrainSegments();
         // Create bubbles
