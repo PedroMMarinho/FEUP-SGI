@@ -16,7 +16,7 @@ class RockGroup extends THREE.Object3D {
 		for (const pos of this.positions) {
 			const lodSet = this.rockModels[Math.floor(Math.random() * this.rockModels.length)];
 			const rockLOD = new RockLOD(lodSet);
-			const positionYOffset = THREE.MathUtils.randFloat(-0.005, 0.8);
+			const positionYOffset = THREE.MathUtils.randFloat(-0.005, 0.08);
 			rockLOD.position.copy(pos);
 			rockLOD.position.y += positionYOffset;
 

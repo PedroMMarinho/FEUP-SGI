@@ -44,24 +44,16 @@ class TerrainSegment extends THREE.Object3D {
       side: THREE.DoubleSide,
     });
 
-    // --- Mesh ---
+    //--- Mesh ---
     this.terrain = new THREE.Mesh(geometry, material);
     this.terrain.position.y = -0.01;
     this.terrain.rotation.x = -Math.PI / 2;
     this.add(this.terrain);
 
-    // --- Precompute height data once image is loaded ---
-    if (displacementMap.image && displacementMap.image.complete) {
-      this._cacheHeightData();
-    } else {
-      displacementMap.image.onload = () => this._cacheHeightData();
-    }
+    this.cacheHeightData();
   }
 
-  /**
-   * Caches grayscale height data from the displacement map
-   */
-  _cacheHeightData() {
+  cacheHeightData() {
     const image = this.displacementMap.image;
     if (!image) return;
 
