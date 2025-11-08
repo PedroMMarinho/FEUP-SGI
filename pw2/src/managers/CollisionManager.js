@@ -30,7 +30,7 @@ class CollisionManager {
         const objectSize = new THREE.Vector3();
         bbox.getSize(objectSize);
         
-        const offsetMultiplier = this.fleeRadiusBase * (1 + 0.5 * (danger - 1));
+        const offsetMultiplier = this.fleeRadiusBase * (1 + 2 * (danger - 1));
         
         const boxSize = new THREE.Vector3(
             objectSize.x + offsetMultiplier,
@@ -187,14 +187,14 @@ class CollisionManager {
                 case ActionType.FLEE:
                     entity.ai.setState(EntityState.FLEEING);
                     entity.ai.updateActionData(action, boxData);
+                    entity.ai.resetStateTimer();
                     return; 
                     
                 case ActionType.AVOID:
-                    // Only avoid if not already fleeing
-                    if (entity.ai.state !== EntityState.FLEEING) {
-                        entity.ai.setState(EntityState.AVOIDING);
-                        entity.ai.updateActionData(action, boxData);
-                    }
+                    entity.ai.setState(EntityState.AVOIDING);
+                    entity.ai.updateActionData(action, boxData);
+                    entity.ai.resetStateTimer();
+                    
                     break;
             }
         }
