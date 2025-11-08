@@ -18,7 +18,7 @@ class MyContents {
         this.app = app
         this.axis = new MyAxis(this);
         this.showAxis = true;
-        this.assetManager = new AssetManager(); // Asset Manager
+        this.assetManager = new AssetManager(app.renderer); // Asset Manager
         this.keyManager = this.app.keyManager;
         this.cameraManager = this.app.cameraManager;
         this.aquarium = new Aquarium(this.assetManager, this.keyManager, this.cameraManager, this.app.scene); // Main Object of the scene
