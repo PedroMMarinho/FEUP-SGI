@@ -2,41 +2,23 @@ import * as THREE from 'three';
 import { RockLOD } from './RockLOD.js';
 
 class RockGroup extends THREE.Object3D {
-	constructor(count = 30, spreadX = 15, spreadZ = 15, rockModels = [], minDistance = 0.5) {
+	constructor(positions = [], rockModels = []) {
 		super();
 
-		this.count = count;
-		this.spreadX = spreadX;
-		this.spreadZ = spreadZ;
+		this.positions = positions;
 		this.rockModels = rockModels;
-		this.minDistance = minDistance;
 		this.rocks = [];
-		this.positions = []; 
 
 		this.init();
 	}
 
 	init() {
-		for (let i = 0; i < this.count; i++) {
+		for (const pos of this.positions) {
 			const lodSet = this.rockModels[Math.floor(Math.random() * this.rockModels.length)];
 			const rockLOD = new RockLOD(lodSet);
-
-			let pos;
-			let tries = 0;
-			const maxTries = 50;
-
-			do {
-				pos = new THREE.Vector3(
-					THREE.MathUtils.randFloatSpread(this.spreadX),
-					0,
-					THREE.MathUtils.randFloatSpread(this.spreadZ)
-				);
-
-				tries++;
-			} while (!this.isFarEnough(pos) && tries < maxTries);
-
-			this.positions.push(pos);
+			const positionYOffset = THREE.MathUtils.randFloat(-0.005, 0.8);
 			rockLOD.position.copy(pos);
+			rockLOD.position.y += positionYOffset;
 
 			// Random rotation
 			rockLOD.rotation.set(
@@ -45,16 +27,13 @@ class RockGroup extends THREE.Object3D {
 				THREE.MathUtils.randFloat(0, Math.PI / 8)
 			);
 
+			// Random scale
+			const scale = THREE.MathUtils.randFloat(0.2, 0.8);
+			rockLOD.scale.set(scale, scale, scale);
+
 			this.add(rockLOD);
 			this.rocks.push(rockLOD);
 		}
-	}
-
-	isFarEnough(candidate) {
-		for (const existing of this.positions) {
-			if (candidate.distanceTo(existing) < this.minDistance) return false;
-		}
-		return true;
 	}
 }
 
