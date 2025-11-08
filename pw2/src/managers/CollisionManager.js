@@ -3,6 +3,7 @@ import { EntityType } from '../enums/EntityType.js';
 import { DangerLevel } from '../enums/DangerLevel.js';
 import { ActionType } from '../enums/ActionType.js';
 import { EntityState } from '../enums/EntityState.js';
+import { OBB } from '../../../lib/jsm/math/OBB.js';
 
 class CollisionManager {
     constructor(scene) {
@@ -10,7 +11,7 @@ class CollisionManager {
         this.fleeRadiusBase = 2;
         this.awarenessBoxes = new Map();
         this.scene = scene;
-        
+
         // Spatial grid for optimization
         this.gridCellSize = 40;
         this.spatialGrid = new Map();
@@ -25,13 +26,13 @@ class CollisionManager {
 
     createAwarenessBox(object) {
         const danger = object.dangerLevel;
-        
+
         const bbox = new THREE.Box3().setFromObject(object);
         const objectSize = new THREE.Vector3();
         bbox.getSize(objectSize);
-        
-        const offsetMultiplier = this.fleeRadiusBase * (1 + 2 * (danger - 1));
-        
+
+        const offsetMultiplier = this.fleeRadiusBase * (1 + 0.8 * (danger - 1));
+
         const boxSize = new THREE.Vector3(
             objectSize.x + offsetMultiplier,
             objectSize.y + offsetMultiplier,
@@ -42,8 +43,8 @@ class CollisionManager {
             danger === DangerLevel.LOW
                 ? 0x00ff00
                 : danger === DangerLevel.MEDIUM
-                ? 0xffff00
-                : 0xff0000;
+                    ? 0xffff00
+                    : 0xff0000;
 
         const geometry = new THREE.BoxGeometry(boxSize.x, boxSize.y, boxSize.z);
         const material = new THREE.MeshBasicMaterial({
@@ -55,11 +56,22 @@ class CollisionManager {
 
         const box = new THREE.Mesh(geometry, material);
         this.scene.add(box);
-        
-        const collisionBox = new THREE.Box3();
-        
-        this.awarenessBoxes.set(object, { 
-            mesh: box, 
+
+        const collisionBox = new OBB();
+
+        // Initialize the properties
+        collisionBox.center = new THREE.Vector3();
+        collisionBox.halfSize = new THREE.Vector3();
+collisionBox.rotation = new THREE.Matrix4();
+
+        // Now you can safely copy
+        collisionBox.halfSize.copy(boxSize.clone().multiplyScalar(0.5));
+        collisionBox.rotation.copy(object.matrix);
+        collisionBox.center.copy(object.position);
+
+
+        this.awarenessBoxes.set(object, {
+            mesh: box,
             size: boxSize,
             collisionBox: collisionBox
         });
@@ -90,7 +102,7 @@ class CollisionManager {
 
     updateSpatialGrid() {
         this.spatialGrid.clear();
-        
+
         for (const entity of this.entities) {
             const key = this.getGridKey(entity.position);
             if (!this.spatialGrid.has(key)) {
@@ -102,7 +114,7 @@ class CollisionManager {
 
     checkForDangers(entity, boxData) {
         const nearbyEntities = this.findNearbyEntities(entity);
-        
+
         // If no threats or same-level entities, return to wandering
         if (nearbyEntities.threats.length === 0 && nearbyEntities.sameLevel.length === 0) {
             if (entity.ai && entity.ai.state !== EntityState.WANDERING) {
@@ -119,7 +131,7 @@ class CollisionManager {
         const threats = [];
         const sameLevel = [];
         const nearbyCells = this.getNearbyCells(entity.position);
-        
+
         const entityBoxData = this.awarenessBoxes.get(entity);
         if (!entityBoxData) return { threats, sameLevel };
 
@@ -129,11 +141,11 @@ class CollisionManager {
 
             for (const other of cellEntities) {
                 if (other === entity) continue;
-                
+
                 const otherBoxData = this.awarenessBoxes.get(other);
                 if (!otherBoxData) continue;
-                
-                if (entityBoxData.collisionBox.intersectsBox(otherBoxData.collisionBox)) {
+
+                if (entityBoxData.collisionBox.intersectsOBB(otherBoxData.collisionBox)) {
                     if (other.dangerLevel > entity.dangerLevel) {
                         threats.push(other);
                     } else if (other.dangerLevel === entity.dangerLevel) {
@@ -188,13 +200,13 @@ class CollisionManager {
                     entity.ai.setState(EntityState.FLEEING);
                     entity.ai.updateActionData(action, boxData);
                     entity.ai.resetStateTimer();
-                    return; 
-                    
+                    return;
+
                 case ActionType.AVOID:
                     entity.ai.setState(EntityState.AVOIDING);
                     entity.ai.updateActionData(action, boxData);
                     entity.ai.resetStateTimer();
-                    
+
                     break;
             }
         }
@@ -206,9 +218,16 @@ class CollisionManager {
         for (const entity of this.entities) {
             const boxData = this.awarenessBoxes.get(entity);
 
+            // Update visual mesh
             boxData.mesh.position.copy(entity.position);
-            boxData.collisionBox.setFromCenterAndSize(entity.position, boxData.size);
-            
+            boxData.mesh.quaternion.copy(entity.quaternion);
+
+            // Update collision OBB
+            boxData.collisionBox.center.copy(entity.position);
+            boxData.collisionBox.halfSize.copy(boxData.size.clone().multiplyScalar(0.5));
+            boxData.collisionBox.rotation.makeRotationFromQuaternion(entity.quaternion);
+
+
 
             this.checkForDangers(entity, boxData);
         }
