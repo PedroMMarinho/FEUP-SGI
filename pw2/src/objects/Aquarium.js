@@ -13,11 +13,12 @@ import { Seabed } from './seabed/Seabed.js';
  * Main Aquarium class
  */
 class Aquarium extends THREE.Object3D {
-    constructor(assetManager, keyManager, cameraManager, scene) {
+    constructor(assetManager, keyManager, cameraManager, collisionManager, scene) {
         super();
         this.assetManager = assetManager;
         this.keyManager = keyManager;
         this.cameraManager = cameraManager;
+        this.collisionManager = collisionManager;
         this.scene = scene;
 
         // Terrain dimensions
@@ -30,6 +31,7 @@ class Aquarium extends THREE.Object3D {
     addToAquarium(object) {
         this.objects.push(object);
         this.add(object);
+        this.collisionManager.registerObject(object);
     }
 
     createWaterFog() {
@@ -137,13 +139,13 @@ class Aquarium extends THREE.Object3D {
         this.addToAquarium(shark2);
     }
 
-
     createSubmarine() {
         this.submarine = new SubmarineLOD(this.assetManager.getBlenderManager().getAllLODs('propeller-blade'), this.keyManager, this.cameraManager);
         this.addToAquarium(this.submarine);
     }
 
     update() {
+        this.collisionManager.update();
         for (const obj of this.objects) {
             if (obj.updateState) obj.updateState();
         }
