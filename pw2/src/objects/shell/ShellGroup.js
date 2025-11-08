@@ -23,7 +23,7 @@ class ShellGroup extends THREE.Object3D {
 		for (const position of this.positions) {
             const lodSets = this.lods[Math.floor(Math.random() * this.lods.length)];
 			const shell = new ShellLOD(lodSets);
-            const positionYOffset = THREE.MathUtils.randFloat(-0.005, 0.8);
+            const positionYOffset = THREE.MathUtils.randFloat(-0.005, 0.08);
 
 			shell.position.copy(position);
             shell.position.y += positionYOffset;
