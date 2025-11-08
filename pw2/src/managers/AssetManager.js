@@ -37,6 +37,12 @@ export class AssetManager {
             { key: 'granite', url: 'rocks/granite-high.glb', lod: 0 },
             { key: 'granite', url: 'rocks/granite-medium.glb', lod: 1 },
             { key: 'granite', url: 'rocks/granite-low.glb', lod: 2 },
+
+
+            // Shells
+            { key: 'whelk', url: 'shells/whelk-high.glb', lod: 0 },
+            { key: 'whelk', url: 'shells/whelk-medium.glb', lod: 1 },
+            { key: 'whelk', url: 'shells/whelk-low.glb', lod: 2 },
         ];
         return modelList;
     }
@@ -67,6 +73,9 @@ export class AssetManager {
             'shark-blue': 'shark/shark-blue.png',
             // Water Texture
             'water-normal': 'water/waternormals.jpg',
+            'sand': 'sand/sandwaves.png',
+            'sand-normal': 'sand/sandwavesNormal.png',
+            'sand-noise': 'sand/sandNoise.png',
         };
         return textureMap;
     }

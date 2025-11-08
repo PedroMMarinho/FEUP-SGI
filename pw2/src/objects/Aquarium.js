@@ -7,6 +7,7 @@ import { TerrainSegment } from './terrainSegment/TerrainSegment.js';
 import { SharkLOD } from './shark/SharkLOD.js';
 import { SubmarineLOD } from './submarine/SubmarineLOD.js';
 import { GlassTank } from './glassTank/GlassTank.js';
+import { Seabed } from './seabed/Seabed.js';
 
 /**
  * Main Aquarium class
@@ -62,16 +63,31 @@ class Aquarium extends THREE.Object3D {
         this.createTerrainSegments();
         // Create bubbles
         this.createBubbles();
-        // create rocks
-        this.createRocks();
-        // create corals
-        this.createCorals();
         // create fishes
         this.createFishes();
         // create shark
         this.createShark();
         // create submarine
         this.createSubmarine();
+        // create seabed
+        this.createSeaBed();
+    }
+
+    createSeaBed() {
+        const rockModels = [
+            this.assetManager.getBlenderManager().getAllLODs('granite'),
+        ];
+        const shellModels = [
+            this.assetManager.getBlenderManager().getAllLODs('whelk'),
+        ];
+
+
+        const rockCount = 1000;
+        const coralCount = 300;
+        const shellCount = 500;
+
+        const seabed = new Seabed(this.terrainWidth, rockCount, coralCount, shellCount, rockModels, shellModels);
+        this.addToAquarium(seabed);
     }
 
     createBubbles() {
@@ -80,14 +96,6 @@ class Aquarium extends THREE.Object3D {
     }
 
 
-    createRocks() {
-        const rockModels = [
-            this.assetManager.getBlenderManager().getAllLODs('granite'),
-        ]
-
-        const rockGroup = new RockGroup(1000, this.terrainWidth - this.terrainWidth / 10, this.terrainHeight - this.terrainHeight / 10, rockModels);
-        this.addToAquarium(rockGroup);
-    }
 
     createTerrainSegments() {
         const terrainGroup = new TerrainSegment(this.terrainWidth, this.terrainHeight);
