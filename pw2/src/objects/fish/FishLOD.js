@@ -12,7 +12,6 @@ export class FishLOD extends THREE.LOD {
 
         // animation params
         this.timeManager = TimeManager.getInstance();
-        this.globalTime = 0;
         this.speed = 1;
         this.animationOffset = Math.random() * Math.PI * 2;
 
@@ -66,8 +65,8 @@ export class FishLOD extends THREE.LOD {
     }
 
     updateState() {
-        const delta = this.timeManager.getDeltaTime();
-        this.globalTime += delta * this.speed;
+        this.globalTime = this.timeManager.getElapsedTime();
+        
 
         const visibleLOD = this.levels.find(level => level.object.visible);
         if (!visibleLOD) return;

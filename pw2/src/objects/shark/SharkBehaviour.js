@@ -285,13 +285,14 @@ export class SharkBehaviour {
 
   this.targetSpeed = this.maxSpeed;
   this.acceleration = this.fleeAcceleration;
-
+  /*
   console.log('FLEE TARGET:', this.currentTarget.clone());
   console.log('FLEE SPEED:', {
     currentSpeed: this.currentSpeed.toFixed(2),
     targetSpeed: this.targetSpeed.toFixed(2),
     acceleration: this.acceleration.toFixed(2)
   });
+  */
 }
 
 

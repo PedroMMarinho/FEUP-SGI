@@ -16,6 +16,7 @@ export class SharkLOD extends THREE.LOD {
 
     // use singleton TimeManager
     this.timeManager = TimeManager.getInstance();
+    this.globalTime = this.timeManager.getElapsedTime();
     this.timeSinceLastUpdate = 0;
 
     this.position.copy(position);
@@ -63,7 +64,8 @@ export class SharkLOD extends THREE.LOD {
   }
 
  updateState() {
-    const delta = this.timeManager.getDeltaTime();
+    const delta = this.timeManager.getElapsedTime() - this.globalTime;
+    this.globalTime += delta;
 
     // Update AI behaviour
     this.ai.update(delta);

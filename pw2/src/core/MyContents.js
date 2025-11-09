@@ -74,7 +74,6 @@ class MyContents {
      * 
      */
     update() {
-        if (this.timeManager) this.timeManager.update();
         if (this.aquarium) this.aquarium.update();
     }
 
