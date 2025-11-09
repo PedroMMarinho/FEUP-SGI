@@ -2,12 +2,31 @@ import * as THREE from 'three';
 import { Fish } from './Fish.js';
 
 export class FishLOD extends THREE.LOD {
-	constructor(bodyColor, finColor) {
+	constructor(bodyColor, finColor, sparseness, baseHeight, maxHeight, boidProperties) {
 		super();
+	
+		this.boidProperties = boidProperties;
 		this.bodyColor = bodyColor;
 		this.finColor = finColor;
-		this.distanceStart = 20;
-		this.distanceOffset = 10;
+		this.distanceStart = 30;
+		this.distanceOffset = 20;
+		this.size = 1;
+		this.sparseness = sparseness;
+		this.baseHeight = baseHeight;
+		this.maxHeight = maxHeight;
+
+		// boid stuff
+		this.pos = new THREE.Vector3(
+			THREE.MathUtils.randFloatSpread(sparseness),
+			THREE.MathUtils.randFloat(baseHeight, maxHeight),
+			THREE.MathUtils.randFloatSpread(sparseness)
+		);
+
+		this.acceleration = new THREE.Vector3(0,0,0);
+		this.velocity = new THREE.Vector3(THREE.MathUtils.randFloat(-1, 1),
+			THREE.MathUtils.randFloat(-1,1),
+			THREE.MathUtils.randFloat(-1,1));
+		this.velocity.setLength(Math.random() * (4 - 2) + 2);
 
 		// animation params
 		this.clock = new THREE.Clock();
@@ -21,6 +40,7 @@ export class FishLOD extends THREE.LOD {
 	}
 
 	init() {
+		var pos = new THREE.Vector3(this.pos.x, this.pos.y, this.pos.z);
 		const normalFish = new Fish(0);
 		const lowResFish = new Fish(1);
 		const emptyFish = new THREE.Object3D();
@@ -34,19 +54,44 @@ export class FishLOD extends THREE.LOD {
 		
 		
 		// low res model
+		lowResFish.bodyGeometry.computeBoundingBox();
+		var loresCenter = new THREE.Vector3();
+		var loresSize = new THREE.Vector3();
+		lowResFish.bodyGeometry.boundingBox.getCenter(loresCenter);
+		lowResFish.bodyGeometry.boundingBox.getSize(loresSize);
+
+		var loresMin = lowResFish.bodyGeometry.boundingBox.min;
+		var loresSca = new THREE.Matrix4();
+		var loresTra = new THREE.Matrix4();
+		var loresScaleFact = this.size / loresSize.length();
+		loresSca.makeScale(loresScaleFact, loresScaleFact, loresScaleFact);
+		loresTra.makeTranslation(-loresCenter.x, -loresCenter.y, -loresMin.z);
+
 		const lowMesh = new THREE.Group();
 		lowMesh.isSkinned = false;
 		const lowResBodyMesh = new THREE.Mesh(lowResFish.bodyGeometry, bodyMaterial);
 		const lowResTailMesh = new THREE.Mesh(lowResFish.tailGeometry, finMaterial);
 		lowMesh.add(lowResTailMesh, lowResBodyMesh);
 
+		lowMesh.applyMatrix4(loresTra);
+		lowMesh.applyMatrix4(loresSca);
+
 		// high res model
 		const hiMesh = new THREE.Group();
 		hiMesh.isSkinned = true;
 
-		//const highResBodyMesh = new THREE.Mesh(normalFish.bodyGeometry, bodyMaterial);
-		//const highResTailMesh = new THREE.Mesh(normalFish.tailGeometry, finMaterial);
-		//const highResDorsalMesh = new THREE.Mesh(normalFish.dorsalFinGeometry, finMaterial);
+		normalFish.bodyGeometry.computeBoundingBox();
+		var hiresCenter = new THREE.Vector3();
+		var hiresSize = new THREE.Vector3();
+		normalFish.bodyGeometry.boundingBox.getCenter(hiresCenter);
+		normalFish.bodyGeometry.boundingBox.getSize(hiresSize);
+
+		var hiresMin = lowResFish.bodyGeometry.boundingBox.min;
+		var hiresSca = new THREE.Matrix4();
+		var hiresTra = new THREE.Matrix4();
+		var hiresScaleFact = this.size / hiresSize.length();
+		hiresSca.makeScale(hiresScaleFact, hiresScaleFact, hiresScaleFact);
+		hiresTra.makeTranslation(-hiresCenter.x, -hiresCenter.y, -hiresMin.z);
 
 		/// Create skinned meshes for each part
 		const highResBodyMesh = new THREE.SkinnedMesh(normalFish.bodyGeometry, bodyMaterial);
@@ -68,19 +113,83 @@ export class FishLOD extends THREE.LOD {
 
 		hiMesh.add(highResBodyMesh, highResTailMesh, highResDorsalMesh);
 
+		hiMesh.applyMatrix4(loresTra);
+		hiMesh.applyMatrix4(loresSca);
+
 		this.addLevel(hiMesh, this.distanceStart);
 		this.addLevel(lowMesh, this.distanceStart + this.distanceOffset);
 		this.addLevel(emptyFish, this.distanceStart + 2 * this.distanceOffset);
+
+		this.position.set(pos.x, pos.y, pos.z);
+	}
+
+	viewingAngle(other) {
+		let rads = this.pos.angleTo(other);
+		return rads < 3.927 || rads > 5.4978;
 	}
 
 	attachAnimation(keyframedAnimation) {
 		this.keyframedAnimation = keyframedAnimation;
 	}
 
+	flock(boidsQ) {
+		let alignment = new THREE.Vector3(0,0,0);
+		let cohesion = new THREE.Vector3(0,0,0);
+		let separation = new THREE.Vector3(0,0,0);
+
+		let total = 0;
+
+		for (let other of boidsQ) {
+			let distance = this.pos.distanceTo(other.pos);
+
+			if (other != this && distance > 0 && distance < this.boidProperties.awareness && this.viewingAngle(other.pos)) {
+				alignment.add(other.velocity);
+				cohesion.add(other.pos);
+				separation.addScaledVector(this.pos.clone().sub(other.pos),1/distance);
+
+				total++;
+			}
+		}
+
+		if (total > 0) {
+			alignment.setLength(Math.min(this.boidProperties.moveSpeed, this.boidProperties.alignment));
+			
+			cohesion.divideScalar(total);
+			cohesion.sub(this.pos);
+			cohesion.setLength(Math.min(this.boidProperties.moveSpeed, this.boidProperties.cohesion));
+
+			separation.setLength(Math.min(this.boidProperties.moveSpeed, this.boidProperties.separation));
+
+			this.acceleration.add(alignment);
+			this.acceleration.add(cohesion);
+			this.acceleration.add(separation);
+		}
+
+		let boundavoid = new THREE.Vector3(0, 0, 0);
+
+		const limit = this.sparseness - 30; // TODO: why - 30?
+
+		if (this.pos.x <= -limit) boundavoid.setX(1);
+		if (this.pos.x >= limit) boundavoid.setX(-1);
+    
+		if (this.pos.y <= this.baseHeight) boundavoid.setY(1);
+		else if (this.pos.y >= this.maxHeight) boundavoid.setY(-1);
+
+    	if (this.pos.z <= -limit) boundavoid.setZ(1);
+    	if (this.pos.z >= limit) boundavoid.setZ(-1);
+
+		boundavoid.setLength(Math.min(1, this.boidProperties.moveSpeed));
+
+		this.acceleration.add(boundavoid);
+	}
+
+
+
 	updateState() {
 		const delta = this.clock.getDelta();
 		this.globalTime += delta * this.speed;
 
+		// lod
 		const visibleLOD = this.levels.find(level => level.object.visible);
 		if (!visibleLOD) return;
 
@@ -88,7 +197,8 @@ export class FishLOD extends THREE.LOD {
 		const swimFreq = 4.0 * this.speed;
 
 		const time = this.globalTime * swimFreq + this.animationOffset;
-
+		
+		// skelly
 		if (fishGroup.isSkinned) {
 			const skeleton = fishGroup.children[0].skeleton;
 			skeleton.bones[0].rotation.y = Math.sin(time) * 0.2; // front
@@ -97,6 +207,16 @@ export class FishLOD extends THREE.LOD {
 		} else {
 			fishGroup.rotation.y = Math.sin(time) * 0.2;
 		}
+
+		// flocking
+		this.pos.addScaledVector(this.velocity, delta);
+		this.velocity.add(this.acceleration);
+		this.velocity.clampLength(-this.boidProperties.moveSpeed, this.boidProperties.moveSpeed);
+		
+		this.position.set(this.pos.x, this.pos.y, this.pos.z);
+		this.acceleration.set(0,0,0);
+		let dir = this.pos.clone().add(this.velocity);
+		this.lookAt(dir);
 	}
 
 	updateAnimation() {
