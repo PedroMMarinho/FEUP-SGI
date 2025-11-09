@@ -22,9 +22,9 @@ class FishGroup extends THREE.Object3D {
 		this.count = count;
 		this.fishes = [];
 		this.animatedFishes = [];
-		this.sparseness = 100;
+		this.sparseness = 200;
 		this.baseHeight = -3;
-		this.maxHeight = 20;
+		this.maxHeight = 30;
 		this.init();
 	}
 
@@ -34,7 +34,7 @@ class FishGroup extends THREE.Object3D {
 			separation: 2,
 			alignment: 2,
 			moveSpeed: 5,
-			awareness: 25,
+			awareness: 20,
 			colour: new THREE.Color(0,1,1)
 		};
 

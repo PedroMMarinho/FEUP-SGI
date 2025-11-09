@@ -119,7 +119,7 @@ class Aquarium extends THREE.Object3D {
             this.addToAquarium(group);
         }*/
 		this.fishGroups = [
-			new FishGroup(300),
+			new FishGroup(400),
 		];
 		this.fishGroups[0].position.set(0,0,0);
 		this.addToAquarium(this.fishGroups[0]);
