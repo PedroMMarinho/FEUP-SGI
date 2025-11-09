@@ -37,15 +37,6 @@ class SeaweedGroup extends THREE.Object3D {
             const seaweed = seaweedTemplate.clone(true);
             seaweed.position.copy(position);
 
-            const basePhase = Math.random() * Math.PI * 2;
-
-            seaweed.levels.forEach(level => {
-                level.object.onBeforeRender = (renderer, scene, camera, geometry, material, group) => {
-                    if (material.userData.shader) {
-                        material.userData.shader.uniforms.uBasePhase.value = basePhase;
-                    }
-                };
-            });
 
             this.add(seaweed);
             this.seaweeds.push({ position, object: seaweed });
@@ -59,9 +50,8 @@ class SeaweedGroup extends THREE.Object3D {
             shininess: 25,
             onBeforeCompile: (shader) => {
                 shader.uniforms.uTime = { value: 0.0 };
-                shader.uniforms.uAmplitude = { value: 0.8 };
+                shader.uniforms.uAmplitude = { value: 0.4 };
                 shader.uniforms.uFrequency = { value: 1.0 };
-                shader.uniforms.uBasePhase = { value: 0.0 };
 
                 // GLSL random helper
                 const hashGLSL = `
@@ -76,7 +66,6 @@ class SeaweedGroup extends THREE.Object3D {
                     uniform float uTime;
                     uniform float uAmplitude;
                     uniform float uFrequency;
-                    uniform float uBasePhase;
                     varying vec2 vUv;
                     ${hashGLSL}
                 ` + shader.vertexShader;
@@ -106,9 +95,12 @@ class SeaweedGroup extends THREE.Object3D {
 
                     #endif
 
+                    // Quantize the seaweed's base position to ensure stable per-object randomness
+                    vec3 objectIdSeed = mod(modelMatrix[3].xyz, 5.0);
+                    float phase = hash(objectIdSeed) * 6.2831853; // 2*PI
 
                     // Apply waving effect
-                    float wave = sin(uBasePhase + uFrequency * uTime + mvPosition.y * 0.3) * uAmplitude;
+                    float wave = sin( phase + uFrequency * uTime + mvPosition.y * 0.3) * uAmplitude;
 
                     // Displace vertices along the X axis based on their Y position
                     mvPosition.x += wave * pow(mvPosition.y / 5.0, 2.0); // Adjust divisor for height influence

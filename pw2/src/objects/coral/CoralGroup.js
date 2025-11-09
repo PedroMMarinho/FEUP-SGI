@@ -17,12 +17,15 @@ class CoralGroup extends THREE.Object3D {
         this.spreadX = spreadX;
         this.spreadZ = spreadZ;
         this.clock = new THREE.Clock();
+
+        // Shared material for all corals
         this.material = this.createMaterial();
+
         this.init();
     }
 
     init() {
-        const coralTemplate = new CoralLOD(this.material); // no material yet
+        const coralTemplate = new CoralLOD(this.material);
 
         for (let i = 0; i < this.count; i++) {
             const position = new THREE.Vector3(
@@ -34,7 +37,6 @@ class CoralGroup extends THREE.Object3D {
             const coral = coralTemplate.clone(true);
             coral.position.copy(position);
 
-
             this.add(coral);
             this.corals.push({ position, object: coral });
         }
@@ -42,7 +44,7 @@ class CoralGroup extends THREE.Object3D {
 
     createMaterial() {
         const material = new THREE.MeshPhongMaterial({
-            color: 0xff7f50,
+            color: 0xff7f50, // coral color
             specular: 0x222222,
             shininess: 25,
             onBeforeCompile: (shader) => {
@@ -67,7 +69,7 @@ class CoralGroup extends THREE.Object3D {
                     ${hashGLSL}
                 ` + shader.vertexShader;
 
-                // Inject after UVs
+                // Inject UV handling
                 shader.vertexShader = shader.vertexShader.replace(
                     '#include <uv_vertex>',
                     `#include <uv_vertex>
@@ -75,24 +77,37 @@ class CoralGroup extends THREE.Object3D {
                     `
                 );
 
-                // Replace vertex transformation
+                // Replace vertex transformation logic (same as SeaweedGroup)
                 shader.vertexShader = shader.vertexShader.replace(
-                    '#include <begin_vertex>',
-                    `
-                    vec3 transformed = vec3(position);
+                    '#include <project_vertex>',
+                    `vec4 mvPosition = vec4( transformed, 1.0 );
 
-                    // Compute pseudo-random phase based on world-space position
-                    vec3 worldPos = (modelMatrix * vec4(position, 1.0)).xyz;
-                    float phase = hash(floor(worldPos * 0.5)); // stable per object-ish
+                    #ifdef USE_BATCHING
+                        mvPosition = batchingMatrix * mvPosition;
+                    #endif
 
-                    float heightFactor = smoothstep(0.0, 1.0, position.y + 1.0);
-                    float wave = sin(uTime * 2.0 + phase * 6.2831) * uAmplitude * heightFactor;
-                    transformed.x += wave;
+                    #ifdef USE_INSTANCING
+                        mvPosition = instanceMatrix * mvPosition;
+                    #endif
+
+                    // Stable per-object random phase using world-space origin
+                    vec3 objectIdSeed = mod(modelMatrix[3].xyz, 5.0);
+                    float phase = hash(objectIdSeed) * 6.2831853; // 2*PI
+
+                    // Apply waving effect
+                    float wave = sin(phase + uFrequency * uTime + mvPosition.y * 0.3) * uAmplitude;
+
+                    // Displace vertices along X axis based on height
+                    mvPosition.x += wave * pow(mvPosition.y / 5.0, 2.0);
+
+                    // Standard transformations
+                    mvPosition = modelViewMatrix * mvPosition;
+                    gl_Position = projectionMatrix * mvPosition;
                     `
                 );
 
-                this.material.userData.shader = shader;
-
+                // Keep shader reference for updates
+                material.userData.shader = shader;
             }
         });
 
@@ -106,7 +121,6 @@ class CoralGroup extends THREE.Object3D {
             shader.uniforms.uTime.value = elapsed;
         }
     }
-
 }
 
 CoralGroup.prototype.isGroup = true;
