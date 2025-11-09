@@ -45,6 +45,13 @@ class Aquarium extends THREE.Object3D {
         this.scene.fog = new THREE.FogExp2(0x003d5c, 0.009);
     }
 
+    createTopLight() {
+        const topLight = new THREE.DirectionalLight(0xffffff, 10.0);
+        topLight.position.set(0, 100, 0);
+        topLight.castShadow = true;
+        this.addToAquarium(topLight);
+    }
+
     createGlassTank() {
         const glassTank = new GlassTank(this.terrainWidth, this.terrainHeight / 4, this.terrainWidth);
         this.addToAquarium(glassTank);
@@ -59,6 +66,8 @@ class Aquarium extends THREE.Object3D {
      * Initializes and adds all aquarium elements
      */
     init() {
+        // Create light
+        this.createTopLight();
         // Create outside environment
         this.createOutsideEnvironment();
         // Create aquarium geometry and material

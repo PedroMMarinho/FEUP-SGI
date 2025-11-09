@@ -11,11 +11,14 @@ class Water extends THREE.Object3D {
             color: 0x1ca3ec,
             transparent: true,
             opacity: 0.8,
+            difuse: 0x1ca3ec,
+            specular: 0xfafafa,
+            shininess: 100,
             side: THREE.DoubleSide,
             onBeforeCompile: (shader) => {
                 shader.uniforms.time = { value: 0 };
                 shader.uniforms.heightMap = { value: heightMap };
-                shader.uniforms.uMaxOffset = { value: 4.0 };
+                shader.uniforms.uMaxOffset = { value: 6.0 };
 
                 shader.vertexShader = `
                     uniform float time;
@@ -33,7 +36,7 @@ class Water extends THREE.Object3D {
                     '#include <begin_vertex>',
                     `
                     #include <begin_vertex>
-                    vec3 color = texture2D(heightMap, uv + vec2(time * 0.01, time * 0.01)).rgb;
+                    vec3 color = texture2D(heightMap, uv + vec2(time * 0.005, time * 0.005)).rgb;
 
                     float offsetR = (color.r - 0.5) * uMaxOffset;
                     float offsetG = (color.g - 0.5) * uMaxOffset * 0.5; 
