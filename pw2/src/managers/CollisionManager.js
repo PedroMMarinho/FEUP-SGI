@@ -38,7 +38,7 @@ class CollisionManager {
             objectSize.y + offsetMultiplier,
             objectSize.z + offsetMultiplier
         );
-
+        /*
         const color =
             danger === DangerLevel.LOW
                 ? 0x00ff00
@@ -56,6 +56,7 @@ class CollisionManager {
 
         const box = new THREE.Mesh(geometry, material);
         this.scene.add(box);
+        */
 
         const collisionBox = new OBB();
 
@@ -71,7 +72,7 @@ collisionBox.rotation = new THREE.Matrix4();
 
 
         this.awarenessBoxes.set(object, {
-            mesh: box,
+            // mesh: box,   
             size: boxSize,
             collisionBox: collisionBox
         });
@@ -217,10 +218,11 @@ collisionBox.rotation = new THREE.Matrix4();
 
         for (const entity of this.entities) {
             const boxData = this.awarenessBoxes.get(entity);
-
+            /*
             // Update visual mesh
             boxData.mesh.position.copy(entity.position);
             boxData.mesh.quaternion.copy(entity.quaternion);
+            */
 
             // Update collision OBB
             boxData.collisionBox.center.copy(entity.position);

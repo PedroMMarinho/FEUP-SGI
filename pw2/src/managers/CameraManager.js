@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { TimeManager } from './TimeManager.js';
 
 class CameraManager {
     constructor(aspect, keyManager, frustumSize = 20) {
@@ -19,7 +20,8 @@ class CameraManager {
         this.pitch = 0;
 
         this.freeFlyActive = false;
-        this.clock = new THREE.Clock(); 
+        this.timeManager = TimeManager.getInstance();
+        this.globalTime = this.timeManager.getElapsedTime();
 
         // Orthographic parameters
         this.left = -frustumSize / 2 * aspect;
@@ -67,7 +69,8 @@ class CameraManager {
     }
 
     update(renderer, submarine) {
-        const deltaTime = this.clock.getDelta(); 
+        const deltaTime = this.timeManager.getElapsedTime() - this.globalTime;
+        this.globalTime += deltaTime;
 
         if (this.activeCameraName === 'Underwater View' && !this.controls) {
             this.controls = new OrbitControls(this.activeCamera, renderer.domElement);
@@ -88,7 +91,7 @@ class CameraManager {
 
     }
 
-     updateSubmarineView(submarine) {
+    updateSubmarineView(submarine) {
         const camera = this.cameras['Submarine View'];
 
         const position = submarine.getSubmarineCameraPosition();
@@ -177,17 +180,6 @@ class CameraManager {
     if (this.canvasOverlay) this.canvasOverlay.remove();
     this.canvasOverlay = null;
 }
-    }
-
-    updateSubmarineFollow(submarine, deltaTime) {
-        const camera = this.cameras['Submarine View'];
-        const offset = new THREE.Vector3(0, 3, 12);
-        const relativeOffset = offset.clone().applyMatrix4(submarine.matrixWorld);
-        camera.position.lerp(relativeOffset, 2 * deltaTime);
-
-
-        const lookAtOffset = new THREE.Vector3(0, 1, -5).applyMatrix4(submarine.matrixWorld);
-        camera.lookAt(lookAtOffset);
     }
 
     updateFreeFly(deltaTime) {

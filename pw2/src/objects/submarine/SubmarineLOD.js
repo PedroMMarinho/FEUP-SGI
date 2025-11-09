@@ -23,6 +23,8 @@ export class SubmarineLOD extends THREE.LOD {
         this.setupLODs();
 
         this.timeManager = TimeManager.getInstance();
+        this.globalTime = this.timeManager.getElapsedTime();
+        this.clock = new THREE.Clock();
 
         // Movement parameters
         this.currentSpeed = 0;
@@ -58,8 +60,11 @@ export class SubmarineLOD extends THREE.LOD {
 
     updateState() {
         if (this.cameraManager.activeCameraName !== 'Submarine View') return;
-
-        const delta = this.timeManager.getDeltaTime(); 
+        /*
+        const delta = this.timeManager.getElapsedTime() - this.globalTime;
+        this.globalTime += delta;
+        */
+        const delta = this.clock.getDelta();
 
         let isAccelerating = false;
 
