@@ -1,9 +1,9 @@
 import * as THREE from 'three';
 import { MyAxis } from '../objects/MyAxis.js';
 import { Aquarium } from '../objects/Aquarium.js';
-import { TextureManager } from '../managers/TextureManager.js';
 import { AssetManager } from '../managers/AssetManager.js';
-import { Submarine } from '../objects/submarine/Submarine.js';
+import { CollisionManager } from '../managers/CollisionManager.js';
+import { TimeManager } from '../managers/TimeManager.js';
 
 /**
  *  This class contains the contents of out application
@@ -21,7 +21,9 @@ class MyContents {
         this.assetManager = new AssetManager(); // Asset Manager
         this.keyManager = this.app.keyManager;
         this.cameraManager = this.app.cameraManager;
-        this.aquarium = new Aquarium(this.assetManager, this.keyManager, this.cameraManager, this.app.scene); // Main Object of the scene
+        this.collisionManager = new CollisionManager(this.app.scene);
+        this.timeManager = new TimeManager();
+        this.aquarium = new Aquarium(this.assetManager, this.keyManager, this.cameraManager, this.collisionManager, this.app.scene); // Main Object of the scene
     }
 
     /**
