@@ -1,19 +1,20 @@
 import * as THREE from 'three'; 
 
 class Water extends THREE.Object3D {
-    constructor(heightMap, width, height, depth) {
+    constructor(heightMap, width, height, depth, envMap) {
         super();
         this.clock = new THREE.Clock(); 
         const geometry = new THREE.PlaneGeometry(width, depth,64,64);
         heightMap.wrapS = heightMap.wrapT = THREE.RepeatWrapping;
         heightMap.repeat.set(4, 4);
-        this.material = new THREE.MeshPhongMaterial({
+        this.material = new THREE.MeshStandardMaterial({
             color: 0x1ca3ec,
+            metalness: 0,
+            roughness: 0.1,
             transparent: true,
             opacity: 0.8,
-            difuse: 0x1ca3ec,
-            specular: 0xfafafa,
-            shininess: 100,
+            envMap: envMap, // works with PMREM texture
+            envMapIntensity: 1.0,
             side: THREE.DoubleSide,
             onBeforeCompile: (shader) => {
                 shader.uniforms.time = { value: 0 };

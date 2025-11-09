@@ -26,6 +26,7 @@ class Aquarium extends THREE.Object3D {
         this.terrainHeight = 200;
 
         this.objects = [];
+        this.envMap = null;
     }
 
     addToAquarium(object) {
@@ -38,6 +39,7 @@ class Aquarium extends THREE.Object3D {
         this.scene.environment = hdri.hdr;
         this.scene.environment.intensity = 0.01;
         this.scene.background = hdri.envMap;
+        this.envMap = hdri.envMap;
     }
 
     createWaterFog() {
@@ -58,7 +60,7 @@ class Aquarium extends THREE.Object3D {
     }
 
     createWaterTopLayer() {
-        const water = new Water(this.assetManager.getTextureManager().getTexture('water-normal'), this.terrainWidth, 4*this.terrainHeight / 4 / 5, this.terrainWidth);
+        const water = new Water(this.assetManager.getTextureManager().getTexture('water-normal'), this.terrainWidth, 4*this.terrainHeight / 4 / 5, this.terrainWidth, this.envMap );
         this.addToAquarium(water);
     }
 
