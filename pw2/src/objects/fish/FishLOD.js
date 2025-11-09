@@ -8,8 +8,8 @@ export class FishLOD extends THREE.LOD {
 		this.boidProperties = boidProperties;
 		this.bodyColor = bodyColor;
 		this.finColor = finColor;
-		this.distanceStart = 30;
-		this.distanceOffset = 20;
+		this.distanceStart = 40;
+		this.distanceOffset = 30;
 		this.size = 1;
 		this.sparseness = sparseness;
 		this.baseHeight = baseHeight;
