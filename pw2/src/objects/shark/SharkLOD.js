@@ -48,7 +48,7 @@ export class SharkLOD extends THREE.LOD {
       if (this.texture) {
         
         shark.traverse((child) => {
-          if (child.isMesh && child.material.name === 'Material') {
+          if (child.isMesh) {
             child.material.map = this.texture;
             child.material.needsUpdate = true;
           }
