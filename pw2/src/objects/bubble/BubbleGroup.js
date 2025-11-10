@@ -32,17 +32,14 @@ class BubbleGroup extends THREE.Object3D {
         const dummy = new THREE.Object3D();
 
         for (let i = 0; i < this.count; i++) {
-            // Random position
             const position = new THREE.Vector3(
                 THREE.MathUtils.randFloatSpread(6),
                 THREE.MathUtils.randFloat(-2, 5),
                 THREE.MathUtils.randFloatSpread(6)
             );
 
-            // Store logical bubble data
             this.bubbles.push({ position });
 
-            // Apply transform
             dummy.position.copy(position);
             dummy.updateMatrix();
             this.mesh.setMatrixAt(i, dummy.matrix);

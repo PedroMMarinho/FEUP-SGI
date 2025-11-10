@@ -12,11 +12,9 @@ export class SharkBehaviour {
     this.currentSpeed = this.baseSpeed;
     this.maxSpeed = this.baseSpeed * 6;
     
-    // --- MODIFICATION ---
     this.acceleration = options.acceleration || 0.3;
     this.baseAcceleration = this.acceleration;
-    this.fleeAcceleration = this.acceleration * 3.0; 
-    // --- END MODIFICATION ---
+    this.fleeAcceleration = this.acceleration * 2.5; 
     
     this.deceleration = options.deceleration || 0.4;
     
@@ -71,7 +69,6 @@ export class SharkBehaviour {
     this.generateNewTarget();
   }
 
-  // --- Main Update Loop ---
 
   update(delta) {
     if (!this.currentTarget) return;
@@ -79,7 +76,6 @@ export class SharkBehaviour {
     const clampedDelta = Math.min(delta, 0.1);
     this.stateTimer += clampedDelta;
 
-    // 1. Run state-specific logic (to set goals)
     switch (this.state) {
       case EntityState.WANDERING:
         this.updateWandering(clampedDelta);
@@ -92,15 +88,13 @@ export class SharkBehaviour {
         break;
     }
 
-    // 2. Apply steering, movement, and rotation (based on goals)
     this.applyMovement(clampedDelta);
 
-    // 3. Apply shared logic
+    // Apply shared logic
     this.keepWithinBounds();
     this.updateMetrics();
   }
 
-  // --- State-Specific Update Functions ---
   updateWandering(delta) {
     this.acceleration = this.baseAcceleration;
 
@@ -135,7 +129,6 @@ export class SharkBehaviour {
   }
 
   updateFleeing() {
-    // --- MODIFICATION ---
     this.acceleration = this.fleeAcceleration;
     
     this.targetSpeed = this.maxSpeed;
@@ -148,10 +141,7 @@ export class SharkBehaviour {
   }
 
   updateAvoiding() {
-    // --- MODIFICATION ---
-    // Ensure we are using normal acceleration
     this.acceleration = this.baseAcceleration;
-    // --- END MODIFICATION ---
 
     this.targetSpeed = this.baseSpeed * 1.1;
     this.adaptiveTurnSpeed = this.turnSpeed * 1.2;
@@ -201,14 +191,12 @@ export class SharkBehaviour {
     );
     moveDelta.y = depthAdjustment;
 
-    // 5. Apply movement
     const previousPos = this.shark.position.clone();
     this.shark.position.add(moveDelta);
     
     this.metrics.totalDistanceTraveled += previousPos.distanceTo(this.shark.position);
     this.metrics.currentSpeed = this.currentSpeed;
 
-    // 6. Apply rotation
     const targetQuat = new THREE.Quaternion().setFromUnitVectors(
       new THREE.Vector3(0, 0, -1), 
       this.smoothedDir         
@@ -228,7 +216,6 @@ export class SharkBehaviour {
       : this.currentSpeed;
   }
 
-  // --- State Management & Reactions ---
  executeFlee() {
   if (!this.actionData) return;
   const action = this.actionData.action;
@@ -294,8 +281,6 @@ export class SharkBehaviour {
   });
   */
 }
-
-
 
 
   executeAvoid() {

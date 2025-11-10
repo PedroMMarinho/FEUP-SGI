@@ -16,7 +16,6 @@ class TimeManager {
     }
 
 
-    // static method to get the singleton instance
     static getInstance() {
         if (!TimeManager._instance) {
             new TimeManager();

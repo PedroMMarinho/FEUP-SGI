@@ -8,7 +8,6 @@ class GlassTank extends THREE.Object3D {
         this.height = height;
         this.depth = depth;
 
-        // 1. The Glass Material
         const glassMaterial = new THREE.MeshPhysicalMaterial({
             color: 0xffffff,
             transmission: 1.0,  
@@ -23,27 +22,22 @@ class GlassTank extends THREE.Object3D {
         const wallGeoZ = new THREE.PlaneGeometry(width, height); 
         const bottomGeo = new THREE.PlaneGeometry(width, depth);
 
-        // Bottom Wall
         const bottom = new THREE.Mesh(bottomGeo, glassMaterial);
         bottom.rotation.x = -Math.PI / 2;
 
-        // Back Wall
         const backWall = new THREE.Mesh(wallGeoZ, glassMaterial);
         backWall.position.y = height / 2; 
         backWall.position.z = -depth / 2;
 
-        // Front Wall
         const frontWall = new THREE.Mesh(wallGeoZ, glassMaterial);
         frontWall.position.y = height / 2;
         frontWall.position.z = depth / 2;
 
-        // Left Wall
         const leftWall = new THREE.Mesh(wallGeoX, glassMaterial);
         leftWall.position.y = height / 2;
         leftWall.position.x = -width / 2;
         leftWall.rotation.y = Math.PI / 2;
 
-        // Right Wall
         const rightWall = new THREE.Mesh(wallGeoX, glassMaterial);
         rightWall.position.y = height / 2;
         rightWall.position.x = width / 2;

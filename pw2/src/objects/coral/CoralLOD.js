@@ -1,6 +1,5 @@
 import * as THREE from 'three';
 import { Coral } from "./Coral.js";
-import { CameraManager } from '../../managers/CameraManager.js';
 
 export class CoralLOD extends THREE.LOD {
     constructor(){
