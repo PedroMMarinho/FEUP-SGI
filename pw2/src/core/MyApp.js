@@ -45,6 +45,8 @@ class MyApp {
         this.renderer.setClearColor("#000000");
         this.renderer.shadowMap.enabled = true;
         this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
+        this.renderer.toneMappingExposure = 0.1;
         this.renderer.setSize(window.innerWidth, window.innerHeight);
 
         document.getElementById("canvas").appendChild(this.renderer.domElement);

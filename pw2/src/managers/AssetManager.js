@@ -1,5 +1,6 @@
 import { TextureManager } from './TextureManager.js';
 import { BlenderManager } from './BlenderManager.js';
+import { HDRIManager } from './HDRIManager.js';
 
 /**
  * AssetManager
@@ -11,10 +12,11 @@ import { BlenderManager } from './BlenderManager.js';
  * - Provides convenient access methods for assets
  */
 export class AssetManager {
-    constructor() {
+    constructor(renderer) {
         // Create specialized loaders
         this.textureManager = new TextureManager();
         this.blenderManager = new BlenderManager();
+        this.hdriManager = new HDRIManager(renderer);
 
     }
 
@@ -89,9 +91,26 @@ export class AssetManager {
         console.log('✅ All textures loaded.');
     }
 
+    initHDRIs() {
+        const hdriList = [
+            { key: 'fin-hall', url: 'hall_of_finfish_1k.hdr' },
+        ];
+        return hdriList;
+    }
+
+    async loadHDRIs() {
+        console.log('🌀 Loading HDRIs...')
+        const hdriList = this.initHDRIs()
+        for (const hdri of hdriList) {
+            await this.hdriManager.loadHDRI(hdri.key, hdri.url);
+        }
+        console.log('✅ All HDRIs loaded.');
+    }
+
     async preloadAll() {
         this.loadTextures();
         await this.loadBlenderModels();
+        await this.loadHDRIs();
     }
 
 
@@ -102,6 +121,9 @@ export class AssetManager {
     getModel(key, lodLevel = 0) {
         return this.blenderManager.getModel(key, lodLevel);
     }
+    getHDRI(key) {
+        return this.hdriManager.getHDRI(key);
+    }
 
     getBlenderManager() {
         return this.blenderManager;
@@ -109,6 +131,9 @@ export class AssetManager {
 
     getTextureManager() {
         return this.textureManager;
+    }
+    getHDRIManager() {
+        return this.hdriManager;
     }
 
     /**
@@ -118,5 +143,6 @@ export class AssetManager {
         console.log('🧹 Clearing all loaded assets...');
         this.textureManager.clear();
         this.blenderManager.clear();
+        this.hdriManager.clear();
     }
 }
