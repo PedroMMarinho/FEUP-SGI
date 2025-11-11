@@ -166,7 +166,7 @@ export class FishLOD extends THREE.LOD {
 
 		let avoidForce = new THREE.Vector3(0, 0, 0);
 
-		const margin = 7;
+		const margin = 5;
 		const vertMargin = 1;
 		const limit = this.sparseness;
 
