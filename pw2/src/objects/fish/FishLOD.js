@@ -8,8 +8,8 @@ export class FishLOD extends THREE.LOD {
 		this.boidProperties = boidProperties;
 		this.bodyColor = bodyColor;
 		this.finColor = finColor;
-		this.distanceStart = 40;
-		this.distanceOffset = 30;
+		this.distanceStart = 50;
+		this.distanceOffset = 20;
 		this.size = 1;
 		this.sparseness = sparseness;
 		this.baseHeight = baseHeight;
@@ -167,7 +167,7 @@ export class FishLOD extends THREE.LOD {
 
 		let boundavoid = new THREE.Vector3(0, 0, 0);
 
-		const limit = this.sparseness - 30; // TODO: why - 30?
+		const limit = this.sparseness; // TODO: why - 30?
 
 		if (this.pos.x <= -limit) boundavoid.setX(1);
 		if (this.pos.x >= limit) boundavoid.setX(-1);
