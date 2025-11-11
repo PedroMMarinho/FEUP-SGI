@@ -8,6 +8,7 @@ import { SharkLOD } from './shark/SharkLOD.js';
 import { SubmarineLOD } from './submarine/SubmarineLOD.js';
 import { GlassTank } from './glassTank/GlassTank.js';
 import { Seabed } from './seabed/Seabed.js';
+import { Water } from './water/Water.js';
 
 /**
  * Main Aquarium class
@@ -26,6 +27,7 @@ class Aquarium extends THREE.Object3D {
         this.terrainHeight = 200;
 
         this.objects = [];
+        this.envMap = null;
     }
 
     addToAquarium(object) {
@@ -34,11 +36,24 @@ class Aquarium extends THREE.Object3D {
         this.collisionManager.registerObject(object);
     }
 
+    createOutsideEnvironment() {
+        const hdri = this.assetManager.getHDRI('fin-hall');
+        this.scene.environment = hdri.hdr;
+        this.scene.environment.intensity = 0.01;
+        this.scene.background = hdri.envMap;
+        this.envMap = hdri.envMap;
+    }
+
     createWaterFog() {
         // Blue cyan color
-        const backgroundColor = 0x003d5c;
-        this.scene.background = new THREE.Color(backgroundColor);
-        this.scene.fog = new THREE.FogExp2(backgroundColor, 0.009);
+        this.scene.fog = new THREE.FogExp2(0x003d5c, 0.009);
+    }
+
+    createTopLight() {
+        const topLight = new THREE.DirectionalLight(0xffffff, 10.0);
+        topLight.position.set(0, 100, 0);
+        topLight.castShadow = true;
+        this.addToAquarium(topLight);
     }
 
     createGlassTank() {
@@ -47,7 +62,7 @@ class Aquarium extends THREE.Object3D {
     }
 
     createWaterTopLayer() {
-        const water = new Water(this.assetManager.getTextureManager().getTexture('water-normal'), this.terrainWidth, this.terrainWidth, this.terrainHeight / 4);
+        const water = new Water(this.assetManager.getTextureManager().getTexture('water-normal'), this.terrainWidth, 4*this.terrainHeight / 4 / 5, this.terrainWidth, this.envMap );
         this.addToAquarium(water);
     }
 
@@ -55,12 +70,16 @@ class Aquarium extends THREE.Object3D {
      * Initializes and adds all aquarium elements
      */
     init() {
+        // Create light
+        this.createTopLight();
+        // Create outside environment
+        this.createOutsideEnvironment();
         // Create aquarium geometry and material
         this.createGlassTank();
         // Create water fog
         this.createWaterFog();
         // Create water top layer
-        //this.createWaterTopLayer();
+        this.createWaterTopLayer();
         //create terrain
         this.createTerrainSegments();
         // Create bubbles

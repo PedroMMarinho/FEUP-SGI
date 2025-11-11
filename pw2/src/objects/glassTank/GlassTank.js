@@ -12,7 +12,7 @@ class GlassTank extends THREE.Object3D {
             color: 0xffffff,
             transmission: 1.0,  
             ior: 1.5,           
-            roughness: 0.0,     
+            roughness: 0.3,     
             metalness: 0.0,
             transparent: true,
             side: THREE.DoubleSide 
