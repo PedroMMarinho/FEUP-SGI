@@ -1,9 +1,6 @@
 import * as THREE from 'three';
 
 export class Shark extends THREE.Object3D {
-  /**
-   * @param {GLTF} [gltfModel] - optional preloaded GLTF model
-   */
   constructor(gltfModel,lodLevel) {
     super();
 

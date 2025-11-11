@@ -38,6 +38,8 @@ class CollisionManager {
             objectSize.y + offsetMultiplier,
             objectSize.z + offsetMultiplier
         );
+
+        // Visual representation of Boxes
         /*
         const color =
             danger === DangerLevel.LOW

@@ -84,7 +84,6 @@ class Seabed extends THREE.Object3D {
 	computePositions(count, maxTries = 50) {
 		const positions = [];
 
-		// 👇 shrink available placement area by marginFactor
 		const effectiveSize = this.terrainSize * this.marginFactor;
 		const halfSize = effectiveSize / 2;
 

@@ -20,14 +20,12 @@ class RockGroup extends THREE.Object3D {
 			rockLOD.position.copy(pos);
 			rockLOD.position.y += positionYOffset;
 
-			// Random rotation
 			rockLOD.rotation.set(
 				THREE.MathUtils.randFloat(0, Math.PI / 8),
 				THREE.MathUtils.randFloat(0, Math.PI * 2),
 				THREE.MathUtils.randFloat(0, Math.PI / 8)
 			);
 
-			// Random scale
 			const scale = THREE.MathUtils.randFloat(0.2, 0.8);
 			rockLOD.scale.set(scale, scale, scale);
 
