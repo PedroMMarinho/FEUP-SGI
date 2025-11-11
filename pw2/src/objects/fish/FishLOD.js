@@ -165,22 +165,26 @@ export class FishLOD extends THREE.LOD {
 			this.acceleration.add(separation);
 		}
 
-		let boundavoid = new THREE.Vector3(0, 0, 0);
+		let avoidForce = new THREE.Vector3(0, 0, 0);
 
-		const limit = this.sparseness; // TODO: why - 30?
+		const margin = 7;
+		const vertMargin = 1;
+		const limit = this.sparseness;
 
-		if (this.pos.x <= -limit) boundavoid.setX(1);
-		if (this.pos.x >= limit) boundavoid.setX(-1);
-    
-		if (this.pos.y <= this.baseHeight) boundavoid.setY(1);
-		else if (this.pos.y >= this.maxHeight) boundavoid.setY(-1);
+		if (this.pos.x < -limit + margin) avoidForce.x = ( -limit + margin - this.pos.x ) / margin;
+		else if (this.pos.x >  limit - margin) avoidForce.x = ( limit - margin - this.pos.x ) / margin;
 
-    	if (this.pos.z <= -limit) boundavoid.setZ(1);
-    	if (this.pos.z >= limit) boundavoid.setZ(-1);
+		if (this.pos.y < this.baseHeight + vertMargin)
+			avoidForce.y = ( this.baseHeight + vertMargin - this.pos.y ) / vertMargin;
+		else if (this.pos.y > this.maxHeight - vertMargin)
+			avoidForce.y = ( this.maxHeight - vertMargin - this.pos.y ) / vertMargin;
 
-		boundavoid.setLength(Math.min(1, this.boidProperties.moveSpeed));
+		if (this.pos.z < -limit + margin) avoidForce.z = ( -limit + margin - this.pos.z ) / margin;
+		else if (this.pos.z >  limit - margin) avoidForce.z = ( limit - margin - this.pos.z ) / margin;
 
-		this.acceleration.add(boundavoid);
+		avoidForce.multiplyScalar(this.boidProperties.moveSpeed * 0.5);
+		this.acceleration.add(avoidForce);
+
 	}
 
 
