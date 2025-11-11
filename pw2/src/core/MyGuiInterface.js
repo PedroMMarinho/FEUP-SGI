@@ -2,7 +2,6 @@ import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 import * as THREE from 'three';
 import { MyApp } from './MyApp.js';
 import { MyContents } from './MyContents.js';
-import { Submarine } from '../objects/submarine/Submarine.js';
 
 /**
  * Custom GUI interface for the app

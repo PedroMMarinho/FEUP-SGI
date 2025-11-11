@@ -14,7 +14,6 @@ export class SharkLOD extends THREE.LOD {
     this.animationFrameRateStart = 120;
     this.animationFrameRateOffset = 40;
 
-    // use singleton TimeManager
     this.timeManager = TimeManager.getInstance();
     this.globalTime = this.timeManager.getElapsedTime();
     this.timeSinceLastUpdate = 0;
@@ -58,7 +57,6 @@ export class SharkLOD extends THREE.LOD {
       distance += this.distanceOffset;
     }
 
-    // Add empty LOD to avoid popping
     const emptyObject = new THREE.Object3D();
     this.addLevel(emptyObject, distance);
   }
@@ -67,7 +65,7 @@ export class SharkLOD extends THREE.LOD {
     const delta = this.timeManager.getElapsedTime() - this.globalTime;
     this.globalTime += delta;
 
-    // Update AI behaviour
+    // Update Shark behaviour
     this.ai.update(delta);
 
     const visibleLOD = this.levels.find(level => level.object.visible);

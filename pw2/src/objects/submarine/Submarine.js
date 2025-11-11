@@ -8,7 +8,6 @@ export class Submarine extends THREE.Object3D {
 		this.height = 1.5;
 		this.color = 0x000000;
 
-		// Blender model
 		this.propellerBladeObject = propellerBladeModel.scene;
 
 
@@ -194,8 +193,8 @@ export class Submarine extends THREE.Object3D {
 	}
 
 	addEllipticalFins() {
-		this.createFinElipticalCylinder({ side: "right" }); // right side
-		this.createFinElipticalCylinder({ side: "left" }); // left side
+		this.createFinElipticalCylinder({ side: "right" }); 
+		this.createFinElipticalCylinder({ side: "left" }); 
 
 		this.createFinElipticalCylinder({
 			side: "left",
@@ -293,7 +292,7 @@ export class Submarine extends THREE.Object3D {
 
 
 	createFinElipticalCylinder({
-		side = "right", // "left", "right", "top", "bottom"
+		side = "right", 
 		position = { x: 0, y: 0, z: -3.21 },
 		rotation = { x: 0, y: 0, z: 0 },
 		scale = { x: 0.6, y: 1, z: 4.1 },
@@ -306,7 +305,6 @@ export class Submarine extends THREE.Object3D {
 		);
 		const finMesh = new THREE.Mesh(finGeometry, this.finMaterial);
 
-		// Base rotation/orientation per side
 		const offset = this.height - 0.115;
 		switch (side.toLowerCase()) {
 			case "right":
@@ -685,7 +683,7 @@ export class Submarine extends THREE.Object3D {
 			new THREE.Vector2(cylinderRadius * 1, 0),
 		];
 		const latheGeometry = new THREE.LatheGeometry(lathePoints, this.cutNumber);
-		latheGeometry.computeVertexNormals(); // smooth shading
+		latheGeometry.computeVertexNormals(); 
 
 		const latheMesh = new THREE.Mesh(latheGeometry, this.finMaterial);
 
@@ -790,18 +788,13 @@ export class Submarine extends THREE.Object3D {
 	}
 
 getSubmarineCameraPosition() {
-    // 1️⃣ Get glass dome world position
     const worldPos = this.glassDome.getWorldPosition(new THREE.Vector3());
 
-    // 2️⃣ Get submarine's world quaternion (rotation)
     const worldQuat = this.getWorldQuaternion(new THREE.Quaternion());
 
-    // 3️⃣ Move slightly forward in the submarine's local forward direction
-    //    (0, 0, -1) is forward in Three.js local space
-    const forwardOffset = new THREE.Vector3(0, 0, -0.5); // move 0.5 units forward
-    forwardOffset.applyQuaternion(worldQuat); // rotate offset into world space
+    const forwardOffset = new THREE.Vector3(0, 0, -0.5); 
+    forwardOffset.applyQuaternion(worldQuat); 
 
-    // 4️⃣ Combine position + offset
     worldPos.add(forwardOffset);
 
     return worldPos;
