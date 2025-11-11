@@ -103,7 +103,6 @@ class SeaweedGroup extends THREE.Object3D {
 `
                 );
 
-                console.log(shader.vertexShader);
 
                 // Keep shader reference for external updates
                 material.userData.shader = shader;
