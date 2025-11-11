@@ -7,24 +7,24 @@ class SeaweedLOD extends THREE.LOD {
         this.seaweeds = [];
         this.startDistance = 0;
         this.distanceOffset = 20;
+        this.maxComplexity = 6;
         this.material = material
         this.createLODs();
     }
     createLODs(){
-        const lodLevels = [
-            { complexity: 6, distance: this.startDistance },
-            { complexity: 5, distance: this.startDistance + this.distanceOffset },
-            { complexity: 4, distance: this.startDistance + 2 * this.distanceOffset },
-        ];
 
-        lodLevels.forEach((level) => {
-            const seaweed = new Seaweed(level.complexity,this.material);
-            this.addLevel(seaweed, level.distance);
+        const seaweed = new Seaweed(this.maxComplexity,this.material);
+        const seaweedLevels = seaweed.meshes;   
+
+        for(let i = 0; i < this.maxComplexity; i++ ){
+            const seaweed = seaweedLevels[seaweedLevels.length - 1 - i];
+            this.addLevel(seaweed, this.startDistance + i * this.distanceOffset);
             this.seaweeds.push(seaweed);
-        });
+        }
         const emptyObject = new THREE.Object3D();
-        this.addLevel(emptyObject, this.startDistance + lodLevels.length * this.distanceOffset);
+        this.addLevel(emptyObject, this.startDistance + seaweedLevels.length * this.distanceOffset);
     }
+    
 
 
 }

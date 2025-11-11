@@ -1,32 +1,28 @@
 import * as THREE from 'three';
-import { Coral } from "./Coral.js";
+import { Coral } from './Coral.js';
 
 export class CoralLOD extends THREE.LOD {
-    constructor(material){
+    constructor(material) {
         super();
         this.corals = [];
         this.startDistance = 0;
         this.distanceOffset = 20;
+        this.maxComplexity = 5;
         this.material = material;
         this.createLODs();
     }
-    createLODs(){
-        const lodLevels = [
-            { complexity: 5, distance: this.startDistance },
-            { complexity: 4, distance: this.startDistance + this.distanceOffset },
-            { complexity: 3, distance: this.startDistance + 2 * this.distanceOffset },
-        ];
 
-        lodLevels.forEach((level) => {
-            const coral = new Coral(level.complexity,this.material);
-            this.addLevel(coral, level.distance);
-            this.corals.push(coral);
-        });
+    createLODs() {
+        const coral = new Coral(this.maxComplexity, this.material);
+        const coralLevels = coral.meshes;
+
+        for (let i = 0; i < this.maxComplexity; i++) {
+            const mesh = coralLevels[coralLevels.length - 1 - i];
+            this.addLevel(mesh, this.startDistance + i * this.distanceOffset);
+            this.corals.push(mesh);
+        }
+
         const emptyObject = new THREE.Object3D();
-        this.addLevel(emptyObject, this.startDistance + lodLevels.length * this.distanceOffset);
+        this.addLevel(emptyObject, this.startDistance + coralLevels.length * this.distanceOffset);
     }
-
-
-
-
 }
