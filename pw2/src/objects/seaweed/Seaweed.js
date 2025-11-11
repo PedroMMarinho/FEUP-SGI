@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 
-export class Coral {
-    constructor(complexity = 5,material) {
+export class Seaweed {
+    constructor(complexity = 10, material) {
         this.material = material;
         return this.createObject(complexity)
     }
@@ -26,12 +26,11 @@ export class Coral {
 
     createObject(complexity) {
         const iterations = complexity;
-        const yawAngle = 30 * THREE.MathUtils.DEG2RAD;
+        const yawAngle = 45 * THREE.MathUtils.DEG2RAD;
         const pitchAngle = 20 * THREE.MathUtils.DEG2RAD;
         const variableAngle = 10 * THREE.MathUtils.DEG2RAD; // random angle variation for more natural trees
 
         // 'F': Move forward and draw a branch
-        // Z: Move and draw triple branch
         // 'X': Draw a leaf at the current position
         // '+','-': Yaw (turn left/right 15 degrees)
         // '&','^': Pitch (turn up/down)
@@ -40,31 +39,20 @@ export class Coral {
         // --- Stochastic L-System Rules ---
         const stochasticRules = {
             'X': [
-                { prob: 0.7, rule: '[&&FQFQFQL]+++[&&FQFQFQL]+++[&&FQFQFQL]+++[&&FQFQFQL]FQTFQTFQTL' },
-                { prob: 0.3, rule: '[&&FQFQFQL]++++[&&FQFQFQL]++++[&&FQFQFQL]FQTFQTFQTL' },
+                { prob: 0.25, rule: 'F[&+FX]A[&X]' },
+                { prob: 0.25, rule: 'F[&-FX]A[&-X]' },
+                { prob: 0.25, rule: 'F[^++FX]A[^--X]' },
+                { prob: 0.25, rule: 'F[^--FX]A[&++X]' },
+            ],
+            'F': [
+                { prob: 0.4, rule: 'FF' },
+                { prob: 0.6, rule: 'F' },
+            ],
+            'A': [
+                { prob: 0.5, rule: 'F[&+X][&-X]A' },
+                { prob: 0.5, rule: 'F[^+X][^-X]A' },
+            ],
 
-            ],
-            'L': [
-                { prob: 0.3, rule: 'K[&&ZX]+++[&&ZX]+++[&&ZX]+++[&&ZX]' },
-                { prob: 0.3, rule: 'K[&&ZX]++++[&&ZX]++++[&&ZX]' },
-                { prob: 0.3, rule: 'K[&&ZX]+++[&&ZX]' },
-                { prob: 0.1, rule: 'K[&&ZX]++++[&&ZX]'}
-            ],
-
-            'K': [
-                { prob: 0.5, rule: 'F' },
-                { prob: 0.2, rule: 'KQF' },
-
-            ],
-            'T': [
-                { prob: 0.1, rule: '[&&FL]' }
-            ],
-            'Q': [
-                { prob: 0.1, rule: '[&&F]' },
-                { prob: 0.1, rule: '[---&&F]' },
-                { prob: 0.1, rule: '[+++&&F]' },
-                
-            ],
         };
 
         const axiom = 'X';
@@ -74,7 +62,13 @@ export class Coral {
         for (let i = 0; i < iterations; i++) {
             let nextString = '';
             for (const char of currentString) {
-                if (stochasticRules[char]) {
+                if( char === 'F' ) {
+                    if( iterations - i <= 2 ) {
+                        nextString += this.chooseNextRule(stochasticRules[char]);
+                    } else {
+                        continue;
+                    }
+                } else if (stochasticRules[char]) {
                     nextString += this.chooseNextRule(stochasticRules[char]);
                 } else {
                     nextString += char;
@@ -93,10 +87,6 @@ export class Coral {
         let branchLength = 0.8;
         const lengthFactor = 0.5;
         const branchMatrices = [];
-        const leafMatrices = [];
-
-        // don't add branches shorter than this to the final InstancedMesh
-        const minBranchLength = 0.02;
 
         const axisX = new THREE.Vector3(1, 0, 0);
         const axisY = new THREE.Vector3(0, 1, 0);
@@ -104,6 +94,8 @@ export class Coral {
         const q = new THREE.Quaternion();
 
         const randomAngle = (base) => base + (Math.random() * 2 - 1) * variableAngle;
+
+        const minBranchLength = 0.05;
 
         for (const char of currentString) {
             switch (char) {
@@ -157,23 +149,6 @@ export class Coral {
                     branchLength = state.length;
                     break;
                 }
-                case 'Z': {
-                    const startPosition = turtle.position.clone();
-                    const forward = new THREE.Vector3(0, 1, 0)
-                        .applyQuaternion(turtle.quaternion)
-                        .multiplyScalar(branchLength);
-                    turtle.position.add(forward);
-
-                    // Z generates a branch as well — skip if below threshold
-                    if (branchLength < minBranchLength) break;
-
-                    const instanceMatrix = new THREE.Matrix4();
-                    const orientation = new THREE.Quaternion().setFromUnitVectors(axisY, forward.clone().normalize());
-                    const scale = new THREE.Vector3(1, branchLength, 1);
-                    instanceMatrix.compose(startPosition, orientation, scale);
-                    branchMatrices.push(instanceMatrix);
-                    break;
-                }
                 default:
                     break;
             }
@@ -182,23 +157,21 @@ export class Coral {
 
         const group = new THREE.Group();
 
-        const branchGeo = new THREE.CylinderGeometry(0.05, 0.05, 1, 3);
+        const branchGeo = new THREE.CylinderGeometry(0.05, 0.05, 1, 3,4);
         branchGeo.translate(0, 0.5, 0);
-        //const branchMat = this.material;
             
         const branchMat = this.material;
-        
+
         const branchMesh = new THREE.InstancedMesh(branchGeo, branchMat, branchMatrices.length);
         branchMesh.name = "branches";
         for (let i = 0; i < branchMatrices.length; i++) {
             branchMesh.setMatrixAt(i, branchMatrices[i]);
         }
-        group.add(branchMesh);
+        branchMesh.scale.setScalar(0.4);
 
 
-        group.scale.setScalar(0.4);
 
-        return group;
+        return branchMesh;
     }
 
 

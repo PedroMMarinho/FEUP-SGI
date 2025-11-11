@@ -3,11 +3,12 @@ import { Coral } from "./Coral.js";
 import { CameraManager } from '../../managers/CameraManager.js';
 
 export class CoralLOD extends THREE.LOD {
-    constructor(){
+    constructor(material){
         super();
         this.corals = [];
         this.startDistance = 0;
         this.distanceOffset = 20;
+        this.material = material;
         this.createLODs();
     }
     createLODs(){
@@ -18,13 +19,15 @@ export class CoralLOD extends THREE.LOD {
         ];
 
         lodLevels.forEach((level) => {
-            const coral = new Coral(level.complexity);
+            const coral = new Coral(level.complexity,this.material);
             this.addLevel(coral, level.distance);
             this.corals.push(coral);
         });
         const emptyObject = new THREE.Object3D();
         this.addLevel(emptyObject, this.startDistance + lodLevels.length * this.distanceOffset);
     }
+
+
 
 
 }

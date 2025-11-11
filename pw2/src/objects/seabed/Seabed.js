@@ -3,6 +3,7 @@ import { RockGroup } from '../rock/RockGroup.js';
 import { CoralGroup } from '../coral/CoralGroup.js';
 import { TerrainSegment } from '../terrainSegment/TerrainSegment.js';
 import { ShellGroup } from '../shell/ShellGroup.js';
+import { SeaweedGroup } from '../seaweed/SeaweedGroup.js';
 
 class Seabed extends THREE.Object3D {
 	constructor(
@@ -10,6 +11,7 @@ class Seabed extends THREE.Object3D {
 		rockCount = 30,
 		coralCount = 40,
         shellCount = 50,
+        seaweedCount = 20,
 		rockModels = [],
         shellModels = [],
 		distanceRange = [0.005, 0.1],
@@ -22,11 +24,12 @@ class Seabed extends THREE.Object3D {
 		this.rockCount = rockCount;
         this.shellCount = shellCount;
 		this.coralCount = coralCount;
+		this.seaweedCount = seaweedCount;
 
-
-        // Models 
+        // Models
 		this.rockModels = rockModels;
 		this.shellModels = shellModels;
+		console.log(this.shellModels);
 
 
 		this.distanceRange = distanceRange;
@@ -42,6 +45,7 @@ class Seabed extends THREE.Object3D {
 		this.createRockGroup();
 		this.createCoralGroup();
         this.createShellGroup();
+		this.createSeaweedGroup();
 	}
 
 	createTerrain() {
@@ -70,6 +74,12 @@ class Seabed extends THREE.Object3D {
         this.add(shellGroup);
         this.globalPositions.push(...shellPositions);
     }
+
+	createSeaweedGroup() {
+		const seaweedPositions = this.computePositions(this.seaweedCount);
+		const seaweedGroup = new SeaweedGroup(seaweedPositions);
+		this.add(seaweedGroup);
+	}
 
 	computePositions(count, maxTries = 50) {
 		const positions = [];
@@ -105,6 +115,16 @@ class Seabed extends THREE.Object3D {
 		}
 		return true;
 	}
+
+	updateState() {
+		// Update seabed elements if needed
+		for(const child of this.children) {
+			if(child.updateState) {
+				child.updateState();
+			}
+		}
+	}
+
 }
 
 export { Seabed };
