@@ -23,8 +23,8 @@ class FishGroup extends THREE.Object3D {
 		this.fishes = [];
 		this.animatedFishes = [];
 		this.sparseness = 100;
-		this.baseHeight = -3;
-		this.maxHeight = 30;
+		this.baseHeight = 2;
+		this.maxHeight = 35;
 		this.init();
 	}
 
