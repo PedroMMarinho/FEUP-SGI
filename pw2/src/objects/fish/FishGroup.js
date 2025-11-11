@@ -22,10 +22,22 @@ class FishGroup extends THREE.Object3D {
 		this.count = count;
 		this.fishes = [];
 		this.animatedFishes = [];
+		this.sparseness = 100;
+		this.baseHeight = 5;
+		this.maxHeight = 35;
 		this.init();
 	}
 
 	init() {
+		let boidProps = {
+			cohesion: 2,
+			separation: 2,
+			alignment: 2,
+			moveSpeed: 4,
+			awareness: 10,
+			colour: new THREE.Color(0,1,1)
+		};
+
 		/* const material = new THREE.MeshStandardMaterial({ color: 0xdc143c });
 		const finMaterial = new THREE.MeshStandardMaterial({color: 0x00ff55 });
 		const fatFish = new Fish(0xdc143c, 0.8, 1.3, 1.2);
@@ -33,13 +45,14 @@ class FishGroup extends THREE.Object3D {
 		const thinFish = new Fish(0xdc143c, 1.3, 0.8, 1.1); */
 
 		for (let i = 0; i < this.count; i++) {
-			const fishLOD = new FishLOD(0xdc143c, 0x00ff55);
+			const fishLOD = new FishLOD(0xdc143c, 0x00ff55, this.sparseness, 
+				this.baseHeight, this.maxHeight, boidProps);
 
-			fishLOD.position.set(
-				THREE.MathUtils.randFloatSpread(10),
-				THREE.MathUtils.randFloat(-1, 6),
-				THREE.MathUtils.randFloatSpread(10)
-			);
+			/* fishLOD.position.set(
+				THREE.MathUtils.randFloatSpread(this.sparseness),
+				THREE.MathUtils.randFloat(-1, this.sparseness),
+				THREE.MathUtils.randFloatSpread(this.sparseness)
+			); */
 
 			fishLOD.rotation.y = THREE.MathUtils.randFloat(0, Math.PI * 2);
 			const scale = THREE.MathUtils.randFloat(0.8, 1.2);
@@ -49,7 +62,7 @@ class FishGroup extends THREE.Object3D {
 			this.fishes.push(fishLOD);
 		}
 
-		const animatedFishesCount = 3;
+		/*const animatedFishesCount = 3;
 		for (let i = 0; i < animatedFishesCount; i++) {
 			const fishLOD = new FishLOD(0x003465, 0xffffff);
 
@@ -64,11 +77,12 @@ class FishGroup extends THREE.Object3D {
 			fishLOD.attachAnimation(animation);
 			this.add(fishLOD);
 			this.animatedFishes.push(fishLOD);
-		}
+		} */
 	}
 
 	updateState() {
 		for (const fish of this.fishes) {
+			fish.flock(this.fishes);
 			fish.updateState();
 		}
 		for (const fish of this.animatedFishes) {

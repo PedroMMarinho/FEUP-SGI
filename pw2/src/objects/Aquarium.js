@@ -111,7 +111,7 @@ class Aquarium extends THREE.Object3D {
     }
 
     createFishes() {
-        this.fishGroups = [
+        /*this.fishGroups = [
             new FishGroup(20),
             new FishGroup(15),
             new FishGroup(10),
@@ -120,7 +120,12 @@ class Aquarium extends THREE.Object3D {
             const randomCord = () => THREE.MathUtils.randFloat(5, 60);
             group.position.set(randomCord(), 10, randomCord());
             this.addToAquarium(group);
-        }
+        }*/
+		this.fishGroups = [
+			new FishGroup(400),
+		];
+		this.fishGroups[0].position.set(0,0,0);
+		this.addToAquarium(this.fishGroups[0]);
     }
 
     createShark() {

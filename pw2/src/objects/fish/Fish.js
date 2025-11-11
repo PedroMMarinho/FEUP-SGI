@@ -38,8 +38,9 @@ export class Fish {
 			0, 1, 2,
 		];
 
-		this.bodyGeometry.setIndex(indices);
 		this.bodyGeometry.setAttribute('position', new THREE.BufferAttribute(vertices, 3));
+		this.bodyGeometry.setIndex(indices);
+		this.bodyGeometry.computeVertexNormals();
 	}
 
 	initBody() {
@@ -65,8 +66,9 @@ export class Fish {
 			5, 3, 4, // body left bottom	
 		];
 
-		this.bodyGeometry.setIndex(indices);
 		this.bodyGeometry.setAttribute('position', new THREE.BufferAttribute(vertices, 3));
+		this.bodyGeometry.setIndex(indices);
+		this.bodyGeometry.computeVertexNormals();
 	}
 
 	initTail() {
@@ -84,8 +86,9 @@ export class Fish {
 			1,3,0,
 		];
 		
-		this.tailGeometry.setIndex(indices);
 		this.tailGeometry.setAttribute('position', new THREE.BufferAttribute(vertices, 3));
+		this.tailGeometry.setIndex(indices);
+		this.tailGeometry.computeVertexNormals();
 	}
 
 	initLowResTail() {
@@ -100,8 +103,9 @@ export class Fish {
 			0, 1, 2
 		];
 
-		this.tailGeometry.setIndex(indices);
 		this.tailGeometry.setAttribute('position', new THREE.BufferAttribute(vertices, 3));
+		this.tailGeometry.setIndex(indices);
+		this.tailGeometry.computeVertexNormals();
 	}
 
 	initDorsalFin() {
@@ -119,8 +123,9 @@ export class Fish {
 			0, 2, 1,
 		];
 		
-		this.dorsalFinGeometry.setIndex(indices);
 		this.dorsalFinGeometry.setAttribute('position', new THREE.BufferAttribute(vertices, 3));
+		this.dorsalFinGeometry.setIndex(indices);
+		this.dorsalFinGeometry.computeVertexNormals();
 	}
 
 	// --- Skeleton setup ---
