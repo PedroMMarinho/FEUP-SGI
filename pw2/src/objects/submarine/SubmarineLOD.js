@@ -5,7 +5,7 @@ import { DangerLevel } from '../../enums/DangerLevel.js';
 import { TimeManager } from '../../managers/TimeManager.js';
 
 export class SubmarineLOD extends THREE.LOD {
-    constructor(propellerBladeModel, keyManager, cameraManager, position = new THREE.Vector3(10, 5, 0)) {
+    constructor(propellerBladeModel, keyManager, cameraManager, bounds, position = new THREE.Vector3(10, 5, 0)) {
         super();
 
         this.propellerBladeModel = propellerBladeModel;
@@ -25,6 +25,8 @@ export class SubmarineLOD extends THREE.LOD {
         this.timeManager = TimeManager.getInstance();
         this.globalTime = this.timeManager.getElapsedTime();
         this.clock = new THREE.Clock();
+        // Bound
+        this.bounds = bounds;
 
         // Movement parameters
         this.currentSpeed = 0;
@@ -117,6 +119,21 @@ export class SubmarineLOD extends THREE.LOD {
                 }
             }
         }
+        
+        // Clamp to bounds
+        this.clampToBounds();
+
+    }
+
+    clampToBounds() {
+        if (!this.bounds) return;
+
+        const { minX, maxX, minY, maxY, minZ, maxZ } = this.bounds;
+
+
+        this.position.x = Math.min(Math.max(this.position.x, minX), maxX);
+        this.position.y = Math.min(Math.max(this.position.y, minY), maxY);
+        this.position.z = Math.min(Math.max(this.position.z, minZ), maxZ);
     }
 
     getSubmarineCameraPosition() {
