@@ -24,7 +24,7 @@ class Aquarium extends THREE.Object3D {
 
         // Terrain dimensions
         this.terrainWidth = 200;
-        this.terrainHeight = 200;
+        this.terrainHeight = 50;
 
         this.objects = [];
         this.envMap = null;
@@ -57,12 +57,12 @@ class Aquarium extends THREE.Object3D {
     }
 
     createGlassTank() {
-        const glassTank = new GlassTank(this.terrainWidth, this.terrainHeight / 4, this.terrainWidth);
+        const glassTank = new GlassTank(this.terrainWidth, this.terrainHeight, this.terrainWidth);
         this.addToAquarium(glassTank);
     }
 
     createWaterTopLayer() {
-        const water = new Water(this.assetManager.getTextureManager().getTexture('water-normal'), this.terrainWidth, 4*this.terrainHeight / 4 / 5, this.terrainWidth, this.envMap );
+        const water = new Water(this.assetManager.getTextureManager().getTexture('water-normal'), this.terrainWidth, 4* this.terrainHeight / 5, this.terrainWidth, this.envMap );
         this.addToAquarium(water);
     }
 
@@ -80,8 +80,6 @@ class Aquarium extends THREE.Object3D {
         this.createWaterFog();
         // Create water top layer
         this.createWaterTopLayer();
-        //create terrain
-        this.createTerrainSegments();
         // Create bubbles
         this.createBubbles();
         // create fishes
@@ -117,18 +115,6 @@ class Aquarium extends THREE.Object3D {
         this.addToAquarium(bubbleGroup);
     }
 
-
-
-    createTerrainSegments() {
-        const terrainGroup = new TerrainSegment(this.terrainWidth, this.terrainHeight);
-        this.addToAquarium(terrainGroup);
-    }
-
-    createCorals() {
-        const coralGroup = new CoralGroup(100, this.terrainWidth / 2, this.terrainHeight / 2);
-        this.addToAquarium(coralGroup);
-    }
-
     createFishes() {
         /*this.fishGroups = [
             new FishGroup(20),
@@ -148,24 +134,39 @@ class Aquarium extends THREE.Object3D {
     }
 
     createShark() {
+        const aiOptions = {
+            // Bounds
+            terrainWidth: this.terrainWidth* 9/10,
+            terrainHeight: 4 * this.terrainHeight / 5,
+            maxY: this.terrainHeight / 2,
+        };
+    
         const sharkGLTF1 = this.assetManager.getBlenderManager().getAllLODs('shark1');
         const sharkGLTF2 = this.assetManager.getBlenderManager().getAllLODs('shark2');
         // Blue Shark
         const position1 = new THREE.Vector3(5, 4, 0);
         const blueSharkTex = this.assetManager.getTextureManager().getTexture('shark-blue');
-        const shark1 = new SharkLOD(sharkGLTF1, position1, blueSharkTex);
+        const shark1 = new SharkLOD(sharkGLTF1, position1, blueSharkTex, aiOptions);
         shark1.scale.set(0.5, 0.5, 0.5);
         this.addToAquarium(shark1);
 
         // Grey Shark
         const position2 = new THREE.Vector3(5, 6, -10);
-        const shark2 = new SharkLOD(sharkGLTF2, position2);
+        const shark2 = new SharkLOD(sharkGLTF2, position2, null, aiOptions);
         shark2.scale.set(0.5, 0.5, 0.5);
         this.addToAquarium(shark2);
     }
 
     createSubmarine() {
-        this.submarine = new SubmarineLOD(this.assetManager.getBlenderManager().getAllLODs('propeller-blade'), this.keyManager, this.cameraManager);
+        const bounds = {
+            minX: -this.terrainWidth / 2 - 5,
+            maxX: this.terrainWidth  / 2 - 5,
+            minY: 5,
+            maxY: this.terrainHeight - 8,
+            minZ: -this.terrainWidth / 2 - 5,
+            maxZ: this.terrainWidth / 2 - 5,
+        };
+        this.submarine = new SubmarineLOD(this.assetManager.getBlenderManager().getAllLODs('propeller-blade'), this.keyManager, this.cameraManager, bounds);
         this.addToAquarium(this.submarine);
     }
 

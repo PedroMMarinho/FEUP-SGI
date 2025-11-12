@@ -44,7 +44,7 @@ export class SharkBehaviour {
     
     // Vertical movement tracking
     this.targetDepth = this.shark.position.y;
-    this.depthChangeRate = 0.5;
+    this.depthChangeRate = 0.3;
     
     // State-specific timers and data
     this.stateTimer = 0;
@@ -409,7 +409,6 @@ export class SharkBehaviour {
   
   keepWithinBounds() {
     const halfWidth = this.terrainWidth / 2;
-    const halfHeight = this.terrainHeight / 2;
     const pos = this.shark.position;
 
     let needsNewTarget = false;
@@ -426,14 +425,14 @@ export class SharkBehaviour {
       needsNewTarget = true;
     }
 
-    if (pos.z < -halfHeight) {
-      pos.z = -halfHeight;
+    if (pos.z < -halfWidth) {
+      pos.z = -halfWidth;
       this.smoothedDir.z = Math.abs(this.smoothedDir.z);
       needsNewTarget = true;
     }
 
-    if (pos.z > halfHeight) {
-      pos.z = halfHeight;
+    if (pos.z > halfWidth) {
+      pos.z = halfWidth;
       this.smoothedDir.z = -Math.abs(this.smoothedDir.z);
       needsNewTarget = true;
     }
