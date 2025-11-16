@@ -4,6 +4,7 @@ import { Aquarium } from '../objects/Aquarium.js';
 import { AssetManager } from '../managers/AssetManager.js';
 import { CollisionManager } from '../managers/CollisionManager.js';
 import { TimeManager } from '../managers/TimeManager.js';
+import { BVHManager } from '../managers/BVHManager.js';
 
 /**
  *  This class contains the contents of out application
@@ -23,6 +24,7 @@ class MyContents {
         this.cameraManager = this.app.cameraManager;
         this.collisionManager = new CollisionManager(this.app.scene);
         this.timeManager = new TimeManager();
+        this.bvhManager = new BVHManager(this.app.scene);
         this.aquarium = new Aquarium(this.assetManager, this.keyManager, this.cameraManager, this.collisionManager, this.app.scene); // Main Object of the scene
     }
 
