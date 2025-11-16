@@ -75,6 +75,22 @@ class MyGuiInterface {
         } else {
             console.log('Submarine not found in contents — make sure it’s stored in MyContents!');
         }
+
+        // --- BVH Acceleration controls ---
+        const bvhParams = this.contents.bvhManager;
+        if (bvhParams) {
+            const accelerationFolder = this.datgui.addFolder('Acceleration');
+
+            accelerationFolder
+                .add(bvhParams, 'useBVH')
+                .name('Use BVH')
+                .onChange((enabled) => {
+                    bvhParams.toggleBVH(enabled);
+                });
+
+            accelerationFolder.open();
+        }
+
     }
 }
 
