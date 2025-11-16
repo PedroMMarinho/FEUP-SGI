@@ -11,6 +11,7 @@ class BVHManager {
         this.cameraManager = cameraManager;
         this.useBVH = true;
         this.selected = null;
+        this.selectedMaterial = null;
         this.highlightMaterial = new THREE.MeshBasicMaterial({ color: 'yellow' });
 
         this.init();
@@ -49,9 +50,9 @@ class BVHManager {
             object.children.forEach(child => this.setupBVH(child));
         }
     }
-    // TOOD check if its correct
+    // TODO check if its correct
     raycastSelect() {
-        if (!this.keyManager.isMousePressed()) return;
+        if (!this.keyManager.isMouseDownThisFrame()) return;
 
         const mouse = this.keyManager.getMousePos();
         const camera = this.cameraManager.getActiveCamera();
@@ -84,23 +85,32 @@ class BVHManager {
     }
 
     // TODO check if its correct
-    selectObject(object) {
-    if (this.selected === object) return;
+selectObject(object) {
 
-        // restore previous
+
+    if (!object || this.selected === object) {
         if (this.selected) {
-            this.selected.material.color = this.selected.userData.originalMaterial.color;
+            this.selected.material.copy(this.selectedMaterial);
         }
+        this.selected = null;
+        this.selectedMaterial = null;
+        return;
+    }
 
-        if (object) {
-            if (!object.userData.originalMaterial) {
-                object.userData.originalMaterial = object.material;
-            }
-            object.material.color = this.highlightMaterial.color;
-        }
+    if (this.selected && this.selected !== object) {
+        this.selected.material.copy(this.selectedMaterial);
+    }
+
+    if (this.selected !== object) {
+        this.selectedMaterial = object.material.clone();
+
+        object.material = object.material.clone();
+        object.material.color.copy(this.highlightMaterial.color);
 
         this.selected = object;
     }
+}
+
 
 
     toggleBVH(enabled) {
