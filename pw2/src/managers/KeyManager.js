@@ -2,6 +2,7 @@ class KeyManager {
     constructor() {
         this.activeKeys = {};
         this.mouseDelta = { x: 0, y: 0 };
+        this.mousePos = { x: 0, y: 0 };
         this.mouseHeld = false;
 
 
@@ -34,6 +35,12 @@ class KeyManager {
         this.mouseDelta.x += event.movementX || 0;
         this.mouseDelta.y += event.movementY || 0;
         
+        this.mousePos.x = event.clientX;
+        this.mousePos.y = event.clientY;
+    }
+
+    getMousePos() {
+        return { ...this.mousePos };
     }
 
     getDelta() {
