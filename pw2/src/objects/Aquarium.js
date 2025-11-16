@@ -1,9 +1,6 @@
 import * as THREE from 'three';
 import { BubbleGroup } from './bubble/BubbleGroup.js';
-import { RockGroup } from './rock/RockGroup.js';
-import { CoralGroup } from './coral/CoralGroup.js';
 import { FishGroup } from './fish/FishGroup.js';
-import { TerrainSegment } from './terrainSegment/TerrainSegment.js';
 import { SharkLOD } from './shark/SharkLOD.js';
 import { SubmarineLOD } from './submarine/SubmarineLOD.js';
 import { GlassTank } from './glassTank/GlassTank.js';
@@ -14,12 +11,16 @@ import { Water } from './water/Water.js';
  * Main Aquarium class
  */
 class Aquarium extends THREE.Object3D {
-    constructor(assetManager, keyManager, cameraManager, collisionManager, scene) {
+    constructor(assetManager, keyManager, cameraManager, collisionManager, bvhManager, scene) {
         super();
+        // Managers
         this.assetManager = assetManager;
         this.keyManager = keyManager;
         this.cameraManager = cameraManager;
         this.collisionManager = collisionManager;
+        this.bvhManager = bvhManager;
+
+        // Scene
         this.scene = scene;
 
         // Terrain dimensions
@@ -90,6 +91,8 @@ class Aquarium extends THREE.Object3D {
         this.createSubmarine();
         // create seabed
         this.createSeaBed();
+        // Setup bvh for all objects
+        this.bvhManager.setupBVH(this.objects);
     }
 
     createSeaBed() {

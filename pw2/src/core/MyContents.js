@@ -22,10 +22,10 @@ class MyContents {
         this.assetManager = new AssetManager(app.renderer); // Asset Manager
         this.keyManager = this.app.keyManager;
         this.cameraManager = this.app.cameraManager;
-        this.collisionManager = new CollisionManager(this.app.scene);
+        this.bvhManager = new BVHManager(this.app.scene, this.keyManager, this.cameraManager);
+        this.collisionManager = new CollisionManager(this.app.scene, this.bvhManager);
         this.timeManager = new TimeManager();
-        this.bvhManager = new BVHManager(this.app.scene);
-        this.aquarium = new Aquarium(this.assetManager, this.keyManager, this.cameraManager, this.collisionManager, this.app.scene); // Main Object of the scene
+        this.aquarium = new Aquarium(this.assetManager, this.keyManager, this.cameraManager, this.collisionManager, this.bvhManager,this.app.scene); // Main Object of the scene
     }
 
     /**
@@ -76,6 +76,8 @@ class MyContents {
      * 
      */
     update() {
+        // TODO This needs to be on other place
+        this.bvhManager.raycastSelect();
         if (this.aquarium) this.aquarium.update();
     }
 

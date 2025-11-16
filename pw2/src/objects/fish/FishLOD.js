@@ -1,10 +1,16 @@
 import * as THREE from 'three';
 import { Fish } from './Fish.js';
 import { TimeManager } from '../../managers/TimeManager.js';
+import { EntityType } from '../../enums/EntityType.js';
+import { DangerLevel } from '../../enums/DangerLevel.js';
 
 export class FishLOD extends THREE.LOD {
 	constructor(bodyColor, finColor, sparseness, baseHeight, maxHeight, boidProperties) {
 		super();
+
+		// Entity properties
+		this.type = EntityType.FISH;
+		this.dangerLevel = DangerLevel.LOW;
 	
 		this.boidProperties = boidProperties;
 		this.bodyColor = bodyColor;
