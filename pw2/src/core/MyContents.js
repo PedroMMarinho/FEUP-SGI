@@ -79,6 +79,7 @@ class MyContents {
         // TODO This needs to be on other place
         this.bvhManager.raycastSelect();
         if (this.aquarium) this.aquarium.update();
+        this.keyManager.endOfFrame();
     }
 
 }
