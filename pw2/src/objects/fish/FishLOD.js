@@ -3,15 +3,17 @@ import { Fish } from './Fish.js';
 import { TimeManager } from '../../managers/TimeManager.js';
 import { EntityType } from '../../enums/EntityType.js';
 import { DangerLevel } from '../../enums/DangerLevel.js';
+import { EntityState } from '../../enums/EntityState.js';
 
 export class FishLOD extends THREE.LOD {
-	constructor(bodyColor, finColor, sparseness, baseHeight, maxHeight, boidProperties) {
+	constructor(bodyColor, finColor, sparseness, baseHeight, maxHeight, boidProperties, collisionManager) {
 		super();
 
+		this.collisionManager = collisionManager;
 		// Entity properties
 		this.type = EntityType.FISH;
 		this.dangerLevel = DangerLevel.LOW;
-	
+
 		this.boidProperties = boidProperties;
 		this.bodyColor = bodyColor;
 		this.finColor = finColor;
@@ -29,17 +31,17 @@ export class FishLOD extends THREE.LOD {
 			THREE.MathUtils.randFloatSpread(sparseness)
 		);
 
-		this.acceleration = new THREE.Vector3(0,0,0);
+		this.acceleration = new THREE.Vector3(0, 0, 0);
 		this.velocity = new THREE.Vector3(THREE.MathUtils.randFloat(-1, 1),
-			THREE.MathUtils.randFloat(-1,1),
-			THREE.MathUtils.randFloat(-1,1));
+			THREE.MathUtils.randFloat(-1, 1),
+			THREE.MathUtils.randFloat(-1, 1));
 		this.velocity.setLength(Math.random() * (4 - 2) + 2);
 
-        // animation params
-        this.timeManager = TimeManager.getInstance();
+		// animation params
+		this.timeManager = TimeManager.getInstance();
 		this.globalTime = 0;
-        this.speed = 1;
-        this.animationOffset = Math.random() * Math.PI * 2;
+		this.speed = 1;
+		this.animationOffset = Math.random() * Math.PI * 2;
 
 		this.keyframedAnimation = null;
 
@@ -49,7 +51,7 @@ export class FishLOD extends THREE.LOD {
 
 		this.init();
 	}
- 
+
 	init() {
 		var pos = new THREE.Vector3(this.pos.x, this.pos.y, this.pos.z);
 		const normalFish = new Fish(0);
@@ -62,8 +64,8 @@ export class FishLOD extends THREE.LOD {
 		const finMaterial = new THREE.MeshPhongMaterial({
 			color: this.finColor,
 		});
-		
-		
+
+
 		// low res model
 		lowResFish.bodyGeometry.computeBoundingBox();
 		var loresCenter = new THREE.Vector3();
@@ -104,27 +106,27 @@ export class FishLOD extends THREE.LOD {
 		hiresSca.makeScale(hiresScaleFact, hiresScaleFact, hiresScaleFact);
 		hiresTra.makeTranslation(-hiresCenter.x, -hiresCenter.y, -hiresMin.z);
 
-        const highResBodyMesh = new THREE.SkinnedMesh(normalFish.bodyGeometry, bodyMaterial);
-        const highResTailMesh = new THREE.SkinnedMesh(normalFish.tailGeometry, finMaterial);
-        const highResDorsalMesh = new THREE.SkinnedMesh(normalFish.dorsalFinGeometry, finMaterial);
+		const highResBodyMesh = new THREE.SkinnedMesh(normalFish.bodyGeometry, bodyMaterial);
+		const highResTailMesh = new THREE.SkinnedMesh(normalFish.tailGeometry, finMaterial);
+		const highResDorsalMesh = new THREE.SkinnedMesh(normalFish.dorsalFinGeometry, finMaterial);
 
-        const skeleton = normalFish.skeleton;
+		const skeleton = normalFish.skeleton;
 
-        // Attach root bone and bind skeleton
-        highResBodyMesh.add(skeleton.bones[0]);
-        highResBodyMesh.bind(skeleton);
+		// Attach root bone and bind skeleton
+		highResBodyMesh.add(skeleton.bones[0]);
+		highResBodyMesh.bind(skeleton);
 
-        highResTailMesh.add(skeleton.bones[0]);
-        highResTailMesh.bind(skeleton);
+		highResTailMesh.add(skeleton.bones[0]);
+		highResTailMesh.bind(skeleton);
 
-        highResDorsalMesh.add(skeleton.bones[0]);
-        highResDorsalMesh.bind(skeleton);
+		highResDorsalMesh.add(skeleton.bones[0]);
+		highResDorsalMesh.bind(skeleton);
 
-        hiMesh.add(highResBodyMesh, highResTailMesh, highResDorsalMesh);
-		
+		hiMesh.add(highResBodyMesh, highResTailMesh, highResDorsalMesh);
+
 		hiMesh.applyMatrix4(loresTra);
 		hiMesh.applyMatrix4(loresSca);
-		
+
 		this.addLevel(hiMesh, this.distanceStart);
 		this.addLevel(lowMesh, this.distanceStart + this.distanceOffset);
 		this.addLevel(emptyFish, this.distanceStart + 2 * this.distanceOffset);
@@ -141,29 +143,47 @@ export class FishLOD extends THREE.LOD {
 		this.keyframedAnimation = keyframedAnimation;
 	}
 
-	flock(boidsQ) {
-		let alignment = new THREE.Vector3(0,0,0);
-		let cohesion = new THREE.Vector3(0,0,0);
-		let separation = new THREE.Vector3(0,0,0);
+	flock() {
+		let alignment = new THREE.Vector3(0, 0, 0);
+		let cohesion = new THREE.Vector3(0, 0, 0);
+		let separation = new THREE.Vector3(0, 0, 0);
+		let avoidance = new THREE.Vector3(0, 0, 0);
 
-		let total = 0;
+		let totalBoids = 0;
 
-		for (let other of boidsQ) {
-			let distance = this.pos.distanceTo(other.pos);
+		const nearbyEntities = this.collisionManager.getNearbyEntitiesForBoid(
+			this,
+			this.boidProperties.awareness
+		);
 
-			if (other != this && distance > 0 && distance < this.boidProperties.awareness && this.viewingAngle(other.pos)) {
+		for (let other of nearbyEntities) {
+			if (other === this) continue;
+
+			const otherPos = other.pos || other.position;
+			let distance = this.pos.distanceTo(otherPos);
+
+			if (distance === 0) continue;
+
+			// Boid flocking with other fish
+			if (other.type === EntityType.FISH && this.viewingAngle(other.pos)) {
 				alignment.add(other.velocity);
 				cohesion.add(other.pos);
-				separation.addScaledVector(this.pos.clone().sub(other.pos),1/distance);
-
-				total++;
+				separation.addScaledVector(this.pos.clone().sub(other.pos), 1 / distance);
+				totalBoids++;
+			}
+			// Avoid sharks and submarines
+			else if (other.type === EntityType.SHARK || other.type === EntityType.SUBMARINE) {
+				const avoidDir = this.pos.clone().sub(otherPos);
+				const avoidStrength = 3 / (distance * distance); 
+				avoidance.addScaledVector(avoidDir, avoidStrength);
 			}
 		}
 
-		if (total > 0) {
+		// Apply boid forces
+		if (totalBoids > 0) {
 			alignment.setLength(Math.min(this.boidProperties.moveSpeed, this.boidProperties.alignment));
-			
-			cohesion.divideScalar(total);
+
+			cohesion.divideScalar(totalBoids);
 			cohesion.sub(this.pos);
 			cohesion.setLength(Math.min(this.boidProperties.moveSpeed, this.boidProperties.cohesion));
 
@@ -174,26 +194,31 @@ export class FishLOD extends THREE.LOD {
 			this.acceleration.add(separation);
 		}
 
+		// Apply obstacle avoidance
+		if (avoidance.lengthSq() > 0) {
+			avoidance.setLength(this.boidProperties.moveSpeed * 1.5);
+			this.acceleration.add(avoidance);
+		}
+
 		let avoidForce = new THREE.Vector3(0, 0, 0);
 
 		const margin = 5;
 		const vertMargin = 1;
 		const limit = this.sparseness;
 
-		if (this.pos.x < -limit + margin) avoidForce.x = ( -limit + margin - this.pos.x ) / margin;
-		else if (this.pos.x >  limit - margin) avoidForce.x = ( limit - margin - this.pos.x ) / margin;
+		if (this.pos.x < -limit + margin) avoidForce.x = (-limit + margin - this.pos.x) / margin;
+		else if (this.pos.x > limit - margin) avoidForce.x = (limit - margin - this.pos.x) / margin;
 
 		if (this.pos.y < this.baseHeight + vertMargin)
-			avoidForce.y = ( this.baseHeight + vertMargin - this.pos.y ) / vertMargin;
+			avoidForce.y = (this.baseHeight + vertMargin - this.pos.y) / vertMargin;
 		else if (this.pos.y > this.maxHeight - vertMargin)
-			avoidForce.y = ( this.maxHeight - vertMargin - this.pos.y ) / vertMargin;
+			avoidForce.y = (this.maxHeight - vertMargin - this.pos.y) / vertMargin;
 
-		if (this.pos.z < -limit + margin) avoidForce.z = ( -limit + margin - this.pos.z ) / margin;
-		else if (this.pos.z >  limit - margin) avoidForce.z = ( limit - margin - this.pos.z ) / margin;
+		if (this.pos.z < -limit + margin) avoidForce.z = (-limit + margin - this.pos.z) / margin;
+		else if (this.pos.z > limit - margin) avoidForce.z = (limit - margin - this.pos.z) / margin;
 
 		avoidForce.multiplyScalar(this.boidProperties.moveSpeed * 0.5);
 		this.acceleration.add(avoidForce);
-
 	}
 
 	updateState() {
@@ -210,7 +235,7 @@ export class FishLOD extends THREE.LOD {
 		const swimFreq = 4.0 * this.speed;
 
 		const time = this.globalTime * swimFreq + this.animationOffset;
-		
+
 		// skelly
 		if (fishGroup.isSkinned) {
 			const skeleton = fishGroup.children[0].skeleton;
@@ -225,9 +250,9 @@ export class FishLOD extends THREE.LOD {
 		this.pos.addScaledVector(this.velocity, delta);
 		this.velocity.add(this.acceleration.multiplyScalar(delta));
 		this.velocity.clampLength(-this.boidProperties.moveSpeed, this.boidProperties.moveSpeed);
-		
+
 		this.position.copy(this.pos);
-		this.acceleration.set(0,0,0);
+		this.acceleration.set(0, 0, 0);
 		let dir = this.pos.clone().add(this.velocity);
 		this.lookAt(dir);
 	}
@@ -238,10 +263,10 @@ export class FishLOD extends THREE.LOD {
 
 		const timeMS = (this.globalTime * 1000);
 		const pose = this.keyframedAnimation.getPose(timeMS);
-		
+
 		//set self position and rotation.
 		this.position.set(pose.x, pose.y, pose.z);
-  		this.rotation.y = pose.angle;
+		this.rotation.y = pose.angle;
 	}
 
 }

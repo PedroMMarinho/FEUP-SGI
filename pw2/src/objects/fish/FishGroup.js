@@ -10,7 +10,7 @@ import { KeyframedAnimation } from './../../properties/KeyframedAnimation.js';
 // and instancing from those. - Ismael Moniz (up202206871@up.pt)
 
 class FishGroup extends THREE.Object3D {
-	constructor(count = 30) {
+	constructor(count = 30, collisionManager) {
 		super();
 
 		if (count < 0) {
@@ -25,6 +25,7 @@ class FishGroup extends THREE.Object3D {
 		this.sparseness = 92;
 		this.baseHeight = 5;
 		this.maxHeight = 35;
+		this.collisionManager = collisionManager;
 		this.init();
 	}
 
@@ -46,7 +47,7 @@ class FishGroup extends THREE.Object3D {
 
 		for (let i = 0; i < this.count; i++) {
 			const fishLOD = new FishLOD(0xdc143c, 0x00ff55, this.sparseness, 
-				this.baseHeight, this.maxHeight, boidProps);
+				this.baseHeight, this.maxHeight, boidProps, this.collisionManager);
 
 			/* fishLOD.position.set(
 				THREE.MathUtils.randFloatSpread(this.sparseness),
