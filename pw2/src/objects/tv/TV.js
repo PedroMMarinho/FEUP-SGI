@@ -20,12 +20,11 @@ class TV extends THREE.Object3D {
     // TODO fit the whole screen
    changeVideoTexture(model) {
     model.traverse((child) => {
-        if (child.isMesh && child.name === 'Mesh') {
+        if (child.isMesh && child.name === 'screenSurface') {
             const videoTexture = this.textureManager.getTexture('tv-screen');
 
             videoTexture.flipY = false;
-            videoTexture.repeat.set(2,2);
-            
+            videoTexture.center.set(0.5, 0.5);           
 
             child.material = new THREE.MeshBasicMaterial({
                 map: videoTexture,

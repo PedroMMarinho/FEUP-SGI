@@ -53,8 +53,8 @@ export class AssetManager {
             
             // TV Screen
             { key: 'tv', url: 'tvs/TV-high.glb', lod: 0 },
-            { key: 'tv', url: 'tvs/TV-high.glb', lod: 1 },
-            { key: 'tv', url: 'tvs/TV-high.glb', lod: 2 }, 
+            { key: 'tv', url: 'tvs/TV-medium.glb', lod: 1 },
+            { key: 'tv', url: 'tvs/TV-low.glb', lod: 2 }, 
         ];
         return modelList;
     }
