@@ -184,6 +184,10 @@ class BVHManager {
             THREE.BatchedMesh.prototype.raycast = this.originalRaycastingMethods.batchedMesh;
         }
     }
+
+    isUsingBVH() {
+        return this.useBVH;
+    }
 }
 
 export { BVHManager };

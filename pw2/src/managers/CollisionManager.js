@@ -1,27 +1,88 @@
 import * as THREE from 'three';
 import { EntityType } from '../enums/EntityType.js';
-import { DangerLevel } from '../enums/DangerLevel.js';
 import { ActionType } from '../enums/ActionType.js';
 import { EntityState } from '../enums/EntityState.js';
 import { OBB } from '../../../lib/jsm/math/OBB.js';
 
 class CollisionManager {
-    constructor(scene) {
+    constructor(scene, bvhManager) {
         this.entities = [];
         this.fleeRadiusBase = 2;
         this.awarenessBoxes = new Map();
         this.scene = scene;
+        this.bvhManager = bvhManager;
 
         // Spatial grid for optimization
         this.gridCellSize = 40;
         this.spatialGrid = new Map();
     }
 
-    registerObject(object) {
-        if (object.type === EntityType.SHARK || object.type === EntityType.SUBMARINE) {
-            this.entities.push(object);
-            this.createAwarenessBox(object);
+    // for fish boid awareness
+    getNearbyEntitiesForBoid(boid, radius) {
+        if (this.bvhManager.isUsingBVH()) {
+            return this.getNearbyBVH(boid.pos, radius);
+        } else {
+            return this.getNearbyBruteForce(boid.pos, radius);
         }
+    }
+
+    // BVH approach - use spatial grid
+    getNearbyBVH(position, radius) {
+        const nearby = [];
+        const radiusSq = radius * radius;
+        const nearbyCells = this.getNearbyCells(position);
+
+        for (const cellKey of nearbyCells) {
+            const cellEntities = this.spatialGrid.get(cellKey);
+            if (!cellEntities) continue;
+
+            for (const entity of cellEntities) {
+                const entityPos = entity.pos || entity.position;
+                const distSq = position.distanceToSquared(entityPos);
+
+                if (distSq <= radiusSq) {
+                    nearby.push(entity);
+                }
+            }
+        }
+
+        return nearby;
+    }
+
+    // Brute force approach - check all entities
+    getNearbyBruteForce(position, radius) {
+        const nearby = [];
+        const radiusSq = radius * radius;
+
+        for (const entity of this.entities) {
+            const entityPos = entity.pos || entity.position;
+            const distSq = position.distanceToSquared(entityPos);
+
+            if (distSq <= radiusSq) {
+                nearby.push(entity);
+            }
+        }
+
+        return nearby;
+    }
+
+    registerObject(object) {
+        // Recursively traverse and register
+        const traverse = (obj) => {
+            if (obj.type === EntityType.SHARK || obj.type === EntityType.SUBMARINE || obj.type === EntityType.FISH) {
+                this.entities.push(obj);
+                this.createAwarenessBox(obj);
+            }
+
+            // Traverse children
+            if (obj.children && obj.children.length > 0) {
+                for (const child of obj.children) {
+                    traverse(child);
+                }
+            }
+        };
+
+        traverse(object);
     }
 
     createAwarenessBox(object) {
@@ -65,7 +126,7 @@ class CollisionManager {
         // Initialize the properties
         collisionBox.center = new THREE.Vector3();
         collisionBox.halfSize = new THREE.Vector3();
-collisionBox.rotation = new THREE.Matrix4();
+        collisionBox.rotation = new THREE.Matrix4();
 
         // Now you can safely copy
         collisionBox.halfSize.copy(boxSize.clone().multiplyScalar(0.5));
@@ -209,7 +270,6 @@ collisionBox.rotation = new THREE.Matrix4();
                     entity.ai.setState(EntityState.AVOIDING);
                     entity.ai.updateActionData(action, boxData);
                     entity.ai.resetStateTimer();
-
                     break;
             }
         }
