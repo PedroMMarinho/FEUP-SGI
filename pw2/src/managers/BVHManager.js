@@ -11,12 +11,15 @@ class BVHManager {
         this.cameraManager = cameraManager;
         this.useBVH = true;
         this.selected = null;
-        this.selectedMaterial = null;
-        this.highlightMaterial = new THREE.MeshBasicMaterial({ color: 'yellow' });
+        this.originalMaterials = new Map(); 
+        this.highlightColor = 'yellow';
+        this.originalRaycastingMethods = {
+            mesh: THREE.Mesh.prototype.raycast,
+            batchedMesh: THREE.BatchedMesh.prototype.raycast
+        };
 
         this.init();
     }
-
 
     init() {
         THREE.BufferGeometry.prototype.computeBoundsTree = computeBoundsTree;
@@ -27,7 +30,7 @@ class BVHManager {
         THREE.BatchedMesh.prototype.disposeBoundsTree = disposeBatchedBoundsTree;
         THREE.BatchedMesh.prototype.raycast = acceleratedRaycast;
     }
-    // TODO baddly registering the objects
+
     setupBVH(object) {
         if (!object) return;
 
@@ -50,7 +53,69 @@ class BVHManager {
             object.children.forEach(child => this.setupBVH(child));
         }
     }
-    // TODO check if its correct
+
+    // Find the root parent of an object by checking rootObject property
+    findRoot(object) {
+        let current = object;
+        while (current.parent && !current.rootObject) {
+            current = current.parent;
+        }
+        return current;
+    }
+
+    // Store original materials recursively
+    storeOriginalMaterials(object) {
+        if (object.isMesh && object.material) {
+            if (!this.originalMaterials.has(object.uuid)) {
+                this.originalMaterials.set(object.uuid, {
+                    material: object.material,
+                    color: object.material.color ? object.material.color.clone() : null
+                });
+            }
+        }
+
+        if (object.children) {
+            object.children.forEach(child => this.storeOriginalMaterials(child));
+        }
+    }
+
+    // Change color of all meshes in an object hierarchy
+    changeColorRecursive(object, color) {
+        if (object.isMesh && object.material) {
+            // Store original if not already stored
+            if (!this.originalMaterials.has(object.uuid)) {
+                this.originalMaterials.set(object.uuid, {
+                    material: object.material,
+                    color: object.material.color ? object.material.color.clone() : null
+                });
+            }
+
+            // Clone material and change color
+            object.material = object.material.clone();
+            if (object.material.color) {
+                object.material.color.set(color);
+            }
+        }
+
+        if (object.children) {
+            object.children.forEach(child => this.changeColorRecursive(child, color));
+        }
+    }
+
+    // Restore original colors recursively
+    restoreOriginalColors(object) {
+        if (object.isMesh && object.material) {
+            const stored = this.originalMaterials.get(object.uuid);
+            if (stored) {
+                object.material = stored.material;
+            }
+        }
+
+        if (object.children) {
+            object.children.forEach(child => this.restoreOriginalColors(child));
+        }
+    }
+
     raycastSelect() {
         if (!this.keyManager.isMouseDownThisFrame()) return;
 
@@ -65,6 +130,7 @@ class BVHManager {
 
         const raycaster = new THREE.Raycaster();
         raycaster.setFromCamera(ndc, camera);
+        raycaster.firstHitOnly = true;
 
         // collect all meshes recursively
         const meshes = [];
@@ -78,45 +144,46 @@ class BVHManager {
 
         if (intersects.length > 0) {
             const picked = intersects[0].object;
-            this.selectObject(picked);
+            const root = this.findRoot(picked);
+            if (root.bvhSelectable) this.selectObject(root);
         } else {
             this.selectObject(null);
         }
     }
 
-    // TODO check if its correct
-selectObject(object) {
-
-
-    if (!object || this.selected === object) {
-        if (this.selected) {
-            this.selected.material.copy(this.selectedMaterial);
+    selectObject(object) {
+        // If clicking same object or null, deselect
+        if (!object || this.selected === object) {
+            if (this.selected) {
+                this.restoreOriginalColors(this.selected);
+            }
+            this.selected = null;
+            return;
         }
-        this.selected = null;
-        this.selectedMaterial = null;
-        return;
+
+        // Restore previous selection
+        if (this.selected && this.selected !== object) {
+            this.restoreOriginalColors(this.selected);
+        }
+
+        // Select new object
+        if (this.selected !== object) {
+            this.changeColorRecursive(object, this.highlightColor);
+            this.selected = object;
+        }
     }
-
-    if (this.selected && this.selected !== object) {
-        this.selected.material.copy(this.selectedMaterial);
-    }
-
-    if (this.selected !== object) {
-        this.selectedMaterial = object.material.clone();
-
-        object.material = object.material.clone();
-        object.material.color.copy(this.highlightMaterial.color);
-
-        this.selected = object;
-    }
-}
-
-
 
     toggleBVH(enabled) {
         this.useBVH = enabled;
-    }
 
+        if (this.useBVH) {
+            THREE.Mesh.prototype.raycast = acceleratedRaycast;
+            THREE.BatchedMesh.prototype.raycast = acceleratedRaycast;
+        } else {
+            THREE.Mesh.prototype.raycast = this.originalRaycastingMethods.mesh;
+            THREE.BatchedMesh.prototype.raycast = this.originalRaycastingMethods.batchedMesh;
+        }
+    }
 }
 
 export { BVHManager };

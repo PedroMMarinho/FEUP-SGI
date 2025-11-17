@@ -8,6 +8,10 @@ class SeaweedLOD extends THREE.LOD {
         this.startDistance = 0;
         this.distanceOffset = 20;
         this.material = material
+		// BVH parameters
+		this.rootObject = true;
+		this.bvhSelectable = true;
+
         this.createLODs();
     }
     createLODs(){

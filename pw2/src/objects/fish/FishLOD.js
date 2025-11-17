@@ -43,6 +43,10 @@ export class FishLOD extends THREE.LOD {
 
 		this.keyframedAnimation = null;
 
+		// BVH parameters
+		this.rootObject = true;
+		this.bvhSelectable = true;
+
 		this.init();
 	}
  
