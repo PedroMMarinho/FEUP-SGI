@@ -43,9 +43,36 @@ class TextureManager {
 
     preload(textureMap) {
         for (const [name, filename] of Object.entries(textureMap)) {
-            this.loadTexture(name, filename);
-        }
+            if (filename.endsWith('.mp4')) {
+                this.loadVideoTexture(name, filename);
+            } else {
+                this.loadTexture(name, filename);
+            }
+            }
     }
+
+    loadVideoTexture(name, filename) {
+        if (this.textures.has(name)) return this.textures.get(name);
+
+        const video = document.createElement('video');
+        video.src = this.basePath + filename;
+        video.loop = true;
+        video.muted = true; // important for autoplay on most browsers
+        video.autoplay = true;
+        video.playsInline = true;
+        video.load();
+        video.play();
+
+        const texture = new THREE.VideoTexture(video);
+        texture.encoding = THREE.sRGBEncoding;
+        texture.minFilter = THREE.LinearFilter;
+        texture.magFilter = THREE.LinearFilter;
+        texture.generateMipmaps = false;
+
+        this.textures.set(name, texture);
+        return texture;
+    }   
+
 
     clear() {
         this.textures.forEach((tex) => tex.dispose());

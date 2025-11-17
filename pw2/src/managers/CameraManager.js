@@ -13,7 +13,7 @@ class CameraManager {
         this.cameraSelection = "Free Fly";
         this.controls = null;
 
-        this.moveSpeed = 6; 
+        this.moveSpeed = 60; 
         this.lookSpeed = 0.5; 
 
         this.yaw = 0;

@@ -50,6 +50,11 @@ export class AssetManager {
             { key: 'going-merry', url: 'ship/going-merry-high.glb', lod: 0 },
             { key: 'going-merry', url: 'ship/going-merry-medium.glb', lod: 1 },
             { key: 'going-merry', url: 'ship/going-merry-low.glb', lod: 2 },
+            
+            // TV Screen
+            { key: 'tv', url: 'tvs/TV-high.glb', lod: 0 },
+            { key: 'tv', url: 'tvs/TV-high.glb', lod: 1 },
+            { key: 'tv', url: 'tvs/TV-high.glb', lod: 2 }, 
         ];
         return modelList;
     }
@@ -84,6 +89,7 @@ export class AssetManager {
             'sand': 'sand/sandwaves.png',
             'sand-normal': 'sand/sandwavesNormal.png',
             'sand-noise': 'sand/sandNoise.png',
+            'tv-screen': 'tv/marinho_i_need_this.mp4',
         };
         return textureMap;
     }
