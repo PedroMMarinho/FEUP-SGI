@@ -4,7 +4,7 @@ import * as THREE from 'three';
  * Manages texture loading and caching for the entire scene.
  */
 class TextureManager {
-    constructor() {
+    constructor(maxAniso = null) {
         if (TextureManager._instance) {
             return TextureManager._instance;
         }
@@ -12,6 +12,7 @@ class TextureManager {
         this.loader = new THREE.TextureLoader();
         this.textures = new Map();
         this.basePath = './assets/textures/'; 
+        this.maxAnisotropy = maxAniso;
 
         TextureManager._instance = this;
     }
@@ -23,6 +24,14 @@ class TextureManager {
         }
 
         const texture = this.loader.load(this.basePath + filename);
+
+        if (texture.name.includes('sand')) {
+            texture.anisotropy = this.maxAnisotropy;
+        }
+
+        texture.generateMipmaps = true;
+        texture.minFilter = THREE.LinearMipmapLinearFilter;
+        texture.magFilter = THREE.LinearFilter;
 
         this.textures.set(name, texture);
         return texture;
