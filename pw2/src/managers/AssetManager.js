@@ -64,10 +64,10 @@ export class AssetManager {
     initTextures() {
         const textureMap = {
             // Submarine Textures
-            'metal_color': 'submarine/Metal_2K_Color.jpg',
-            'metal_metalness': 'submarine/Metal_2K_Metalness.jpg',
-            'metal_roughness': 'submarine/Metal_2K_Roughness.jpg',
-            'metal_normal': 'submarine/Metal_2K_Normal.jpg',
+            'metal_color': 'submarine/Metal_1K_Color.jpg',
+            'metal_metalness': 'submarine/Metal_1K_Metalness.jpg',
+            'metal_roughness': 'submarine/Metal_1K_Roughness.jpg',
+            'metal_normal': 'submarine/Metal_1K_Normal.jpg',
             'metal_NRM': 'submarine/MetalFasterners_NRM.png',
             'metal_OCC': 'submarine/MetalFasterners_OCC.png',
             'metal_SPEC': 'submarine/MetalFasterners_SPEC.png',
