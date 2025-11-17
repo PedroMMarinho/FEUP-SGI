@@ -21,7 +21,7 @@ class TV extends THREE.Object3D {
    changeVideoTexture(model) {
     model.traverse((child) => {
         if (child.isMesh && child.name === 'screenSurface') {
-            const videoTexture = this.textureManager.getTexture('tv-screen');
+            const videoTexture = this.textureManager.getTexture('tv-screen2');
 
             videoTexture.flipY = false;
             videoTexture.center.set(0.5, 0.5);           

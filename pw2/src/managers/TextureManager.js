@@ -50,7 +50,7 @@ class TextureManager {
             }
             }
     }
-
+    // TODO this is incorrect cannot start play automatically 
     loadVideoTexture(name, filename) {
         if (this.textures.has(name)) return this.textures.get(name);
 
