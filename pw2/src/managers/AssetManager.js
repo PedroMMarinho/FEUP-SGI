@@ -45,6 +45,11 @@ export class AssetManager {
             { key: 'whelk', url: 'shells/whelk-high.glb', lod: 0 },
             { key: 'whelk', url: 'shells/whelk-medium.glb', lod: 1 },
             { key: 'whelk', url: 'shells/whelk-low.glb', lod: 2 },
+
+            // Sunken Ship
+            { key: 'going-merry', url: 'ship/going-merry-high.glb', lod: 0 },
+            { key: 'going-merry', url: 'ship/going-merry-medium.glb', lod: 1 },
+            { key: 'going-merry', url: 'ship/going-merry-low.glb', lod: 2 },
         ];
         return modelList;
     }

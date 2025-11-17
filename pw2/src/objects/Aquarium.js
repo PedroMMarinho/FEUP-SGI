@@ -1,9 +1,6 @@
 import * as THREE from 'three';
 import { BubbleGroup } from './bubble/BubbleGroup.js';
-import { RockGroup } from './rock/RockGroup.js';
-import { CoralGroup } from './coral/CoralGroup.js';
 import { FishGroup } from './fish/FishGroup.js';
-import { TerrainSegment } from './terrainSegment/TerrainSegment.js';
 import { SharkLOD } from './shark/SharkLOD.js';
 import { SubmarineLOD } from './submarine/SubmarineLOD.js';
 import { GlassTank } from './glassTank/GlassTank.js';
@@ -99,14 +96,18 @@ class Aquarium extends THREE.Object3D {
         const shellModels = [
             this.assetManager.getBlenderManager().getAllLODs('whelk'),
         ];
+        const shipModels = [
+            this.assetManager.getBlenderManager().getAllLODs('going-merry'),
+        ];
 
 
         const rockCount = 1000;
         const coralCount = 300;
         const shellCount = 500;
         const seaweedCount = 200;
+        const shipCount = 1;
 
-        const seabed = new Seabed(this.terrainWidth, rockCount, coralCount, shellCount, seaweedCount, rockModels, shellModels);
+        const seabed = new Seabed(this.terrainWidth, rockCount, coralCount, shellCount, seaweedCount, shipCount, rockModels, shellModels, shipModels);
         this.addToAquarium(seabed);
     }
 
