@@ -26,6 +26,10 @@ export class SharkLOD extends THREE.LOD {
     this.type = EntityType.SHARK;
     this.dangerLevel = DangerLevel.MEDIUM;
 
+		// BVH parameters
+		this.rootObject = true;
+		this.bvhSelectable = true;
+
     this.initTexture(texture);
     this.setupLODs();
   }
@@ -43,7 +47,7 @@ export class SharkLOD extends THREE.LOD {
 
     for (let i = 0; i < lodCount; i++) {
       const shark = new Shark(this.lods[i], i);
-
+      console.log(shark);
       if (this.texture) {
         shark.traverse((child) => {
           if (child.isMesh) {

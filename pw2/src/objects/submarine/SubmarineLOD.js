@@ -7,6 +7,9 @@ import { TimeManager } from '../../managers/TimeManager.js';
 export class SubmarineLOD extends THREE.LOD {
     constructor(propellerBladeModel, keyManager, cameraManager, bounds, position = new THREE.Vector3(10, 5, 0)) {
         super();
+		// BVH parameters
+		this.rootObject = true;
+		this.bvhSelectable = true;
 
         this.propellerBladeModel = propellerBladeModel;
         this.keyManager = keyManager;

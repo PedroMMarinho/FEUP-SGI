@@ -4,6 +4,9 @@ import * as THREE from 'three';
 class Bubble {
     constructor() {
         this.geometry = new THREE.SphereGeometry(0.1, 32, 32);
+        // BVH parameters
+		this.rootObject = true;
+		this.bvhSelectable = false;
         this.material = new THREE.MeshStandardMaterial({
             color: 0x99ccff,
             transparent: true,
