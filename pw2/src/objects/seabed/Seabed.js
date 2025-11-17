@@ -4,6 +4,7 @@ import { CoralGroup } from '../coral/CoralGroup.js';
 import { TerrainSegment } from '../terrainSegment/TerrainSegment.js';
 import { ShellGroup } from '../shell/ShellGroup.js';
 import { SeaweedGroup } from '../seaweed/SeaweedGroup.js';
+import { ShipGroup } from '../ship/ShipGroup.js';
 
 class Seabed extends THREE.Object3D {
 	constructor(
@@ -12,8 +13,10 @@ class Seabed extends THREE.Object3D {
 		coralCount = 40,
         shellCount = 50,
         seaweedCount = 20,
+		shipCount = 1,
 		rockModels = [],
         shellModels = [],
+		shipModels = [],
 		distanceRange = [0.005, 0.1],
 	) {
 		super();
@@ -25,10 +28,12 @@ class Seabed extends THREE.Object3D {
         this.shellCount = shellCount;
 		this.coralCount = coralCount;
 		this.seaweedCount = seaweedCount;
+		this.shipCount = shipCount;
 
         // Models
 		this.rockModels = rockModels;
 		this.shellModels = shellModels;
+		this.shipModels = shipModels;
 		console.log(this.shellModels);
 
 
@@ -42,10 +47,18 @@ class Seabed extends THREE.Object3D {
 
 	init() {
 		this.createTerrain();
+		this.createShipGroup();
 		this.createRockGroup();
 		this.createCoralGroup();
         this.createShellGroup();
 		this.createSeaweedGroup();
+	}
+
+	createShipGroup() {
+		const shipPositions = this.computePositions(this.shipCount);
+		const shipGroup = new ShipGroup(shipPositions, this.shipModels);
+		this.add(shipGroup);
+		this.globalPositions.push(...shipPositions);
 	}
 
 	createTerrain() {
