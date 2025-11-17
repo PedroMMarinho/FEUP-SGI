@@ -14,7 +14,7 @@ import { HDRIManager } from './HDRIManager.js';
 export class AssetManager {
     constructor(renderer) {
         // Create specialized loaders
-        this.textureManager = new TextureManager();
+        this.textureManager = new TextureManager(renderer.capabilities.getMaxAnisotropy());
         this.blenderManager = new BlenderManager();
         this.hdriManager = new HDRIManager(renderer);
 
@@ -75,6 +75,7 @@ export class AssetManager {
             'shark-blue': 'shark/shark-blue.png',
             // Water Texture
             'water-normal': 'water/waternormals.jpg',
+            // Terrain Textures
             'sand': 'sand/sandwaves.png',
             'sand-normal': 'sand/sandwavesNormal.png',
             'sand-noise': 'sand/sandNoise.png',
