@@ -91,7 +91,8 @@ export class AssetManager {
             'sand-noise': 'sand/sandNoise.png',
             // TV Screen Video Texture
             'tv-screen': 'tv/marinho_i_need_this.mp4',
-            //'tv-screen2': 'tv/bro_dance.mp4',
+            'tv-screen2': 'tv/bro_dance.mp4',
+            'tv-screen3': 'tv/spongebob.mp4',
         };
         return textureMap;
     }

@@ -17,21 +17,25 @@ class TV extends THREE.Object3D {
         this.changeVideoTexture(model);
         return model;
     }
-    // TODO fit the whole screen
-   changeVideoTexture(model) {
+    changeVideoTexture(model) {
     model.traverse((child) => {
         if (child.isMesh && child.name === 'screenSurface') {
-            const videoTexture = this.textureManager.getTexture('tv-screen2');
+            const {texture: videoTexture, video: video} = this.textureManager.getVideoTexture('tv-screen3');
+
+            if (!videoTexture || !video) return;
 
             videoTexture.flipY = false;
-            videoTexture.center.set(0.5, 0.5);           
+            videoTexture.center.set(0.5, 0.5);
 
             child.material = new THREE.MeshBasicMaterial({
                 map: videoTexture,
-                toneMapped: false 
+                toneMapped: false,
             });
 
             child.material.needsUpdate = true;
+            video.play().catch(err => {
+                console.warn('Video playback blocked until user gesture:', err);
+            });
         }
     });
 }
