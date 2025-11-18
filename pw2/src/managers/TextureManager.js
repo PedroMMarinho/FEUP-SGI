@@ -11,6 +11,7 @@ class TextureManager {
 
         this.loader = new THREE.TextureLoader();
         this.textures = new Map();
+        this.videos = new Map();
         this.basePath = './assets/textures/'; 
         this.maxAnisotropy = maxAniso;
 
@@ -50,18 +51,16 @@ class TextureManager {
             }
             }
     }
-    // TODO this is incorrect cannot start play automatically 
+
     loadVideoTexture(name, filename) {
         if (this.textures.has(name)) return this.textures.get(name);
 
         const video = document.createElement('video');
         video.src = this.basePath + filename;
         video.loop = true;
-        video.muted = true; // important for autoplay on most browsers
-        video.autoplay = true;
+        video.muted = true;
         video.playsInline = true;
         video.load();
-        video.play();
 
         const texture = new THREE.VideoTexture(video);
         texture.encoding = THREE.sRGBEncoding;
@@ -70,8 +69,16 @@ class TextureManager {
         texture.generateMipmaps = false;
 
         this.textures.set(name, texture);
+        this.videos.set(name, video);
         return texture;
     }   
+
+    getVideoTexture(name) {
+        return {
+            texture: this.textures.get(name) || null,
+            video: this.videos.get(name) || null
+        };
+    }
 
 
     clear() {
