@@ -92,7 +92,9 @@ class Aquarium extends THREE.Object3D {
         // create seabed
         this.createSeaBed();
         // Setup bvh for all objects
-        this.bvhManager.setupBVH(this.objects);
+        for (const obj of this.objects) {
+            this.bvhManager.setupBVH(obj);
+        }        
     }
 
     createSeaBed() {

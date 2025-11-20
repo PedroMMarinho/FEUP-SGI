@@ -31,14 +31,53 @@ class CollisionManager {
     // for fish boid awareness
     getNearbyEntitiesForBoid(boid, radius) {
         if (this.bvhManager.isUsingBVH()) {
-            return this.getNearbyBVH(boid.pos, radius);
+            return this.getNearbySpatialGrid(boid.pos, radius);
         } else {
             return this.getNearbyBruteForce(boid.pos, radius);
         }
     }
 
-    // BVH approach - use spatial grid
-    getNearbyBVH(position, radius) {
+    // BVH-based detection using raycasting - unfeasible
+    getNearbyBVH(boid, radius) {
+        const nearby = [];
+        const numRays = 1;
+        const spreadAngle = Math.PI / 4;
+
+        // Get boid's forward direction
+        const direction = new THREE.Vector3(0, 0, 1);
+        direction.applyQuaternion(boid.quaternion);
+
+        // Check for collisions using BVH
+        const collisions = this.bvhManager.checkBoidCollisions(
+            boid.pos,
+            direction,
+            radius,
+            numRays,
+            spreadAngle
+        );
+
+        const radiusSq = radius * radius;
+        const processedEntities = new Set();
+
+        for (const collision of collisions) {
+            const entity = collision.object;
+
+            if (entity && !processedEntities.has(entity)) {
+                const distSq = boid.pos.distanceToSquared(entity.position);
+
+                if (distSq <= radiusSq) {
+                    nearby.push(entity);
+                    processedEntities.add(entity);
+                }
+            }
+        }
+
+        return nearby;
+    }
+
+
+    // Spatial grid approach - check nearby cells only
+    getNearbySpatialGrid(position, radius) {
         const nearby = [];
         const radiusSq = radius * radius;
         const nearbyCells = this.getNearbyCells(position);
@@ -132,14 +171,13 @@ class CollisionManager {
         this.scene.add(box);
         */
 
+        // Collision OBB
         const collisionBox = new OBB();
 
-        // Initialize the properties
         collisionBox.center = new THREE.Vector3();
         collisionBox.halfSize = new THREE.Vector3();
         collisionBox.rotation = new THREE.Matrix4();
 
-        // Now you can safely copy
         collisionBox.halfSize.copy(boxSize.clone().multiplyScalar(0.5));
         collisionBox.rotation.copy(object.matrix);
         collisionBox.center.copy(object.position);
