@@ -6,6 +6,9 @@ import { OBB } from '../../../lib/jsm/math/OBB.js';
 
 class CollisionManager {
     constructor(scene, bvhManager) {
+        if (CollisionManager._instance) {
+            return CollisionManager._instance;
+        }
         this.entities = [];
         this.fleeRadiusBase = 2;
         this.awarenessBoxes = new Map();
@@ -15,6 +18,14 @@ class CollisionManager {
         // Spatial grid for optimization
         this.gridCellSize = 40;
         this.spatialGrid = new Map();
+        CollisionManager._instance = this;
+    }
+
+    static getInstance() {
+        if (!CollisionManager._instance) {
+            new CollisionManager();
+        }
+        return CollisionManager._instance;
     }
 
     // for fish boid awareness
