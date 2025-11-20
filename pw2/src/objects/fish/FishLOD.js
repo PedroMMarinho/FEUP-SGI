@@ -3,13 +3,13 @@ import { Fish } from './Fish.js';
 import { TimeManager } from '../../managers/TimeManager.js';
 import { EntityType } from '../../enums/EntityType.js';
 import { DangerLevel } from '../../enums/DangerLevel.js';
-import { EntityState } from '../../enums/EntityState.js';
+import { CollisionManager } from '../../managers/CollisionManager.js';
 
 export class FishLOD extends THREE.LOD {
-	constructor(bodyColor, finColor, sparseness, baseHeight, maxHeight, boidProperties, collisionManager) {
+	constructor(bodyColor, finColor, sparseness, baseHeight, maxHeight, boidProperties) {
 		super();
 
-		this.collisionManager = collisionManager;
+		this.collisionManager = CollisionManager.getInstance();
 		// Entity properties
 		this.type = EntityType.FISH;
 		this.dangerLevel = DangerLevel.LOW;
@@ -17,7 +17,7 @@ export class FishLOD extends THREE.LOD {
 		this.boidProperties = boidProperties;
 		this.bodyColor = bodyColor;
 		this.finColor = finColor;
-		this.distanceStart = 50;
+		this.distanceStart = 40;
 		this.distanceOffset = 20;
 		this.size = 1;
 		this.sparseness = sparseness;

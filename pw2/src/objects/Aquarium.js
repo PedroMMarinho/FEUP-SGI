@@ -24,7 +24,7 @@ class Aquarium extends THREE.Object3D {
         this.scene = scene;
 
         // Terrain dimensions
-        this.terrainWidth = 200;
+        this.terrainWidth = 150;
         this.terrainHeight = 50;
 
         this.objects = [];
@@ -104,10 +104,10 @@ class Aquarium extends THREE.Object3D {
         ];
 
 
-        const rockCount = 1000;
-        const coralCount = 300;
-        const shellCount = 500;
-        const seaweedCount = 200;
+        const rockCount = 600;
+        const coralCount = 120;
+        const shellCount = 200;
+        const seaweedCount = 120;
 
         const seabed = new Seabed(this.terrainWidth, rockCount, coralCount, shellCount, seaweedCount, rockModels, shellModels);
         this.addToAquarium(seabed);
@@ -130,7 +130,7 @@ class Aquarium extends THREE.Object3D {
             this.addToAquarium(group);
         }*/
 		this.fishGroups = [
-			new FishGroup(400, this.collisionManager),
+			new FishGroup(400, this.terrainWidth / 2 - 8, this.terrainHeight / 2 + 10),
 		];
 		this.fishGroups[0].position.set(0,0,0);
 		this.addToAquarium(this.fishGroups[0]);
