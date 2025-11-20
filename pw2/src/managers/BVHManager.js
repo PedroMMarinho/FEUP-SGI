@@ -11,13 +11,13 @@ class BVHManager {
         this.cameraManager = cameraManager;
         this.useBVH = true;
         this.selected = null;
-        this.originalMaterials = new Map(); 
+        this.originalMaterials = new Map();
         this.highlightColor = 'yellow';
         this.originalRaycastingMethods = {
             mesh: THREE.Mesh.prototype.raycast,
             batchedMesh: THREE.BatchedMesh.prototype.raycast
         };
-
+        this.meshes = [];
         this.init();
     }
 
@@ -39,6 +39,7 @@ class BVHManager {
             if (object.geometry && object.geometry.computeBoundsTree) {
                 object.geometry.computeBoundsTree();
             }
+            this.meshes.push(object);
         }
 
         // Handle BatchedMesh
@@ -46,6 +47,7 @@ class BVHManager {
             if (object.computeBoundsTree) {
                 object.computeBoundsTree();
             }
+            this.meshes.push(object);
         }
 
         // Handle Groups or any Object3D with children
@@ -132,15 +134,8 @@ class BVHManager {
         raycaster.setFromCamera(ndc, camera);
         raycaster.firstHitOnly = true;
 
-        // collect all meshes recursively
-        const meshes = [];
-        const collectMeshes = (obj) => {
-            if (obj.isMesh) meshes.push(obj);
-            if (obj.children) obj.children.forEach(collectMeshes);
-        };
-        collectMeshes(this.scene);
 
-        const intersects = raycaster.intersectObjects(meshes, true);
+        const intersects = raycaster.intersectObjects(this.meshes, true);
 
         if (intersects.length > 0) {
             const picked = intersects[0].object;
@@ -171,6 +166,76 @@ class BVHManager {
             this.changeColorRecursive(object, this.highlightColor);
             this.selected = object;
         }
+    }
+
+    checkBoidCollisions(origin, direction, maxDistance, numRays = 5, spreadAngle = Math.PI / 6) {
+        if (!this.useBVH) {
+            return []; 
+        }
+
+        const raycaster = new THREE.Raycaster();
+        raycaster.far = maxDistance;
+        raycaster.firstHitOnly = true; 
+
+        const collisions = [];
+
+        const forward = direction.clone().normalize();
+
+        const up = Math.abs(forward.y) < 0.99
+            ? new THREE.Vector3(0, 1, 0)
+            : new THREE.Vector3(1, 0, 0);
+        const right = new THREE.Vector3().crossVectors(forward, up).normalize();
+        const actualUp = new THREE.Vector3().crossVectors(right, forward).normalize();
+
+        const rayDirections = [];
+
+        if (numRays === 1) {
+            // Single ray straight ahead
+            rayDirections.push(forward.clone());
+        } else {
+            // Center ray
+            rayDirections.push(forward.clone());
+
+            // Calculate rays in a cone pattern
+            const angleStep = (Math.PI * 2) / (numRays - 1);
+
+            for (let i = 0; i < numRays - 1; i++) {
+                const angle = angleStep * i;
+                const offsetRight = Math.cos(angle) * Math.sin(spreadAngle);
+                const offsetUp = Math.sin(angle) * Math.sin(spreadAngle);
+                const offsetForward = Math.cos(spreadAngle);
+
+                const rayDir = new THREE.Vector3()
+                    .addScaledVector(forward, offsetForward)
+                    .addScaledVector(right, offsetRight)
+                    .addScaledVector(actualUp, offsetUp)
+                    .normalize();
+
+                rayDirections.push(rayDir);
+            }
+        }
+        // Cast each ray and collect results
+        for (let i = 0; i < rayDirections.length; i++) {
+            raycaster.set(origin, rayDirections[i]);
+
+            const intersects = raycaster.intersectObjects(this.meshes, true);
+
+            if (intersects.length > 0) {
+                const hit = intersects[0];
+                collisions.push({
+                    distance: hit.distance,
+                    point: hit.point,
+                    normal: hit.face ? hit.face.normal : null,
+                    object: hit.object,
+                    rayIndex: i,
+                    rayDirection: rayDirections[i].clone()
+                });
+            }
+        }
+
+        collisions.sort((a, b) => a.distance - b.distance);
+
+        return collisions;
     }
 
     toggleBVH(enabled) {
