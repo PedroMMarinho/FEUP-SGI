@@ -90,6 +90,24 @@ class MyGuiInterface {
 
             accelerationFolder.open();
         }
+        // --- Collision Box Visualization ---
+        const collisionManager = this.contents.collisionManager;
+        if (collisionManager) {
+            const collisionFolder = this.datgui.addFolder('Collision Boxes');
+            
+            const collisionParams = {
+                showBoxes: false
+            };
+
+            collisionFolder
+                .add(collisionParams, 'showBoxes')
+                .name('Show Collision Boxes')
+                .onChange((enabled) => {
+                    collisionManager.toggleBoxVisualization(enabled);
+                });
+
+            collisionFolder.open();
+        }
 
     }
 }

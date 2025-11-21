@@ -3,6 +3,7 @@ import { EntityType } from '../enums/EntityType.js';
 import { ActionType } from '../enums/ActionType.js';
 import { EntityState } from '../enums/EntityState.js';
 import { OBB } from '../../../lib/jsm/math/OBB.js';
+import { DangerLevel } from '../enums/DangerLevel.js';
 
 class CollisionManager {
     constructor(scene, bvhManager) {
@@ -10,7 +11,7 @@ class CollisionManager {
             return CollisionManager._instance;
         }
         this.entities = [];
-        this.fleeRadiusBase = 2;
+        this.fleeRadiusBase = 1;
         this.awarenessBoxes = new Map();
         this.scene = scene;
         this.bvhManager = bvhManager;
@@ -18,6 +19,10 @@ class CollisionManager {
         // Spatial grid for optimization
         this.gridCellSize = 40;
         this.spatialGrid = new Map();
+
+        this.showBoxes = false;
+
+
         CollisionManager._instance = this;
     }
 
@@ -26,6 +31,16 @@ class CollisionManager {
             new CollisionManager();
         }
         return CollisionManager._instance;
+    }
+
+    toggleBoxVisualization(enabled) {
+        this.showBoxes = enabled;
+        
+        for (const [entity, boxData] of this.awarenessBoxes.entries()) {
+            if (boxData.mesh) {
+                boxData.mesh.visible = enabled;
+            }
+        }
     }
 
     // for fish boid awareness
@@ -119,7 +134,7 @@ class CollisionManager {
     registerObject(object) {
         // Recursively traverse and register
         const traverse = (obj) => {
-            if (obj.type === EntityType.SHARK || obj.type === EntityType.SUBMARINE || obj.type === EntityType.FISH) {
+            if (obj.type === EntityType.SHARK || obj.type === EntityType.SUBMARINE || obj.type === EntityType.FISH || obj.type === EntityType.STATIC_OBSTACLE) {
                 this.entities.push(obj);
                 this.createAwarenessBox(obj);
             }
@@ -142,7 +157,7 @@ class CollisionManager {
         const objectSize = new THREE.Vector3();
         bbox.getSize(objectSize);
 
-        const offsetMultiplier = this.fleeRadiusBase * (1 + 0.8 * (danger - 1));
+        const offsetMultiplier = (this.fleeRadiusBase + 0.8 * (danger - 1));
 
         const boxSize = new THREE.Vector3(
             objectSize.x + offsetMultiplier,
@@ -151,13 +166,15 @@ class CollisionManager {
         );
 
         // Visual representation of Boxes
-        /*
-        const color =
-            danger === DangerLevel.LOW
-                ? 0x00ff00
-                : danger === DangerLevel.MEDIUM
-                    ? 0xffff00
-                    : 0xff0000;
+        
+       const color =
+            danger === DangerLevel.NONE
+                ? 0x808080      // Gray - static obstacles
+                : danger === DangerLevel.LOW
+                    ? 0x00ff00  // Green - fish
+                    : danger === DangerLevel.MEDIUM
+                        ? 0xffff00  // Yellow - sharks
+                        : 0xff0000; // Red - submarine
 
         const geometry = new THREE.BoxGeometry(boxSize.x, boxSize.y, boxSize.z);
         const material = new THREE.MeshBasicMaterial({
@@ -168,8 +185,9 @@ class CollisionManager {
         });
 
         const box = new THREE.Mesh(geometry, material);
+        box.visible = this.showBoxes;
         this.scene.add(box);
-        */
+        
 
         // Collision OBB
         const collisionBox = new OBB();
@@ -184,7 +202,7 @@ class CollisionManager {
 
 
         this.awarenessBoxes.set(object, {
-            // mesh: box,   
+             mesh: box,   
             size: boxSize,
             collisionBox: collisionBox
         });
@@ -229,7 +247,7 @@ class CollisionManager {
         const nearbyEntities = this.findNearbyEntities(entity);
 
         // If no threats or same-level entities, return to wandering
-        if (nearbyEntities.threats.length === 0 && nearbyEntities.sameLevel.length === 0) {
+        if (nearbyEntities.threats.length === 0 && nearbyEntities.sameLevel.length === 0 && nearbyEntities.obstacles.length === 0) {
             if (entity.ai && entity.ai.state !== EntityState.WANDERING) {
                 entity.ai.checkIfShouldWander(); // Added this to check before changing state
             }
@@ -243,6 +261,7 @@ class CollisionManager {
     findNearbyEntities(entity) {
         const threats = [];
         const sameLevel = [];
+        const obstacles = [];
         const nearbyCells = this.getNearbyCells(entity.position);
 
         const entityBoxData = this.awarenessBoxes.get(entity);
@@ -259,6 +278,11 @@ class CollisionManager {
                 if (!otherBoxData) continue;
 
                 if (entityBoxData.collisionBox.intersectsOBB(otherBoxData.collisionBox)) {
+
+                    if (other.type === EntityType.STATIC_OBSTACLE) {
+                        obstacles.push(other);
+                    }
+
                     if (other.dangerLevel > entity.dangerLevel) {
                         threats.push(other);
                     } else if (other.dangerLevel === entity.dangerLevel) {
@@ -268,7 +292,7 @@ class CollisionManager {
             }
         }
 
-        return { threats, sameLevel };
+        return { threats, sameLevel, obstacles };
     }
 
     analyzeThreats(entity, nearbyEntities) {
@@ -297,6 +321,13 @@ class CollisionManager {
             actions.push({
                 type: ActionType.AVOID,
                 targets: nearbyEntities.sameLevel
+            });
+        }
+
+        if (nearbyEntities.obstacles.length > 0) {
+            actions.push({
+                type: ActionType.AVOID,
+                targets: nearbyEntities.obstacles
             });
         }
 
@@ -329,11 +360,12 @@ class CollisionManager {
 
         for (const entity of this.entities) {
             const boxData = this.awarenessBoxes.get(entity);
-            /*
-            // Update visual mesh
-            boxData.mesh.position.copy(entity.position);
-            boxData.mesh.quaternion.copy(entity.quaternion);
-            */
+
+            // Update visual box position and rotation
+            if (boxData.mesh) {
+                boxData.mesh.position.copy(entity.position);
+                boxData.mesh.quaternion.copy(entity.quaternion);
+            }
 
             // Update collision OBB
             boxData.collisionBox.center.copy(entity.position);

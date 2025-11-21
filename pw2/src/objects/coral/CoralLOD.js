@@ -1,16 +1,19 @@
 import * as THREE from 'three';
 import { Coral } from "./Coral.js";
 
+
 export class CoralLOD extends THREE.LOD {
     constructor(material){
         super();
         this.corals = [];
         this.startDistance = 0;
-        this.distanceOffset = 20;
+        this.distanceOffset = 25;
         this.material = material;
+
 		// BVH parameters
 		this.rootObject = true;
 		this.bvhSelectable = true;
+
 
         this.createLODs();
     }

@@ -32,7 +32,7 @@ class FishGroup extends THREE.Object3D {
 		let boidProps = {
 			cohesion: 2,
 			separation: 2,
-			alignment: 2,
+			alignment: 1.4,
 			moveSpeed: 4,
 			awareness: 10,
 			colour: new THREE.Color(0,1,1)

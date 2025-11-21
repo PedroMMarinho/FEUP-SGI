@@ -171,10 +171,15 @@ export class FishLOD extends THREE.LOD {
 				separation.addScaledVector(this.pos.clone().sub(other.pos), 1 / distance);
 				totalBoids++;
 			}
-			// Avoid sharks and submarines
+			// Other entities avoidance
 			else if (other.type === EntityType.SHARK || other.type === EntityType.SUBMARINE) {
 				const avoidDir = this.pos.clone().sub(otherPos);
-				const avoidStrength = 3 / (distance * distance); 
+				const avoidStrength = 5 / (distance * distance); 
+				avoidance.addScaledVector(avoidDir, avoidStrength);
+			}
+			else if (other.type === EntityType.STATIC_OBSTACLE) {
+				const avoidDir = this.pos.clone().sub(otherPos);
+				const avoidStrength = 1.5 / (distance * distance); 
 				avoidance.addScaledVector(avoidDir, avoidStrength);
 			}
 		}
