@@ -31,6 +31,12 @@ class BVHManager {
         THREE.BatchedMesh.prototype.raycast = acceleratedRaycast;
     }
 
+    computeBVH(objects) {
+        objects.forEach(object => {
+            this.setupBVH(object);
+        });
+    }
+
     setupBVH(object) {
         if (!object) return;
 
