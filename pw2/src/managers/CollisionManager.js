@@ -2,8 +2,8 @@ import * as THREE from 'three';
 import { EntityType } from '../enums/EntityType.js';
 import { ActionType } from '../enums/ActionType.js';
 import { EntityState } from '../enums/EntityState.js';
-import { OBB } from '../../../lib/jsm/math/OBB.js';
 import { DangerLevel } from '../enums/DangerLevel.js';
+import { OBB } from '../../../lib/jsm/math/OBB.js';
 
 class CollisionManager {
     constructor(scene, bvhManager) {
@@ -11,7 +11,7 @@ class CollisionManager {
             return CollisionManager._instance;
         }
         this.entities = [];
-        this.fleeRadiusBase = 1;
+        this.fleeRadiusBase = 1.5;
         this.awarenessBoxes = new Map();
         this.scene = scene;
         this.bvhManager = bvhManager;
@@ -19,10 +19,10 @@ class CollisionManager {
         // Spatial grid for optimization
         this.gridCellSize = 40;
         this.spatialGrid = new Map();
-
+        
+        // Visualization toggle
         this.showBoxes = false;
-
-
+        
         CollisionManager._instance = this;
     }
 
@@ -33,11 +33,17 @@ class CollisionManager {
         return CollisionManager._instance;
     }
 
+    // Toggle collision box visualization
     toggleBoxVisualization(enabled) {
         this.showBoxes = enabled;
         
         for (const [entity, boxData] of this.awarenessBoxes.entries()) {
             if (boxData.mesh) {
+                if (enabled) {
+                    this.scene.add(boxData.mesh);
+                } else {
+                    this.scene.remove(boxData.mesh);
+                }
                 boxData.mesh.visible = enabled;
             }
         }
@@ -51,45 +57,6 @@ class CollisionManager {
             return this.getNearbyBruteForce(boid.pos, radius);
         }
     }
-
-    // BVH-based detection using raycasting - unfeasible
-    getNearbyBVH(boid, radius) {
-        const nearby = [];
-        const numRays = 1;
-        const spreadAngle = Math.PI / 4;
-
-        // Get boid's forward direction
-        const direction = new THREE.Vector3(0, 0, 1);
-        direction.applyQuaternion(boid.quaternion);
-
-        // Check for collisions using BVH
-        const collisions = this.bvhManager.checkBoidCollisions(
-            boid.pos,
-            direction,
-            radius,
-            numRays,
-            spreadAngle
-        );
-
-        const radiusSq = radius * radius;
-        const processedEntities = new Set();
-
-        for (const collision of collisions) {
-            const entity = collision.object;
-
-            if (entity && !processedEntities.has(entity)) {
-                const distSq = boid.pos.distanceToSquared(entity.position);
-
-                if (distSq <= radiusSq) {
-                    nearby.push(entity);
-                    processedEntities.add(entity);
-                }
-            }
-        }
-
-        return nearby;
-    }
-
 
     // Spatial grid approach - check nearby cells only
     getNearbySpatialGrid(position, radius) {
@@ -134,7 +101,10 @@ class CollisionManager {
     registerObject(object) {
         // Recursively traverse and register
         const traverse = (obj) => {
-            if (obj.type === EntityType.SHARK || obj.type === EntityType.SUBMARINE || obj.type === EntityType.FISH || obj.type === EntityType.STATIC_OBSTACLE) {
+            if (obj.type === EntityType.SHARK || 
+                obj.type === EntityType.SUBMARINE || 
+                obj.type === EntityType.FISH || 
+                obj.type === EntityType.STATIC_OBSTACLE) {
                 this.entities.push(obj);
                 this.createAwarenessBox(obj);
             }
@@ -157,7 +127,7 @@ class CollisionManager {
         const objectSize = new THREE.Vector3();
         bbox.getSize(objectSize);
 
-        const offsetMultiplier = (this.fleeRadiusBase + 0.8 * (danger - 1));
+        const offsetMultiplier = this.fleeRadiusBase * (1 + 0.8 * (danger - 1));
 
         const boxSize = new THREE.Vector3(
             objectSize.x + offsetMultiplier,
@@ -166,8 +136,7 @@ class CollisionManager {
         );
 
         // Visual representation of Boxes
-        
-       const color =
+        const color =
             danger === DangerLevel.NONE
                 ? 0x808080      // Gray - static obstacles
                 : danger === DangerLevel.LOW
@@ -185,13 +154,9 @@ class CollisionManager {
         });
 
         const box = new THREE.Mesh(geometry, material);
-        box.visible = this.showBoxes;
-        this.scene.add(box);
-        
 
         // Collision OBB
         const collisionBox = new OBB();
-
         collisionBox.center = new THREE.Vector3();
         collisionBox.halfSize = new THREE.Vector3();
         collisionBox.rotation = new THREE.Matrix4();
@@ -200,9 +165,8 @@ class CollisionManager {
         collisionBox.rotation.copy(object.matrix);
         collisionBox.center.copy(object.position);
 
-
         this.awarenessBoxes.set(object, {
-             mesh: box,   
+            mesh: box,
             size: boxSize,
             collisionBox: collisionBox
         });
@@ -246,10 +210,12 @@ class CollisionManager {
     checkForDangers(entity, boxData) {
         const nearbyEntities = this.findNearbyEntities(entity);
 
-        // If no threats or same-level entities, return to wandering
-        if (nearbyEntities.threats.length === 0 && nearbyEntities.sameLevel.length === 0 && nearbyEntities.obstacles.length === 0) {
+        // If no threats, same-level entities, or obstacles, return to wandering
+        if (nearbyEntities.threats.length === 0 && 
+            nearbyEntities.sameLevel.length === 0 && 
+            nearbyEntities.obstacles.length === 0) {
             if (entity.ai && entity.ai.state !== EntityState.WANDERING) {
-                entity.ai.checkIfShouldWander(); // Added this to check before changing state
+                entity.ai.checkIfShouldWander();
             }
             return;
         }
@@ -265,7 +231,7 @@ class CollisionManager {
         const nearbyCells = this.getNearbyCells(entity.position);
 
         const entityBoxData = this.awarenessBoxes.get(entity);
-        if (!entityBoxData) return { threats, sameLevel };
+        if (!entityBoxData) return { threats, sameLevel, obstacles };
 
         for (const cellKey of nearbyCells) {
             const cellEntities = this.spatialGrid.get(cellKey);
@@ -278,12 +244,12 @@ class CollisionManager {
                 if (!otherBoxData) continue;
 
                 if (entityBoxData.collisionBox.intersectsOBB(otherBoxData.collisionBox)) {
-
+                    // Handle static obstacles separately
                     if (other.type === EntityType.STATIC_OBSTACLE) {
                         obstacles.push(other);
                     }
-
-                    if (other.dangerLevel > entity.dangerLevel) {
+                    // Handle threats and same-level entities
+                    else if (other.dangerLevel > entity.dangerLevel) {
                         threats.push(other);
                     } else if (other.dangerLevel === entity.dangerLevel) {
                         sameLevel.push(other);
@@ -371,8 +337,6 @@ class CollisionManager {
             boxData.collisionBox.center.copy(entity.position);
             boxData.collisionBox.halfSize.copy(boxData.size.clone().multiplyScalar(0.5));
             boxData.collisionBox.rotation.makeRotationFromQuaternion(entity.quaternion);
-
-
 
             this.checkForDangers(entity, boxData);
         }
