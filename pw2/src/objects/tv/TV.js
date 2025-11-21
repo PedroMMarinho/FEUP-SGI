@@ -13,7 +13,7 @@ class TV extends THREE.Object3D {
         const model = this.gltf.scene.clone();
         // Apply transformations
         model.rotateX(Math.PI/2); 
-        model.position.y += 0.6;
+        model.position.y += 0.5;
         this.changeVideoTexture(model);
         return model;
     }

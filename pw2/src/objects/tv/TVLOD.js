@@ -8,6 +8,11 @@ export class TVLOD extends THREE.LOD {
         this.distanceOffset = 10;
 		this.lods = lods;
 		this.init();
+
+
+		// BVH parameters
+		this.rootObject = true;
+		this.bvhSelectable = true;
 	}
 
 	init() {

@@ -19,7 +19,6 @@ export class SharkLOD extends THREE.LOD {
     this.timeSinceLastUpdate = 0;
 
     this.position.copy(position);
-    this.animationOffset = Math.random() * Math.PI * 2;
 
     this.ai = new SharkBehaviour(this, aiOptions);
 
@@ -47,7 +46,18 @@ export class SharkLOD extends THREE.LOD {
 
     for (let i = 0; i < lodCount; i++) {
       const shark = new Shark(this.lods[i], i);
-      console.log(shark);
+
+      if (shark.currentAction) {
+          const clipDuration = shark.currentAction.getClip().duration;
+          const randomOffset =  this.animationOffset ? this.animationOffset : Math.random() * clipDuration;
+          shark.mixer.setTime(randomOffset);
+              
+          // Store offset for first shark to use for all LODs
+          if (i === 0) {
+            this.animationOffset = randomOffset;
+          }
+      }      
+
       if (this.texture) {
         shark.traverse((child) => {
           if (child.isMesh) {

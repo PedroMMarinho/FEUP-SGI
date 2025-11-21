@@ -11,7 +11,7 @@ class CollisionManager {
             return CollisionManager._instance;
         }
         this.entities = [];
-        this.fleeRadiusBase = 1.5;
+        this.fleeRadiusBase = 1.2;
         this.awarenessBoxes = new Map();
         this.scene = scene;
         this.bvhManager = bvhManager;

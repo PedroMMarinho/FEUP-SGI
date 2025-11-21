@@ -179,7 +179,7 @@ export class FishLOD extends THREE.LOD {
 			}
 			else if (other.type === EntityType.STATIC_OBSTACLE) {
 				const avoidDir = this.pos.clone().sub(otherPos);
-				const avoidStrength = 1.5 / (distance * distance); 
+				const avoidStrength = 1.1 / (distance * distance); 
 				avoidance.addScaledVector(avoidDir, avoidStrength);
 			}
 		}
