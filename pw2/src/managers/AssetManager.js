@@ -14,7 +14,7 @@ import { HDRIManager } from './HDRIManager.js';
 export class AssetManager {
     constructor(renderer) {
         // Create specialized loaders
-        this.textureManager = new TextureManager();
+        this.textureManager = new TextureManager(renderer.capabilities.getMaxAnisotropy());
         this.blenderManager = new BlenderManager();
         this.hdriManager = new HDRIManager(renderer);
 
@@ -45,6 +45,16 @@ export class AssetManager {
             { key: 'whelk', url: 'shells/whelk-high.glb', lod: 0 },
             { key: 'whelk', url: 'shells/whelk-medium.glb', lod: 1 },
             { key: 'whelk', url: 'shells/whelk-low.glb', lod: 2 },
+
+            // Sunken Ship
+            { key: 'going-merry', url: 'ship/going-merry-high.glb', lod: 0 },
+            { key: 'going-merry', url: 'ship/going-merry-medium.glb', lod: 1 },
+            { key: 'going-merry', url: 'ship/going-merry-low.glb', lod: 2 },
+            
+            // TV Screen
+            { key: 'tv', url: 'tvs/TV-high.glb', lod: 0 },
+            { key: 'tv', url: 'tvs/TV-medium.glb', lod: 1 },
+            { key: 'tv', url: 'tvs/TV-low.glb', lod: 2 }, 
         ];
         return modelList;
     }
@@ -75,9 +85,14 @@ export class AssetManager {
             'shark-blue': 'shark/shark-blue.png',
             // Water Texture
             'water-normal': 'water/waternormals.jpg',
+            // Terrain Textures
             'sand': 'sand/sandwaves.png',
             'sand-normal': 'sand/sandwavesNormal.png',
             'sand-noise': 'sand/sandNoise.png',
+            // TV Screen Video Texture
+            'tv-screen': 'tv/marinho_i_need_this.mp4',
+            'tv-screen2': 'tv/bro_dance.mp4',
+            'tv-screen3': 'tv/spongebob.mp4',
         };
         return textureMap;
     }
