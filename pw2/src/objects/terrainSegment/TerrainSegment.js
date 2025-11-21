@@ -5,6 +5,10 @@ class TerrainSegment extends THREE.Object3D {
   constructor(width = 10, height = 10, widthSegments = 64, heightSegments = 64) {
     super();
 
+    // BVH parameters
+		this.rootObject = true;
+		this.bvhSelectable = false;
+
     this.width = width;
     this.height = height;
     this.widthSegments = widthSegments;

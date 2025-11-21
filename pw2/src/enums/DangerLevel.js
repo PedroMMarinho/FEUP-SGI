@@ -1,9 +1,10 @@
 
 // Enumeration for different danger levels of entities
 const DangerLevel = Object.freeze({
-    LOW: 1,      // harmless (fish)
-    MEDIUM: 2,   // predator (shark)
-    HIGH: 3,     // apex / player (submarine)
+    NONE: 0,    // neutral
+    LOW: 1,      // harmless 
+    MEDIUM: 2,   // predator 
+    HIGH: 3,     // apex / player 
 });
 
 export { DangerLevel };
