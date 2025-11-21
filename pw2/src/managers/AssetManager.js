@@ -93,6 +93,8 @@ export class AssetManager {
             'tv-screen': 'tv/marinho_i_need_this.mp4',
             'tv-screen2': 'tv/bro_dance.mp4',
             'tv-screen3': 'tv/spongebob.mp4',
+            // perlin noise  
+            'perlin-noise': 'noise/perlin_noise.png',
         };
         return textureMap;
     }
