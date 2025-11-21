@@ -7,6 +7,9 @@ class GlassTank extends THREE.Object3D {
         this.width = width;
         this.height = height;
         this.depth = depth;
+        // BVH parameters
+		this.rootObject = true;
+		this.bvhSelectable = false;
 
         const glassMaterial = new THREE.MeshPhysicalMaterial({
             color: 0xffffff,

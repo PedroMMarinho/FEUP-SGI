@@ -7,6 +7,9 @@ import { TimeManager } from '../../managers/TimeManager.js';
 export class SubmarineLOD extends THREE.LOD {
     constructor(propellerBladeModel, keyManager, cameraManager, bounds, position = new THREE.Vector3(10, 5, 0)) {
         super();
+		// BVH parameters
+		this.rootObject = true;
+		this.bvhSelectable = true;
 
         this.propellerBladeModel = propellerBladeModel;
         this.keyManager = keyManager;
@@ -39,7 +42,7 @@ export class SubmarineLOD extends THREE.LOD {
         this.VERTICAL_RATE = 0.8;
         this.ACCELERATION_RATE = 1.4;
         this.DECELERATION_RATE = 1.8;
-        this.MAX_SPEED = 7;
+        this.MAX_SPEED = 6;
         this.REVERSE_SPEED = 3;
         this.ROTOR_ACCEL = 2.78;
         this.ROTOR_DECEL = 9.5;

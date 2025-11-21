@@ -1,27 +1,153 @@
 import * as THREE from 'three';
 import { EntityType } from '../enums/EntityType.js';
-import { DangerLevel } from '../enums/DangerLevel.js';
 import { ActionType } from '../enums/ActionType.js';
 import { EntityState } from '../enums/EntityState.js';
 import { OBB } from '../../../lib/jsm/math/OBB.js';
+import { DangerLevel } from '../enums/DangerLevel.js';
 
 class CollisionManager {
-    constructor(scene) {
+    constructor(scene, bvhManager) {
+        if (CollisionManager._instance) {
+            return CollisionManager._instance;
+        }
         this.entities = [];
-        this.fleeRadiusBase = 2;
+        this.fleeRadiusBase = 1;
         this.awarenessBoxes = new Map();
         this.scene = scene;
+        this.bvhManager = bvhManager;
 
         // Spatial grid for optimization
         this.gridCellSize = 40;
         this.spatialGrid = new Map();
+
+        this.showBoxes = false;
+
+
+        CollisionManager._instance = this;
+    }
+
+    static getInstance() {
+        if (!CollisionManager._instance) {
+            new CollisionManager();
+        }
+        return CollisionManager._instance;
+    }
+
+    toggleBoxVisualization(enabled) {
+        this.showBoxes = enabled;
+        
+        for (const [entity, boxData] of this.awarenessBoxes.entries()) {
+            if (boxData.mesh) {
+                boxData.mesh.visible = enabled;
+            }
+        }
+    }
+
+    // for fish boid awareness
+    getNearbyEntitiesForBoid(boid, radius) {
+        if (this.bvhManager.isUsingBVH()) {
+            return this.getNearbySpatialGrid(boid.pos, radius);
+        } else {
+            return this.getNearbyBruteForce(boid.pos, radius);
+        }
+    }
+
+    // BVH-based detection using raycasting - unfeasible
+    getNearbyBVH(boid, radius) {
+        const nearby = [];
+        const numRays = 1;
+        const spreadAngle = Math.PI / 4;
+
+        // Get boid's forward direction
+        const direction = new THREE.Vector3(0, 0, 1);
+        direction.applyQuaternion(boid.quaternion);
+
+        // Check for collisions using BVH
+        const collisions = this.bvhManager.checkBoidCollisions(
+            boid.pos,
+            direction,
+            radius,
+            numRays,
+            spreadAngle
+        );
+
+        const radiusSq = radius * radius;
+        const processedEntities = new Set();
+
+        for (const collision of collisions) {
+            const entity = collision.object;
+
+            if (entity && !processedEntities.has(entity)) {
+                const distSq = boid.pos.distanceToSquared(entity.position);
+
+                if (distSq <= radiusSq) {
+                    nearby.push(entity);
+                    processedEntities.add(entity);
+                }
+            }
+        }
+
+        return nearby;
+    }
+
+
+    // Spatial grid approach - check nearby cells only
+    getNearbySpatialGrid(position, radius) {
+        const nearby = [];
+        const radiusSq = radius * radius;
+        const nearbyCells = this.getNearbyCells(position);
+
+        for (const cellKey of nearbyCells) {
+            const cellEntities = this.spatialGrid.get(cellKey);
+            if (!cellEntities) continue;
+
+            for (const entity of cellEntities) {
+                const entityPos = entity.pos || entity.position;
+                const distSq = position.distanceToSquared(entityPos);
+
+                if (distSq <= radiusSq) {
+                    nearby.push(entity);
+                }
+            }
+        }
+
+        return nearby;
+    }
+
+    // Brute force approach - check all entities
+    getNearbyBruteForce(position, radius) {
+        const nearby = [];
+        const radiusSq = radius * radius;
+
+        for (const entity of this.entities) {
+            const entityPos = entity.pos || entity.position;
+            const distSq = position.distanceToSquared(entityPos);
+
+            if (distSq <= radiusSq) {
+                nearby.push(entity);
+            }
+        }
+
+        return nearby;
     }
 
     registerObject(object) {
-        if (object.type === EntityType.SHARK || object.type === EntityType.SUBMARINE) {
-            this.entities.push(object);
-            this.createAwarenessBox(object);
-        }
+        // Recursively traverse and register
+        const traverse = (obj) => {
+            if (obj.type === EntityType.SHARK || obj.type === EntityType.SUBMARINE || obj.type === EntityType.FISH || obj.type === EntityType.STATIC_OBSTACLE) {
+                this.entities.push(obj);
+                this.createAwarenessBox(obj);
+            }
+
+            // Traverse children
+            if (obj.children && obj.children.length > 0) {
+                for (const child of obj.children) {
+                    traverse(child);
+                }
+            }
+        };
+
+        traverse(object);
     }
 
     createAwarenessBox(object) {
@@ -31,7 +157,7 @@ class CollisionManager {
         const objectSize = new THREE.Vector3();
         bbox.getSize(objectSize);
 
-        const offsetMultiplier = this.fleeRadiusBase * (1 + 0.8 * (danger - 1));
+        const offsetMultiplier = (this.fleeRadiusBase + 0.8 * (danger - 1));
 
         const boxSize = new THREE.Vector3(
             objectSize.x + offsetMultiplier,
@@ -40,13 +166,15 @@ class CollisionManager {
         );
 
         // Visual representation of Boxes
-        /*
-        const color =
-            danger === DangerLevel.LOW
-                ? 0x00ff00
-                : danger === DangerLevel.MEDIUM
-                    ? 0xffff00
-                    : 0xff0000;
+        
+       const color =
+            danger === DangerLevel.NONE
+                ? 0x808080      // Gray - static obstacles
+                : danger === DangerLevel.LOW
+                    ? 0x00ff00  // Green - fish
+                    : danger === DangerLevel.MEDIUM
+                        ? 0xffff00  // Yellow - sharks
+                        : 0xff0000; // Red - submarine
 
         const geometry = new THREE.BoxGeometry(boxSize.x, boxSize.y, boxSize.z);
         const material = new THREE.MeshBasicMaterial({
@@ -57,24 +185,24 @@ class CollisionManager {
         });
 
         const box = new THREE.Mesh(geometry, material);
+        box.visible = this.showBoxes;
         this.scene.add(box);
-        */
+        
 
+        // Collision OBB
         const collisionBox = new OBB();
 
-        // Initialize the properties
         collisionBox.center = new THREE.Vector3();
         collisionBox.halfSize = new THREE.Vector3();
-collisionBox.rotation = new THREE.Matrix4();
+        collisionBox.rotation = new THREE.Matrix4();
 
-        // Now you can safely copy
         collisionBox.halfSize.copy(boxSize.clone().multiplyScalar(0.5));
         collisionBox.rotation.copy(object.matrix);
         collisionBox.center.copy(object.position);
 
 
         this.awarenessBoxes.set(object, {
-            // mesh: box,   
+             mesh: box,   
             size: boxSize,
             collisionBox: collisionBox
         });
@@ -119,7 +247,7 @@ collisionBox.rotation = new THREE.Matrix4();
         const nearbyEntities = this.findNearbyEntities(entity);
 
         // If no threats or same-level entities, return to wandering
-        if (nearbyEntities.threats.length === 0 && nearbyEntities.sameLevel.length === 0) {
+        if (nearbyEntities.threats.length === 0 && nearbyEntities.sameLevel.length === 0 && nearbyEntities.obstacles.length === 0) {
             if (entity.ai && entity.ai.state !== EntityState.WANDERING) {
                 entity.ai.checkIfShouldWander(); // Added this to check before changing state
             }
@@ -133,6 +261,7 @@ collisionBox.rotation = new THREE.Matrix4();
     findNearbyEntities(entity) {
         const threats = [];
         const sameLevel = [];
+        const obstacles = [];
         const nearbyCells = this.getNearbyCells(entity.position);
 
         const entityBoxData = this.awarenessBoxes.get(entity);
@@ -149,6 +278,11 @@ collisionBox.rotation = new THREE.Matrix4();
                 if (!otherBoxData) continue;
 
                 if (entityBoxData.collisionBox.intersectsOBB(otherBoxData.collisionBox)) {
+
+                    if (other.type === EntityType.STATIC_OBSTACLE) {
+                        obstacles.push(other);
+                    }
+
                     if (other.dangerLevel > entity.dangerLevel) {
                         threats.push(other);
                     } else if (other.dangerLevel === entity.dangerLevel) {
@@ -158,7 +292,7 @@ collisionBox.rotation = new THREE.Matrix4();
             }
         }
 
-        return { threats, sameLevel };
+        return { threats, sameLevel, obstacles };
     }
 
     analyzeThreats(entity, nearbyEntities) {
@@ -190,6 +324,13 @@ collisionBox.rotation = new THREE.Matrix4();
             });
         }
 
+        if (nearbyEntities.obstacles.length > 0) {
+            actions.push({
+                type: ActionType.AVOID,
+                targets: nearbyEntities.obstacles
+            });
+        }
+
         return actions;
     }
 
@@ -209,7 +350,6 @@ collisionBox.rotation = new THREE.Matrix4();
                     entity.ai.setState(EntityState.AVOIDING);
                     entity.ai.updateActionData(action, boxData);
                     entity.ai.resetStateTimer();
-
                     break;
             }
         }
@@ -220,11 +360,12 @@ collisionBox.rotation = new THREE.Matrix4();
 
         for (const entity of this.entities) {
             const boxData = this.awarenessBoxes.get(entity);
-            /*
-            // Update visual mesh
-            boxData.mesh.position.copy(entity.position);
-            boxData.mesh.quaternion.copy(entity.quaternion);
-            */
+
+            // Update visual box position and rotation
+            if (boxData.mesh) {
+                boxData.mesh.position.copy(entity.position);
+                boxData.mesh.quaternion.copy(entity.quaternion);
+            }
 
             // Update collision OBB
             boxData.collisionBox.center.copy(entity.position);
