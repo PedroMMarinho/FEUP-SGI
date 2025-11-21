@@ -50,6 +50,8 @@ export class FishLOD extends THREE.LOD {
 
 		this.textureManager = TextureManager.getInstance();
 		this.perlinNoiseTex = this.textureManager.getTexture('perlin-noise');
+		this.perlinNoiseTex.wrapS = THREE.RepeatWrapping; 
+		this.perlinNoiseTex.wrapT = THREE.RepeatWrapping; 
 		this.perlinNoiseTex.repeat.set(16, 16);
 
 		// BVH parameters
@@ -142,6 +144,7 @@ export class FishLOD extends THREE.LOD {
 
 		const finMaterial = new THREE.MeshPhongMaterial({
 			color: this.finColor,
+			map: this.perlinNoiseTex,
 			onBeforeCompile: (shader) => {
 				shader.uniforms.perlinNoise = { value: this.perlinNoiseTex };
 				shader.uniforms.finColor = { value: new THREE.Color(this.finColor) };

@@ -79,7 +79,7 @@ class FishGroup extends THREE.Object3D {
 			this.animatedFishes.push(fishLOD);
 		} */
 	}
-
+	
 	updateState() {
 		for (const fish of this.fishes) {
 			fish.flock(this.fishes);
@@ -90,6 +90,7 @@ class FishGroup extends THREE.Object3D {
 			fish.updateAnimation();
 		}
 	}
+		
 }
 
 FishGroup.prototype.isGroup = true;
