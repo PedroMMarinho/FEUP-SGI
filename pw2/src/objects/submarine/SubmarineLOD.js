@@ -5,7 +5,7 @@ import { DangerLevel } from '../../enums/DangerLevel.js';
 import { TimeManager } from '../../managers/TimeManager.js';
 
 export class SubmarineLOD extends THREE.LOD {
-    constructor(propellerBladeModel, keyManager, cameraManager, bounds, position = new THREE.Vector3(10, 5, 0)) {
+    constructor(propellerBladeModel, keyManager, cameraManager, bounds, position = new THREE.Vector3(10, 6, 20)) {
         super();
 		// BVH parameters
 		this.rootObject = true;
