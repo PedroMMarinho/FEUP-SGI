@@ -102,14 +102,23 @@ class Aquarium extends THREE.Object3D {
         const shellModels = [
             this.assetManager.getBlenderManager().getAllLODs('whelk'),
         ];
+        const shipModels = [
+            this.assetManager.getBlenderManager().getAllLODs('going-merry'),
+        ];
+        const tvModels = [
+            this.assetManager.getBlenderManager().getAllLODs('tv'),
+        ];
 
 
         const rockCount = 600;
         const coralCount = 120;
         const shellCount = 200;
         const seaweedCount = 120;
+        const shipCount = 1;
+        const tvCount = 1;
 
-        const seabed = new Seabed(this.terrainWidth, rockCount, coralCount, shellCount, seaweedCount, rockModels, shellModels);
+
+        const seabed = new Seabed(this.terrainWidth, rockCount, coralCount, shellCount, seaweedCount, shipCount, tvCount, rockModels, shellModels, shipModels, tvModels);
         this.addToAquarium(seabed);
     }
 
