@@ -1,21 +1,26 @@
 class KeyManager {
     constructor() {
         this.activeKeys = {};
-        this.mouseDelta = { x: 0, y: 0 };
-        this.mouseHeld = false;
 
+        this.mouseDelta = { x: 0, y: 0 };
+        this.mousePos = { x: 0, y: 0 };
+
+        this.mouseHeld = false;
+        this.mouseDownThisFrame = false;
+        this.mouseUpThisFrame = false;
 
         const canvas = document.getElementById('canvas');
-        canvas.addEventListener('mousedown', () => this.processMouseDown(), false);
-        canvas.addEventListener('mouseup', () => this.processMouseUp(), false);
+
+        canvas.addEventListener('mousedown', (e) => this.processMouseDown(e), false);
+        canvas.addEventListener('mouseup',   (e) => this.processMouseUp(e), false);
+        document.addEventListener('mousemove', (e) => this.processMouseMove(e), false);
+
         document.addEventListener('keydown', (event) => this.processKeyDown(event), false);
-        document.addEventListener('keyup', (event) => this.processKeyUp(event), false);
-        document.addEventListener('mousemove', (event) => this.processMouseMove(event), false);
-        window.addEventListener('blur', () => this.resetKeys(), false);
-        window.addEventListener('focus', () => this.resetKeys(), false);
-        window.addEventListener('load', () => this.resetKeys(), false);
+        document.addEventListener('keyup',   (event) => this.processKeyUp(event), false);
 
-
+        window.addEventListener('blur',  () => this.reset());
+        window.addEventListener('focus', () => this.reset());
+        window.addEventListener('load',  () => this.reset());
     }
 
     processKeyDown(event) {
@@ -33,31 +38,53 @@ class KeyManager {
     processMouseMove(event) {
         this.mouseDelta.x += event.movementX || 0;
         this.mouseDelta.y += event.movementY || 0;
-        
-    }
 
-    getDelta() {
-        const delta = { ...this.mouseDelta };
-        this.mouseDelta.x = 0;
-        this.mouseDelta.y = 0;
-        return delta;
+        this.mousePos.x = event.clientX;
+        this.mousePos.y = event.clientY;
     }
 
     processMouseDown() {
         this.mouseHeld = true;
+        this.mouseDownThisFrame = true;  
     }
 
     processMouseUp() {
         this.mouseHeld = false;
+        this.mouseUpThisFrame = true;     
     }
 
-    isMousePressed() {
+    getMousePos() {
+        return { ...this.mousePos };
+    }
+
+    getDelta() {
+        const delta = { ...this.mouseDelta };
+        this.mouseDelta = { x: 0, y: 0 };
+        return delta;
+    }
+
+    isMouseDownThisFrame() {
+        return this.mouseDownThisFrame;
+    }
+
+    isMouseUpThisFrame() {
+        return this.mouseUpThisFrame;
+    }
+
+    isMouseHeld() {
         return this.mouseHeld;
-    }       
-    
-    resetKeys() {
+    }
+
+    endOfFrame() {
+        this.mouseDownThisFrame = false;
+        this.mouseUpThisFrame = false;
+    }
+
+    reset() {
         this.activeKeys = {};
         this.mouseHeld = false;
+        this.mouseDownThisFrame = false;
+        this.mouseUpThisFrame = false;
         this.mouseDelta = { x: 0, y: 0 };
     }
 }

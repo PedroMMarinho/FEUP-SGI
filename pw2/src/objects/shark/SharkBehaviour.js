@@ -10,11 +10,11 @@ export class SharkBehaviour {
     // Movement parameters
     this.baseSpeed = options.speed || 2;
     this.currentSpeed = this.baseSpeed;
-    this.maxSpeed = this.baseSpeed * 6;
+    this.maxSpeed = this.baseSpeed * 3.2;
     
     this.acceleration = options.acceleration || 0.3;
     this.baseAcceleration = this.acceleration;
-    this.fleeAcceleration = this.acceleration * 2.5; 
+    this.fleeAcceleration = this.acceleration * 2.2; 
     
     this.deceleration = options.deceleration || 0.4;
     
@@ -132,7 +132,7 @@ export class SharkBehaviour {
     this.acceleration = this.fleeAcceleration;
     
     this.targetSpeed = this.maxSpeed;
-    this.adaptiveTurnSpeed = this.turnSpeed * 1.5;
+    this.adaptiveTurnSpeed = this.turnSpeed * 1.2;
 
     if (this.actionData && this.actionData.action.type === ActionType.FLEE) {
       this.executeFlee();
@@ -251,7 +251,7 @@ export class SharkBehaviour {
     fleeDir.normalize();
   }
 
-  const directionBlend = 0.9;
+  const directionBlend = 0.2;
   this.smoothedDir.lerp(fleeDir, directionBlend);
   this.smoothedDir.normalize();
 
