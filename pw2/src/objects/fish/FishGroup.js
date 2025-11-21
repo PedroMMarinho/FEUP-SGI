@@ -45,7 +45,7 @@ class FishGroup extends THREE.Object3D {
 		const thinFish = new Fish(0xdc143c, 1.3, 0.8, 1.1); */
 
 		for (let i = 0; i < this.count; i++) {
-			const fishLOD = new FishLOD(0xdc143c, 0x00ff55, this.sparseness, 
+			const fishLOD = new FishLOD(0xff7b00, 0x5a2cff, 0xffea00, 0xff3bff, this.sparseness,
 				this.baseHeight, this.maxHeight, boidProps);
 
 			/* fishLOD.position.set(

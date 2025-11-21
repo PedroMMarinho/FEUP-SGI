@@ -4,9 +4,10 @@ import { TimeManager } from '../../managers/TimeManager.js';
 import { EntityType } from '../../enums/EntityType.js';
 import { DangerLevel } from '../../enums/DangerLevel.js';
 import { CollisionManager } from '../../managers/CollisionManager.js';
+import { TextureManager } from '../../managers/TextureManager.js';
 
 export class FishLOD extends THREE.LOD {
-	constructor(bodyColor, finColor, sparseness, baseHeight, maxHeight, boidProperties) {
+	constructor(bodyColor, finColor, bodyColor2, finColor2, sparseness, baseHeight, maxHeight, boidProperties) {
 		super();
 
 		this.collisionManager = CollisionManager.getInstance();
@@ -17,6 +18,8 @@ export class FishLOD extends THREE.LOD {
 		this.boidProperties = boidProperties;
 		this.bodyColor = bodyColor;
 		this.finColor = finColor;
+		this.bodyColor2 = bodyColor2;
+		this.finColor2 = finColor2;
 		this.distanceStart = 40;
 		this.distanceOffset = 20;
 		this.size = 1;
@@ -45,6 +48,10 @@ export class FishLOD extends THREE.LOD {
 
 		this.keyframedAnimation = null;
 
+		this.textureManager = TextureManager.getInstance();
+		this.perlinNoiseTex = this.textureManager.getTexture('perlin-noise');
+		this.perlinNoiseTex.repeat.set(16, 16);
+
 		// BVH parameters
 		this.rootObject = true;
 		this.bvhSelectable = true;
@@ -58,12 +65,138 @@ export class FishLOD extends THREE.LOD {
 		const lowResFish = new Fish(1);
 		const emptyFish = new THREE.Object3D();
 
+
 		const bodyMaterial = new THREE.MeshPhongMaterial({
-			color: this.bodyColor,
-		});
+    color: this.bodyColor,
+	map: this.perlinNoiseTex,
+    onBeforeCompile: (shader) => {
+        shader.uniforms.perlinNoise = { value: this.perlinNoiseTex };
+        shader.uniforms.bodyColor = { value: new THREE.Color(this.bodyColor) };
+        shader.uniforms.bodyColor2 = { value: new THREE.Color(this.bodyColor2) };
+        shader.uniforms.randomOffset = { value: Math.random() * 100 };
+        
+        // Add UV + our uniforms to the vertex shader
+        shader.vertexShader = shader.vertexShader.replace(
+            `#include <common>`,
+            `
+            #include <common>
+            varying vec2 vUv;
+            varying vec3 vPosition;
+            `
+        );
+        shader.vertexShader = shader.vertexShader.replace(
+            `#include <uv_vertex>`,
+            `
+            #include <uv_vertex>
+            vUv = uv;
+            vPosition = position;
+            `
+        );
+        
+        // Add uniforms + color mixing logic to the fragment shader
+        shader.fragmentShader = shader.fragmentShader.replace(
+            `#include <common>`,
+            `
+            #include <common>
+            uniform sampler2D perlinNoise;
+            uniform vec3 bodyColor;
+            uniform vec3 bodyColor2;
+            uniform float randomOffset;
+            varying vec2 vUv;
+            varying vec3 vPosition;
+            `
+        );
+        
+        // Replace the default diffuseColor assignment
+        shader.fragmentShader = shader.fragmentShader.replace(
+            `vec4 diffuseColor = vec4( diffuse, opacity );`,
+            `
+            // Multi-scale noise sampling for more variation
+            float scale1 = 2.0;  // Larger patches
+            float scale2 = 5.0;  // Medium details
+            float scale3 = 10.0; // Fine details
+            
+            vec2 offset = vec2(randomOffset * 0.01);
+            
+            float noise1 = texture2D(perlinNoise, vUv * scale1 + offset).r;
+            float noise2 = texture2D(perlinNoise, vUv * scale2 + offset * 1.3).r;
+            float noise3 = texture2D(perlinNoise, vUv * scale3 + offset * 1.7).r;
+            
+            // Combine noise octaves
+            float noiseValue = noise1 * 0.5 + noise2 * 0.3 + noise3 * 0.2;
+            
+            // Create sharper transitions between colors
+            float threshold = 0.5;
+            float sharpness = 3.0;
+            float colorMix = smoothstep(threshold - 0.1, threshold + 0.1, noiseValue);
+            
+            // Or use a sharper step for more distinct patches:
+            //float colorMix = step(threshold, noiseValue);
+            
+            vec3 mixedColor = mix(bodyColor, bodyColor2, colorMix);
+            vec4 diffuseColor = vec4(mixedColor, opacity);
+            `
+        );
+    },
+});
+
 		const finMaterial = new THREE.MeshPhongMaterial({
 			color: this.finColor,
+			onBeforeCompile: (shader) => {
+				shader.uniforms.perlinNoise = { value: this.perlinNoiseTex };
+				shader.uniforms.finColor = { value: new THREE.Color(this.finColor) };
+				shader.uniforms.finColor2 = { value: new THREE.Color(this.finColor2) };
+				shader.uniforms.randomOffset = { value: Math.random() * 100 };
+
+				// Add UV + our uniforms to the vertex shader
+				shader.vertexShader = shader.vertexShader.replace(
+					`#include <common>`,
+					`
+					#include <common>
+					varying vec2 vUv;
+					`
+				);
+
+				shader.vertexShader = shader.vertexShader.replace(
+					`#include <uv_vertex>`,
+					`
+					#include <uv_vertex>
+					vUv = uv;
+					`
+				);
+
+				// Add uniforms + color mixing logic to the fragment shader
+				shader.fragmentShader = shader.fragmentShader.replace(
+					`#include <common>`,
+					`
+					#include <common>
+					uniform sampler2D perlinNoise;
+					uniform vec3 finColor;
+					uniform vec3 finColor2;
+					uniform float randomOffset;
+
+					varying vec2 vUv;
+					`
+				);
+
+				// Replace the default diffuseColor assignment
+				shader.fragmentShader = shader.fragmentShader.replace(
+					`vec4 diffuseColor = vec4( diffuse, opacity );`,
+					`
+					// Sample noise texture
+					float noiseValue = texture2D(perlinNoise, vUv + vec2(randomOffset * 0.01)).r;
+
+					// Interpolate between the colors
+					vec3 mixedColor = mix(finColor, finColor2, noiseValue);
+
+					vec4 diffuseColor = vec4(mixedColor, opacity);
+					`
+				);
+			},
 		});
+
+		bodyMaterial.needsUpdate = true;
+		finMaterial.needsUpdate = true;
 
 
 		// low res model

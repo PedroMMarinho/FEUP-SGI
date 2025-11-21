@@ -66,9 +66,22 @@ export class Fish {
 			5, 3, 4, // body left bottom	
 		];
 
+		const uv = new Float32Array([
+			0.5,1.0,
+			1.0,0.6,
+			0.5,0.6,
+			0.5,0.4,
+			0.0, 0.6,
+			0.5, 0.0
+		])
+
+		this.bodyGeometry.setAttribute('uv', new THREE.BufferAttribute(uv, 2));
+
 		this.bodyGeometry.setAttribute('position', new THREE.BufferAttribute(vertices, 3));
 		this.bodyGeometry.setIndex(indices);
 		this.bodyGeometry.computeVertexNormals();
+
+
 	}
 
 	initTail() {
