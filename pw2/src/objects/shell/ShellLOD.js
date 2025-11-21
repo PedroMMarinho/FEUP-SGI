@@ -4,9 +4,13 @@ import { Shell } from './Shell.js';
 export class ShellLOD extends THREE.LOD {
 	constructor(lods) {
 		super();
-        this.distanceStart = 50;
-        this.distanceOffset = 10;
+        this.distanceStart = 20;
+        this.distanceOffset = 15;
 		this.lods = lods;
+		// BVH parameters
+		this.rootObject = true;
+		this.bvhSelectable = true;
+
 		this.init();
 	}
 

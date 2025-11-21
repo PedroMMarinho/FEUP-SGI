@@ -192,7 +192,7 @@ class CameraManager {
         this.yaw = camera.rotation.y;
         this.pitch = camera.rotation.x;
 
-        if (keyManager.isMousePressed()) {
+        if (keyManager.isMouseHeld()) {
             this.yaw -= deltaX * this.lookSpeed * deltaTime;
             this.pitch -= deltaY * this.lookSpeed * deltaTime;
         }
