@@ -36,6 +36,28 @@ class FishGroup extends THREE.Object3D {
 		this.init();
 	}
 
+	alterColor(hexColor, hueShift = 0.05, satShift = 0.1, lightShift = 0.1) {
+        const color = new THREE.Color(hexColor);
+        const hsl = {};
+        color.getHSL(hsl);
+
+        // Randomize Hue (wrap around 0-1)
+        hsl.h += THREE.MathUtils.randFloatSpread(hueShift); 
+        if (hsl.h < 0) hsl.h += 1;
+        if (hsl.h > 1) hsl.h -= 1;
+
+        // Randomize Saturation (clamp 0-1)
+        hsl.s += THREE.MathUtils.randFloatSpread(satShift);
+        hsl.s = THREE.MathUtils.clamp(hsl.s, 0, 1);
+
+        // Randomize Lightness (clamp 0-1)
+        hsl.l += THREE.MathUtils.randFloatSpread(lightShift);
+        hsl.l = THREE.MathUtils.clamp(hsl.l, 0, 1);
+
+        color.setHSL(hsl.h, hsl.s, hsl.l);
+        return color.getHex(); 
+    }
+
 	init() {
 
 		/* const material = new THREE.MeshStandardMaterial({ color: 0xdc143c });
@@ -44,8 +66,20 @@ class FishGroup extends THREE.Object3D {
 		const normalFish = new Fish(0xdc143c);
 		const thinFish = new Fish(0xdc143c, 1.3, 0.8, 1.1); */
 
+		const bodyColor = 0xff7b00; 
+		const finColor = 0x5a2cff;
+		const bodyColor2 = 0xffea00; 
+		const finColor2 = 0xff3bff; 
+
+
 		for (let i = 0; i < this.count; i++) {
-			const fishLOD = new FishLOD(0xff7b00, 0x5a2cff, 0xffea00, 0xff3bff, this.sparseness,
+			// Randomly Shaddes of Colors
+			const variedBodyColor = this.alterColor(bodyColor, 0.08, 0.2, 0.2);
+			const variedFinColor = this.alterColor(finColor, 0.05, 0.2, 0.2);
+			const variedBodyColor2 = this.alterColor(bodyColor2, 0.08, 0.2, 0.2);
+			const variedFinColor2 = this.alterColor(finColor2, 0.05, 0.2, 0.2);
+
+			const fishLOD = new FishLOD(variedBodyColor, variedFinColor, variedBodyColor2, variedFinColor2, this.sparseness,
 				this.baseHeight, this.maxHeight, this.boidProps);
 
 			/* fishLOD.position.set(
