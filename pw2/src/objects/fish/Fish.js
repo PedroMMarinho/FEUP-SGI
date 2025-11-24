@@ -2,7 +2,7 @@ import * as THREE from 'three';
 
 export class Fish {
 	constructor(lowRes, bodyLenRatio = 1, fatFishRatio = 1, finSizeRatio = 1) {
-		
+
 		this.bodyGeometry = new THREE.BufferGeometry();
 		this.tailGeometry = new THREE.BufferGeometry();
 		this.dorsalFinGeometry = new THREE.BufferGeometry();
@@ -19,7 +19,7 @@ export class Fish {
 			this.initDorsalFin();
 			this.initSkeleton();
 			this.addSkinning();
-		} else if (lowRes == 1){
+		} else if (lowRes == 1) {
 			this.initLowResBody();
 			this.initLowResTail();
 		}
@@ -28,9 +28,9 @@ export class Fish {
 
 	initLowResBody() {
 		const vertices = new Float32Array([
-			0, -0.4 * this.fatFishRatio, 0,
-			0, 0.4 * this.fatFishRatio, 0,
-			0, 0, -1.5 * this.bodyLenRatio
+			0, -0.4 * this.fatFishRatio, 0,  // v0 bottom spine
+			0, 0.4 * this.fatFishRatio, 0,   // v1 top spine
+			0, 0, -1.5 * this.bodyLenRatio    // v2 back/tail
 		]);
 
 		const indices = [
@@ -38,21 +38,27 @@ export class Fish {
 			0, 1, 2,
 		];
 
+		const uvs = new Float32Array([
+			0.5, 0.0, // v0 bottom spine
+			0.5, 1.0, // v1 top spine
+			0.0, 0.5  // v2 back/tail
+		]);
+
 		this.bodyGeometry.setAttribute('position', new THREE.BufferAttribute(vertices, 3));
+		this.bodyGeometry.setAttribute('uv', new THREE.BufferAttribute(uvs, 2));
 		this.bodyGeometry.setIndex(indices);
 		this.bodyGeometry.computeVertexNormals();
 	}
 
+
 	initBody() {
-		// directions according to image on moodle document
-		
 		const vertices = new Float32Array([
-			0, 0, 0.5 * this.bodyLenRatio, // v0 face tip
-			0.3 * this.fatFishRatio, 0, -0.1, // v1 right face tip
-			0, 0.4 * this.fatFishRatio, 0, // v2 face top
-			0, -0.4 * this.fatFishRatio, 0, // v3 face bottom
-			-0.3 * this.fatFishRatio, 0, -0.1, // v4 left face tip
-			0, 0, -1.5 * this.bodyLenRatio, // v5 back spine tip	
+			0, 0, 0.5 * this.bodyLenRatio,    // v0: Nose
+			0.3 * this.fatFishRatio, 0, -0.1, // v1: Right fin
+			0, 0.4 * this.fatFishRatio, 0,    // v2: Top Spine
+			0, -0.4 * this.fatFishRatio, 0,   // v3: Bottom Spine
+			-0.3 * this.fatFishRatio, 0, -0.1,// v4: Left fin
+			0, 0, -1.5 * this.bodyLenRatio,   // v5: Tail
 		]);
 
 		const indices = [
@@ -63,39 +69,59 @@ export class Fish {
 			1, 5, 2, // body right top 
 			1, 3, 5, // body right bottom 
 			5, 4, 2, // body left top 
-			5, 3, 4, // body left bottom	
+			5, 3, 4, // body left bottom    
 		];
 
+		const uvs = new Float32Array([
+			0.5, 1.0, // v0: Nose
+			1.0, 0.5, // v1: Right fin
+			0.5, 0.75, // v2: Top Spine
+			0.5, 0.25, // v3: Bottom Spine
+			0.0, 0.5, // v4: Left fin
+			0.5, 0.0  // v5: Tail
+		]);
+
 		this.bodyGeometry.setAttribute('position', new THREE.BufferAttribute(vertices, 3));
+		this.bodyGeometry.setAttribute('uv', new THREE.BufferAttribute(uvs, 2));
 		this.bodyGeometry.setIndex(indices);
 		this.bodyGeometry.computeVertexNormals();
 	}
 
 	initTail() {
 		const vertices = new Float32Array([
-			0, 0, -1.5 * this.bodyLenRatio, // v0 back spine tip
-			0, 0, -1.7 * this.finSizeRatio, // v1 tail bone tip
+			0, 0, -1.5 * this.bodyLenRatio,           // v0 back spine tip
+			0, 0, -1.7 * this.finSizeRatio,           // v1 tail bone tip
 			0, 0.5 * this.finSizeRatio, -2 * this.finSizeRatio, // v2 tail top tip 
 			0, -0.5 * this.finSizeRatio, -2 * this.finSizeRatio // v3 tail bottom tip	
 		]);
 
 		const indices = [
-			0,1,2,
-			0,3,1,
-			1,0,2,
-			1,3,0,
+			0, 1, 2,
+			0, 3, 1,
+			1, 0, 2,
+			1, 3, 0,
 		];
-		
+
+
+		const uvs = new Float32Array([
+			0.5, 0.5, // v0 back spine tip
+			0.5, 0.25, // v1 tail bone tip
+			0.5, 1.0, // v2 tail top tip
+			0.5, 0.0  // v3 tail bottom tip
+		]);
+
 		this.tailGeometry.setAttribute('position', new THREE.BufferAttribute(vertices, 3));
+		this.tailGeometry.setAttribute('uv', new THREE.BufferAttribute(uvs, 2));
 		this.tailGeometry.setIndex(indices);
 		this.tailGeometry.computeVertexNormals();
 	}
 
+
 	initLowResTail() {
 		const vertices = new Float32Array([
-			0, 0, -1.5 * this.bodyLenRatio,
-			0, 0.5 * this.finSizeRatio, -2 * this.finSizeRatio,
-			0, -0.5 * this.finSizeRatio, -2 * this.finSizeRatio
+			0, 0, -1.5 * this.bodyLenRatio,          // v0 back spine tip
+			0, 0.5 * this.finSizeRatio, -2 * this.finSizeRatio,  // v1 top tip
+			0, -0.5 * this.finSizeRatio, -2 * this.finSizeRatio  // v2 bottom tip
 		]);
 
 		const indices = [
@@ -103,17 +129,24 @@ export class Fish {
 			0, 1, 2
 		];
 
+		const uvs = new Float32Array([
+			0.5, 0.5, // v0 back spine tip
+			0.5, 1.0, // v1 top tip
+			0.5, 0.0  // v2 bottom tip
+		]);
+
 		this.tailGeometry.setAttribute('position', new THREE.BufferAttribute(vertices, 3));
+		this.tailGeometry.setAttribute('uv', new THREE.BufferAttribute(uvs, 2));
 		this.tailGeometry.setIndex(indices);
 		this.tailGeometry.computeVertexNormals();
 	}
 
 	initDorsalFin() {
 		const vertices = new Float32Array([
-			0, 0.4 * this.fatFishRatio, 0, // v0 face top
-			0, 0, -1.5 * this.bodyLenRatio, // v1 back spine tip
-			0, 0.2, -1.2 * this.bodyLenRatio, // v2 dorsal fin back tip
-			0, 0.6, -0.2 * this.bodyLenRatio // v3 dorsal fin front tip
+			0, 0.4 * this.fatFishRatio, 0,       // v0 face top
+			0, 0, -1.5 * this.bodyLenRatio,       // v1 back spine tip
+			0, 0.2, -1.2 * this.bodyLenRatio,     // v2 dorsal fin back tip
+			0, 0.6, -0.2 * this.bodyLenRatio      // v3 dorsal fin front tip
 		]);
 
 		const indices = [
@@ -122,11 +155,20 @@ export class Fish {
 			0, 3, 2,
 			0, 2, 1,
 		];
-		
+
+		const uvs = new Float32Array([
+			0.5, 1.0, // v0 face top
+			0.5, 0.0, // v1 back spine tip
+			0.25, 0.25, // v2 dorsal fin back tip
+			0.75, 0.75  // v3 dorsal fin front tip
+		]);
+
 		this.dorsalFinGeometry.setAttribute('position', new THREE.BufferAttribute(vertices, 3));
+		this.dorsalFinGeometry.setAttribute('uv', new THREE.BufferAttribute(uvs, 2));
 		this.dorsalFinGeometry.setIndex(indices);
 		this.dorsalFinGeometry.computeVertexNormals();
 	}
+
 
 	// --- Skeleton setup ---
 	initSkeleton() {
@@ -134,9 +176,9 @@ export class Fish {
 		const bone1 = new THREE.Bone(); // middle
 		const bone2 = new THREE.Bone(); // tail
 
-		bone0.position.set(0,0,0);
-		bone1.position.set(0,0,-0.75 * this.bodyLenRatio);
-		bone2.position.set(0,0,-1.5 * this.bodyLenRatio);
+		bone0.position.set(0, 0, 0);
+		bone1.position.set(0, 0, -0.75 * this.bodyLenRatio);
+		bone2.position.set(0, 0, -1.5 * this.bodyLenRatio);
 
 		bone0.add(bone1);
 		bone1.add(bone2);
@@ -178,7 +220,7 @@ export class Fish {
 		geometry.setAttribute('skinIndex', new THREE.Uint16BufferAttribute(skinIndices, 4));
 		geometry.setAttribute('skinWeight', new THREE.Float32BufferAttribute(skinWeights, 4));
 	}
-	
+
 	/* initMaterials() {
 		this.material = new THREE.MeshStandardMaterial({
 			color: this.fishColor,
