@@ -138,8 +138,17 @@ class Aquarium extends THREE.Object3D {
             group.position.set(randomCord(), 10, randomCord());
             this.addToAquarium(group);
         }*/
+
+        this.boidProps = {
+            cohesion: 2,
+            separation: 2,
+            alignment: 1.4,
+            moveSpeed: 4,
+            awareness: 10
+        };
+
 		this.fishGroups = [
-			new FishGroup(400, this.terrainWidth / 2 - 8, this.terrainHeight / 2 + 10),
+			new FishGroup(400, this.terrainWidth / 2 - 8, this.terrainHeight / 2 + 10, this.boidProps),
 		];
 		this.fishGroups[0].position.set(0,0,0);
 		this.addToAquarium(this.fishGroups[0]);
