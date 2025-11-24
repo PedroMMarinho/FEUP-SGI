@@ -57,6 +57,13 @@ class FishGroup extends THREE.Object3D {
         color.setHSL(hsl.h, hsl.s, hsl.l);
         return color.getHex(); 
     }
+	// First fish is target
+	getCameraTarget() {
+        if (this.fishes.length > 0) {
+            return this.fishes[0];
+        }
+        return null;
+    }
 
 	init() {
 
