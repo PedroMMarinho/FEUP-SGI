@@ -68,7 +68,7 @@ class Seabed extends THREE.Object3D {
 	}
 
 	createShipGroup() {
-		const shipPositions = this.computePositions(this.shipCount);
+		const shipPositions = this.computePositions(this.shipCount, 0.85);
 		const shipGroup = new ShipGroup(shipPositions, this.shipModels);
 		this.add(shipGroup);
 		this.globalPositions.push(...shipPositions);
@@ -107,10 +107,10 @@ class Seabed extends THREE.Object3D {
 		this.add(seaweedGroup);
 	}
 
-	computePositions(count, maxTries = 50) {
+	computePositions(count, objectMarginFactor = 1, maxTries = 50) {
 		const positions = [];
 
-		const effectiveSize = this.terrainSize * this.marginFactor;
+		const effectiveSize = this.terrainSize * this.marginFactor * objectMarginFactor;
 		const halfSize = effectiveSize / 2;
 
 		for (let i = 0; i < count; i++) {
