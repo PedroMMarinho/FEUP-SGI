@@ -52,7 +52,7 @@ export class FishLOD extends THREE.LOD {
 		this.perlinNoiseTex = this.textureManager.getTexture('perlin-noise');
 		this.perlinNoiseTex.wrapS = THREE.RepeatWrapping; 
 		this.perlinNoiseTex.wrapT = THREE.RepeatWrapping; 
-		this.perlinNoiseTex.repeat.set(16, 16);
+		this.perlinNoiseTex.repeat.set(1, 1);
 
 		// BVH parameters
 		this.rootObject = true;
@@ -70,7 +70,6 @@ export class FishLOD extends THREE.LOD {
 
 		const bodyMaterial = new THREE.MeshPhongMaterial({
     color: this.bodyColor,
-	map: this.perlinNoiseTex,
     onBeforeCompile: (shader) => {
         shader.uniforms.perlinNoise = { value: this.perlinNoiseTex };
         shader.uniforms.bodyColor = { value: new THREE.Color(this.bodyColor) };
@@ -129,11 +128,8 @@ export class FishLOD extends THREE.LOD {
             
             // Create sharper transitions between colors
             float threshold = 0.5;
-            float sharpness = 3.0;
-            float colorMix = smoothstep(threshold - 0.1, threshold + 0.1, noiseValue);
-            
-            // Or use a sharper step for more distinct patches:
-            //float colorMix = step(threshold, noiseValue);
+            float sharpness = 0.1;
+            float colorMix = smoothstep(threshold - sharpness, threshold + sharpness, noiseValue);
             
             vec3 mixedColor = mix(bodyColor, bodyColor2, colorMix);
             vec4 diffuseColor = vec4(mixedColor, opacity);
@@ -144,7 +140,6 @@ export class FishLOD extends THREE.LOD {
 
 		const finMaterial = new THREE.MeshPhongMaterial({
 			color: this.finColor,
-			map: this.perlinNoiseTex,
 			onBeforeCompile: (shader) => {
 				shader.uniforms.perlinNoise = { value: this.perlinNoiseTex };
 				shader.uniforms.finColor = { value: new THREE.Color(this.finColor) };
