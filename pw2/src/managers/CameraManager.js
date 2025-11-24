@@ -31,6 +31,9 @@ class CameraManager {
         this.near = -frustumSize / 2;
         this.far = frustumSize;
         this.canvasDiv = document.getElementById('canvas');    
+
+        // Fish Camera
+        this.targetFish = null;
     }
 
     init() {
@@ -52,7 +55,14 @@ class CameraManager {
         const submarineCam = new THREE.PerspectiveCamera(100, this.aspect, 0.1, 1000);
         this.cameras['Submarine View'] = submarineCam;
 
+        const fishCam = new THREE.PerspectiveCamera(90, this.aspect, 0.1, 1000);
+        this.cameras['Fish View'] = fishCam;
+
         this.setActiveCamera('Free Fly');
+    }
+
+    setTargetFish(fishObject) {
+        this.targetFish = fishObject;
     }
 
     setActiveCamera(name) {
@@ -88,7 +98,26 @@ class CameraManager {
         if (this.controls) this.controls.update();
         if (this.activeCameraName === 'Free Fly') this.updateFreeFly(deltaTime);
         if (this.activeCameraName === 'Submarine View') this.updateSubmarineView(submarine);
+        if (this.activeCameraName === 'Fish View') this.updateFishView();
 
+    }
+
+    updateFishView() {
+        if (!this.targetFish) return;
+
+        const camera = this.cameras['Fish View'];
+        const fish = this.targetFish;
+
+        camera.position.copy(fish.position);
+        
+        camera.quaternion.copy(fish.quaternion);
+
+        camera.rotateY(Math.PI);
+ 
+        camera.translateZ(1.5); 
+        camera.translateY(1.0);
+
+        camera.rotateX(-0.2); 
     }
 
     updateSubmarineView(submarine) {

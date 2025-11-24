@@ -62,20 +62,6 @@ class MyGuiInterface {
 
         renderFolder.open();
 
-
-        const submarine = this.contents.aquarium.submarine; // Make sure MyContents stores the submarine reference
-        if (submarine) {
-            const submarineFolder = this.datgui.addFolder('Submarine Controls');
-
-  
-            submarineFolder.add(submarine.position, 'x', 0, 4, 1).name('Position X');
-
-
-            submarineFolder.open();
-        } else {
-            console.log('Submarine not found in contents — make sure it’s stored in MyContents!');
-        }
-
         // --- BVH Acceleration controls ---
         const bvhParams = this.contents.bvhManager;
         if (bvhParams) {
@@ -107,6 +93,30 @@ class MyGuiInterface {
                 });
 
             collisionFolder.open();
+        }
+
+        // Boid behavior controls
+        const boidProperties = this.contents.aquarium.boidProps;
+        if (boidProperties) {
+            const boidFolder = this.datgui.addFolder('Boid Behavior');
+            
+            boidFolder
+                .add(boidProperties, 'cohesion', 0, 5, 0.1)
+                .name('Cohesion Strength');
+            boidFolder
+                .add(boidProperties, 'separation', 0, 5, 0.1)
+                .name('Separation Strength');
+            boidFolder
+                .add(boidProperties, 'alignment', 0, 5, 0.1)
+                .name('Alignment Strength');
+            boidFolder
+                .add(boidProperties, 'moveSpeed', 0, 10, 0.1)
+                .name('Movement Speed');
+            boidFolder
+                .add(boidProperties, 'awareness', 1, 20, 1)
+                .name('Awareness Radius');
+                
+            boidFolder.open();
         }
 
     }

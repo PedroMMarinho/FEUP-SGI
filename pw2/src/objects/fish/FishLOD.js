@@ -4,9 +4,10 @@ import { TimeManager } from '../../managers/TimeManager.js';
 import { EntityType } from '../../enums/EntityType.js';
 import { DangerLevel } from '../../enums/DangerLevel.js';
 import { CollisionManager } from '../../managers/CollisionManager.js';
+import { TextureManager } from '../../managers/TextureManager.js';
 
 export class FishLOD extends THREE.LOD {
-	constructor(bodyColor, finColor, sparseness, baseHeight, maxHeight, boidProperties) {
+	constructor(bodyColor, finColor, bodyColor2, finColor2, sparseness, baseHeight, maxHeight, boidProperties) {
 		super();
 
 		this.collisionManager = CollisionManager.getInstance();
@@ -17,6 +18,8 @@ export class FishLOD extends THREE.LOD {
 		this.boidProperties = boidProperties;
 		this.bodyColor = bodyColor;
 		this.finColor = finColor;
+		this.bodyColor2 = bodyColor2;
+		this.finColor2 = finColor2;
 		this.distanceStart = 40;
 		this.distanceOffset = 20;
 		this.size = 1;
@@ -45,6 +48,12 @@ export class FishLOD extends THREE.LOD {
 
 		this.keyframedAnimation = null;
 
+		this.textureManager = TextureManager.getInstance();
+		this.perlinNoiseTex = this.textureManager.getTexture('perlin-noise');
+		this.perlinNoiseTex.wrapS = THREE.RepeatWrapping; 
+		this.perlinNoiseTex.wrapT = THREE.RepeatWrapping; 
+		this.perlinNoiseTex.repeat.set(1, 1);
+
 		// BVH parameters
 		this.rootObject = true;
 		this.bvhSelectable = true;
@@ -58,12 +67,131 @@ export class FishLOD extends THREE.LOD {
 		const lowResFish = new Fish(1);
 		const emptyFish = new THREE.Object3D();
 
-		const bodyMaterial = new THREE.MeshPhongMaterial({
-			color: this.bodyColor,
-		});
-		const finMaterial = new THREE.MeshPhongMaterial({
-			color: this.finColor,
-		});
+
+		this.bodyMaterial = new THREE.MeshPhongMaterial({
+            color: this.bodyColor,
+            onBeforeCompile: (shader) => {
+                shader.uniforms.perlinNoise = { value: this.perlinNoiseTex };
+                shader.uniforms.bodyColor = { value: new THREE.Color(this.bodyColor) };
+                shader.uniforms.bodyColor2 = { value: new THREE.Color(this.bodyColor2) };
+                shader.uniforms.randomOffset = { value: Math.random() * 100 };
+                shader.uniforms.uTime = { value: 0 }; 
+
+                this.bodyMaterial.userData.shader = shader; 
+
+                shader.vertexShader = shader.vertexShader.replace(
+                    `#include <common>`,
+                    `#include <common>
+                     varying vec2 vUv;`
+                );
+                shader.vertexShader = shader.vertexShader.replace(
+                    `#include <uv_vertex>`,
+                    `#include <uv_vertex>
+                     vUv = uv;`
+                );
+                
+                shader.fragmentShader = shader.fragmentShader.replace(
+                    `#include <common>`,
+                    `
+                    #include <common>
+                    uniform sampler2D perlinNoise;
+                    uniform vec3 bodyColor;
+                    uniform vec3 bodyColor2;
+                    uniform float randomOffset;
+                    uniform float uTime;
+                    varying vec2 vUv;
+                    `
+                );
+                
+                shader.fragmentShader = shader.fragmentShader.replace(
+                    `vec4 diffuseColor = vec4( diffuse, opacity );`,
+                    `
+                    float scale1 = 2.0; 
+                    float scale2 = 5.0;
+                    float scale3 = 10.0;
+                    
+                    float timeShift = uTime * 0.8; 
+                    vec2 offset = vec2(randomOffset * 0.01 + timeShift * 0.1);
+                    
+                    float noise1 = texture2D(perlinNoise, vUv * scale1 + offset).r;
+                    float noise2 = texture2D(perlinNoise, vUv * scale2 + offset * 1.3).r;
+                    float noise3 = texture2D(perlinNoise, vUv * scale3 + offset * 1.7).r;
+                    
+                    float noiseValue = noise1 * 0.5 + noise2 * 0.3 + noise3 * 0.2;
+                    
+                    float pulse = 1.0 + (sin(uTime * 2.0) * 0.18); 
+                    
+                    float threshold = 0.5;
+                    float sharpness = 0.1;
+                    float colorMix = smoothstep(threshold - sharpness, threshold + sharpness, noiseValue);
+                    
+                    vec3 mixedColor = mix(bodyColor, bodyColor2, colorMix);
+                    mixedColor *= pulse;
+
+                    vec4 diffuseColor = vec4(mixedColor, opacity);
+                    `
+                );
+            },
+        });
+
+        this.finMaterial = new THREE.MeshPhongMaterial({
+            color: this.finColor,
+            onBeforeCompile: (shader) => {
+                shader.uniforms.perlinNoise = { value: this.perlinNoiseTex };
+                shader.uniforms.finColor = { value: new THREE.Color(this.finColor) };
+                shader.uniforms.finColor2 = { value: new THREE.Color(this.finColor2) };
+                shader.uniforms.randomOffset = { value: Math.random() * 100 };
+                shader.uniforms.uTime = { value: 0 };
+
+                // Save shader reference
+                this.finMaterial.userData.shader = shader;
+
+                shader.vertexShader = shader.vertexShader.replace(
+                    `#include <common>`,
+                    `#include <common>
+                    varying vec2 vUv;`
+                );
+
+                shader.vertexShader = shader.vertexShader.replace(
+                    `#include <uv_vertex>`,
+                    `#include <uv_vertex>
+                    vUv = uv;`
+                );
+
+                shader.fragmentShader = shader.fragmentShader.replace(
+                    `#include <common>`,
+                    `
+                    #include <common>
+                    uniform sampler2D perlinNoise;
+                    uniform vec3 finColor;
+                    uniform vec3 finColor2;
+                    uniform float randomOffset;
+                    uniform float uTime; // Added uTime
+                    varying vec2 vUv;
+                    `
+                );
+
+                shader.fragmentShader = shader.fragmentShader.replace(
+                    `vec4 diffuseColor = vec4( diffuse, opacity );`,
+                    `
+                    // Add time shift to fins too
+                    float timeShift = uTime * 0.8;
+                    float noiseValue = texture2D(perlinNoise, vUv + vec2(randomOffset * 0.01 + timeShift * 0.1)).r;
+
+                    vec3 mixedColor = mix(finColor, finColor2, noiseValue);
+                    
+                    // Add pulse to fins
+                    float pulse = 1.0 + (sin(uTime * 2.0) * 0.18);
+                    mixedColor *= pulse;
+
+                    vec4 diffuseColor = vec4(mixedColor, opacity);
+                    `
+                );
+            },
+        });
+
+        this.bodyMaterial.needsUpdate = true;
+        this.finMaterial.needsUpdate = true;
 
 
 		// low res model
@@ -82,8 +210,8 @@ export class FishLOD extends THREE.LOD {
 
 		const lowMesh = new THREE.Group();
 		lowMesh.isSkinned = false;
-		const lowResBodyMesh = new THREE.Mesh(lowResFish.bodyGeometry, bodyMaterial);
-		const lowResTailMesh = new THREE.Mesh(lowResFish.tailGeometry, finMaterial);
+		const lowResBodyMesh = new THREE.Mesh(lowResFish.bodyGeometry, this.bodyMaterial);
+		const lowResTailMesh = new THREE.Mesh(lowResFish.tailGeometry, this.finMaterial);
 		lowMesh.add(lowResTailMesh, lowResBodyMesh);
 
 		lowMesh.applyMatrix4(loresTra);
@@ -106,9 +234,9 @@ export class FishLOD extends THREE.LOD {
 		hiresSca.makeScale(hiresScaleFact, hiresScaleFact, hiresScaleFact);
 		hiresTra.makeTranslation(-hiresCenter.x, -hiresCenter.y, -hiresMin.z);
 
-		const highResBodyMesh = new THREE.SkinnedMesh(normalFish.bodyGeometry, bodyMaterial);
-		const highResTailMesh = new THREE.SkinnedMesh(normalFish.tailGeometry, finMaterial);
-		const highResDorsalMesh = new THREE.SkinnedMesh(normalFish.dorsalFinGeometry, finMaterial);
+		const highResBodyMesh = new THREE.SkinnedMesh(normalFish.bodyGeometry, this.bodyMaterial);
+		const highResTailMesh = new THREE.SkinnedMesh(normalFish.tailGeometry, this.finMaterial);
+		const highResDorsalMesh = new THREE.SkinnedMesh(normalFish.dorsalFinGeometry, this.finMaterial);
 
 		const skeleton = normalFish.skeleton;
 
@@ -232,6 +360,14 @@ export class FishLOD extends THREE.LOD {
 		this.lastTime = now;
 		this.globalTime += delta;
 
+		// Update Shader Time Uniforms
+		if (this.bodyMaterial.userData.shader) {
+			this.bodyMaterial.userData.shader.uniforms.uTime.value = now + this.animationOffset;
+		}
+		if (this.finMaterial.userData.shader) {
+			this.finMaterial.userData.shader.uniforms.uTime.value = now + this.animationOffset;
+		}
+		
 		// lod
 		const visibleLOD = this.levels.find(level => level.object.visible);
 		if (!visibleLOD) return;
