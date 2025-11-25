@@ -54,6 +54,11 @@ class Seabed extends THREE.Object3D {
 		const tvGroup = new TVGroup(tvPositions, this.tvModels);
 		this.add(tvGroup);
 		this.globalPositions.push(...tvPositions);
+		this.currentTV = tvGroup.tvs[0];
+	}
+
+	getTV(){
+		return this.currentTV;
 	}
 
 

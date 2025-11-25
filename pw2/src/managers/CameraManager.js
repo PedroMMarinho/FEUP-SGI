@@ -32,8 +32,18 @@ class CameraManager {
         this.far = frustumSize;
         this.canvasDiv = document.getElementById('canvas');    
 
-        // Fish Camera
+        // Special Cameras
         this.targetFish = null;
+        this.targetTelevision = null;
+        this.aquariumHeight = null;
+    }
+
+    setAquariumHeight(height){
+        this.aquariumHeight = height;
+    }
+
+    setTargetTV(tv){
+        this.targetTelevision = tv;
     }
 
     init() {
@@ -41,11 +51,7 @@ class CameraManager {
         perspective.position.set(10, 10, 3);
         this.cameras['Free Fly'] = perspective;
 
-        const aquariumCam = new THREE.OrthographicCamera(
-            this.left, this.right, this.top, this.bottom, this.near, this.far
-        );
-        aquariumCam.position.set(0, this.frustumSize / 4, this.frustumSize / 2);
-        aquariumCam.lookAt(new THREE.Vector3(0, 0, 0));
+        const aquariumCam = new THREE.PerspectiveCamera(60, this.aspect, 0.1, 2000);
         this.cameras['Aquarium View'] = aquariumCam;
 
         const UnderwaterCam = new THREE.PerspectiveCamera(75, this.aspect, 0.1, 1000);
@@ -57,6 +63,17 @@ class CameraManager {
 
         const fishCam = new THREE.PerspectiveCamera(90, this.aspect, 0.1, 1000);
         this.cameras['Fish View'] = fishCam;
+
+        const tvSize = 5;
+        const tvCam = new THREE.OrthographicCamera(
+            -tvSize * this.aspect / 2,  
+             tvSize * this.aspect / 2,  
+             tvSize / 2,               
+            -tvSize / 2,                
+             0.01,                       
+             50                         
+        );
+        this.cameras['TV View'] = tvCam;
 
         this.setActiveCamera('Free Fly');
     }
@@ -99,7 +116,7 @@ class CameraManager {
         if (this.activeCameraName === 'Free Fly') this.updateFreeFly(deltaTime);
         if (this.activeCameraName === 'Submarine View') this.updateSubmarineView(submarine);
         if (this.activeCameraName === 'Fish View') this.updateFishView();
-
+        if (this.activeCameraName === 'TV View') this.updateTVView();
     }
 
     updateFishView() {
@@ -132,6 +149,21 @@ class CameraManager {
 
     }
 
+    updateTVView() {
+        if (!this.targetTelevision) return;
+
+        const camera = this.cameras['TV View'];
+        const tv = this.targetTelevision;
+
+        camera.position.copy(tv.position);
+        
+        camera.quaternion.copy(tv.quaternion);
+        camera.translateZ(1.5);
+        camera.translateY(0.6)
+
+        camera.lookAt(tv.position);
+    }
+
 
     onResize(renderer) {
         if (!this.activeCamera) return;
@@ -155,8 +187,8 @@ class CameraManager {
     changeCamera(oldName, newName) {
         if (newName === 'Aquarium View') {
             const cam = this.cameras['Aquarium View'];
-            cam.position.set(0, this.frustumSize / 4, this.frustumSize / 2);
-            cam.lookAt(0, 10, 0);
+            cam.position.set(-50, this.aquariumHeight + 10, -50);
+            cam.lookAt(8, 0, 8);
         }
 
         if (oldName === 'Free Fly') {
