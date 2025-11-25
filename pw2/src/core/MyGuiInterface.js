@@ -118,7 +118,19 @@ class MyGuiInterface {
 
             boidFolder.open();
         }
+        // Enable disable shadows
+        
+        const shadowFolder = this.datgui.addFolder('Shadows');
 
+        shadowFolder
+            .add(this.contents.aquarium, 'shadowsEnabled')
+            .name('Enable Shadows')
+            .onChange((enabled) => {
+                this.contents.aquarium.setupShadows(enabled);
+            });
+
+
+        // Submarine light controls
         const submarine = this.contents.aquarium.submarine;
         if (submarine && submarine.lightControls) {
             console.log(submarine.lightControls)
