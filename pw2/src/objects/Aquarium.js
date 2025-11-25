@@ -59,8 +59,8 @@ class Aquarium extends THREE.Object3D {
         topLight.position.set(30, 100, 20);
         topLight.castShadow = true;
 
-        topLight.shadow.mapSize.width = 4096;
-        topLight.shadow.mapSize.height = 4096;
+        topLight.shadow.mapSize.width = 1024;
+        topLight.shadow.mapSize.height = 1024;
 
         const d = 4 * this.terrainWidth / 5; 
         topLight.shadow.camera.left = -d;
@@ -167,9 +167,8 @@ class Aquarium extends THREE.Object3D {
 
     setupShadows(){
         this.enableShadows(this.seabed)
-        this.enableShadows(this.seabed.rockGroup, false, true)
-        this.enableShadows(this.seabed.shellGroup, false, true)
         this.enableShadows(this.submarine)
+        this.enableShadows(this.seabed.terrain, false, true)
 
         for( const fishGroup of this.fishGroups){
             this.enableShadows(fishGroup)
@@ -205,7 +204,7 @@ class Aquarium extends THREE.Object3D {
         };
 
 		this.fishGroups = [
-			new FishGroup(400, this.terrainWidth / 2 - 8, this.terrainHeight / 2 + 10, this.boidProps),
+			new FishGroup(4, this.terrainWidth / 2 - 8, this.terrainHeight / 2 + 10, this.boidProps),
 		];
 		this.fishGroups[0].position.set(0,0,0);
         this.cameraManager.setTargetFish(this.fishGroups[0].getCameraTarget());
