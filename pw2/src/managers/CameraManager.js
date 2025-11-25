@@ -36,10 +36,15 @@ class CameraManager {
         this.targetFish = null;
         this.targetTelevision = null;
         this.aquariumHeight = null;
+        this.sunkenShip = null;
     }
 
     setAquariumHeight(height){
         this.aquariumHeight = height;
+    }
+
+    setTargetShip(shipObject) {
+        this.sunkenShip = shipObject;
     }
 
     setTargetTV(tv){
@@ -56,7 +61,7 @@ class CameraManager {
 
         const UnderwaterCam = new THREE.PerspectiveCamera(75, this.aspect, 0.1, 1000);
         UnderwaterCam.position.set(0, 2, 5);
-        this.cameras['Underwater View'] = UnderwaterCam;
+        this.cameras['Ship View'] = UnderwaterCam;
 
         const submarineCam = new THREE.PerspectiveCamera(100, this.aspect, 0.1, 1000);
         this.cameras['Submarine View'] = submarineCam;
@@ -99,13 +104,17 @@ class CameraManager {
         const deltaTime = this.timeManager.getElapsedTime() - this.globalTime;
         this.globalTime += deltaTime;
 
-        if (this.activeCameraName === 'Underwater View' && !this.controls) {
+        if (this.activeCameraName === 'Ship View' && !this.controls) {
             this.controls = new OrbitControls(this.activeCamera, renderer.domElement);
-            this.controls.target.set(0, 1, 0);
+            if (this.sunkenShip) {
+                this.controls.target.copy(this.sunkenShip.position);
+            } else {
+                this.controls.target.set(0, 1, 0);
+            }            
             this.controls.enableZoom = true;
             this.controls.enablePan = false;
             this.controls.update();
-        } else if (this.activeCameraName !== 'Underwater View') {
+        } else if (this.activeCameraName !== 'Ship View') {
             if (this.controls) {
                 this.controls.dispose();
                 this.controls = null;
@@ -189,6 +198,14 @@ class CameraManager {
             const cam = this.cameras['Aquarium View'];
             cam.position.set(-50, this.aquariumHeight + 10, -50);
             cam.lookAt(8, 0, 8);
+        }
+
+        if (newName === 'Ship View' && this.sunkenShip) {
+            const cam = this.cameras['Ship View'];
+            cam.position.copy(this.sunkenShip.position);
+            cam.position.y += 15; 
+            cam.position.z += 5;  
+            cam.lookAt(this.sunkenShip.position);
         }
 
         if (oldName === 'Free Fly') {
