@@ -149,7 +149,7 @@ class MyGuiInterface {
         .name("Front Light Distance");
 
 
-        lightFolder.add(submarine.lightControls, "warningFlashFrequency", 0, 20)
+        lightFolder.add(submarine.lightControls, "warningFlashFrequency", 0, 5)
         .onChange(() => submarine.applyLightControls())
         .name("Warning Flash Freq");
 
