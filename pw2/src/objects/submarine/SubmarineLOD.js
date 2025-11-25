@@ -55,7 +55,7 @@ export class SubmarineLOD extends THREE.LOD {
 			frontLightColor: 0xffffaa, 
 			frontLightIntensity: 200,   
 			frontLightDistance: 20,    
-			warningFlashFrequency: 5,  
+			warningFlashFrequency: 0.5,  
 			warningLightIntensity: 10
 		};
 	}
@@ -87,6 +87,12 @@ export class SubmarineLOD extends THREE.LOD {
     }
 
     updateState() {
+        // Update submarine LODs
+        for (const level of this.levels) {
+            const sub = level.object;
+            if (sub.update) sub.update(this.timeManager.getElapsedTime());
+        }
+
         if (this.cameraManager.activeCameraName !== 'Submarine View') return;
         /*
         const delta = this.timeManager.getElapsedTime() - this.globalTime;

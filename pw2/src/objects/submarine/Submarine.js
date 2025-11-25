@@ -67,6 +67,14 @@ export class Submarine extends THREE.Object3D {
 			side: THREE.DoubleSide,
 		});
 
+		this.warningLightMaterial = new THREE.MeshPhysicalMaterial({
+			color: 0xff0000,
+			emissive: 0xff0000,
+			emissiveIntensity: 5,
+			roughness: 0.2,
+			metalness: 0.8,
+			toneMapped: false 
+		});
 
 		this.finMaterial = new THREE.MeshPhysicalMaterial({
 			map: metalColor,
@@ -544,8 +552,24 @@ export class Submarine extends THREE.Object3D {
 		}
 	}
 
+	createWarningLights() {
+		console.log(this.lightControls.warningLightIntensity);
+		this.warningLight = new THREE.PointLight(0xff0000, this.lightControls.warningLightIntensity, 2.5);
+		this.warningLight.position.set(0, 1.28 , - 3.61); 
+		this.upperBodyGroup.add(this.warningLight);
+
+		const bulbGeometry = new THREE.CapsuleGeometry(0.07, 0.1, this.cutNumber, this.cutNumber);
+		this.warningBulbMesh = new THREE.Mesh(bulbGeometry, this.warningLightMaterial);
+		
+		this.warningBulbMesh.position.copy(this.warningLight.position);
+		this.warningBulbMesh.position.y -= 0.15; 
+		
+		this.upperBodyGroup.add(this.warningBulbMesh);
+	}
+
 	createBodyTopDetails() {
 		this.createBodyTopBase();
+		this.createWarningLights();
 		this.createTopCylinders();
 		this.createFrontCylinder();
 		this.createWaterTanks();
@@ -865,23 +889,46 @@ export class Submarine extends THREE.Object3D {
 		return worldPos;
 	}
 
+	update(time) {
+		this.updateWarningLight(time);
+	}
+
+	updateWarningLight(time) {
+		if (!this.warningLight || !this.warningBulbMesh) return;
+
+		const frequency = this.lightControls.warningFlashFrequency; 
+		const maxIntensity = this.lightControls.warningLightIntensity;
+
+		const sinValue = Math.sin(time * frequency * 2 * Math.PI); 
+		const normalized = (sinValue + 1) / 2; 
+
+		this.warningLight.intensity = normalized * maxIntensity;
+
+		if (this.warningBulbMesh.material.emissive) {
+			this.warningBulbMesh.material.emissiveIntensity = normalized * maxIntensity;
+			const baseColor = new THREE.Color(0xff0000);
+			this.warningBulbMesh.material.emissive = baseColor.clone().multiplyScalar(normalized);
+		}
+	}
+
+
 	updateLights() {
-    const lc = this.lightControls;
+		const lc = this.lightControls;
 
-    if (this.frontLight) {
-		// Change lamp emissive color and intensity
-		this.yellowLensMaterial.emissive = new THREE.Color(lc.frontLightColor);
-		this.yellowLensMaterial.emissiveIntensity = lc.frontLightIntensity * 0.5;
-		this.yellowLensMaterial.color = new THREE.Color(lc.frontLightColor);
-		// Update spotlight properties
-        this.frontLight.color.set(lc.frontLightColor);
-        this.frontLight.intensity = lc.frontLightIntensity;
-        this.frontLight.distance = lc.frontLightDistance;
-    }
+		if (this.frontLight) {
+			// Change lamp emissive color and intensity
+			this.yellowLensMaterial.emissive = new THREE.Color(lc.frontLightColor);
+			this.yellowLensMaterial.emissiveIntensity = lc.frontLightIntensity * 0.5;
+			this.yellowLensMaterial.color = new THREE.Color(lc.frontLightColor);
+			// Update spotlight properties
+			this.frontLight.color.set(lc.frontLightColor);
+			this.frontLight.intensity = lc.frontLightIntensity;
+			this.frontLight.distance = lc.frontLightDistance;
+		}
 
-    if (this.warningLight) {
-        this.warningLight.intensity = lc.warningLightIntensity;
-    }
-}
+		if (this.warningLight) {
+			this.warningLight.intensity = lc.warningLightIntensity;
+		}
+	}	
 
 }
