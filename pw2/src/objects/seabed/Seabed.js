@@ -77,6 +77,7 @@ class Seabed extends THREE.Object3D {
 		const shipGroup = new ShipGroup(shipPositions, this.shipModels);
 		this.add(shipGroup);
 		this.globalPositions.push(...shipPositions);
+		this.sunkenShip = shipGroup.ships[0]
 	}
 
 	createTerrain() {
