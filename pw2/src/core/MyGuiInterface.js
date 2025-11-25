@@ -80,7 +80,7 @@ class MyGuiInterface {
         const collisionManager = this.contents.collisionManager;
         if (collisionManager) {
             const collisionFolder = this.datgui.addFolder('Collision Boxes');
-            
+
             const collisionParams = {
                 showBoxes: false
             };
@@ -99,7 +99,7 @@ class MyGuiInterface {
         const boidProperties = this.contents.aquarium.boidProps;
         if (boidProperties) {
             const boidFolder = this.datgui.addFolder('Boid Behavior');
-            
+
             boidFolder
                 .add(boidProperties, 'cohesion', 0, 5, 0.1)
                 .name('Cohesion Strength');
@@ -115,9 +115,38 @@ class MyGuiInterface {
             boidFolder
                 .add(boidProperties, 'awareness', 1, 20, 1)
                 .name('Awareness Radius');
-                
+
             boidFolder.open();
         }
+
+        const submarine = this.contents.aquarium.submarine;
+        if (submarine && submarine.lightControls) {
+            console.log(submarine.lightControls)
+            const lightFolder = this.datgui.addFolder('Submarine Lights');
+
+                    lightFolder.addColor(submarine.lightControls, "frontLightColor")
+        .onChange(() => submarine.applyLightControls())
+        .name("Front Light Color");
+
+        lightFolder.add(submarine.lightControls, "frontLightIntensity", 0, 500)
+        .onChange(() => submarine.applyLightControls())
+        .name("Front Light Intensity");
+        
+        lightFolder.add(submarine.lightControls, "frontLightDistance", 0.1, 100)
+        .onChange(() => submarine.applyLightControls())
+        .name("Front Light Distance");
+
+
+        lightFolder.add(submarine.lightControls, "warningFlashFrequency", 0, 20)
+        .onChange(() => submarine.applyLightControls())
+        .name("Warning Flash Freq");
+
+        lightFolder.add(submarine.lightControls, "warningLightIntensity", 0, 100)
+        .onChange(() => submarine.applyLightControls())
+        .name("Warning Light Intensity");
+            lightFolder.open();
+        }
+
 
     }
 }

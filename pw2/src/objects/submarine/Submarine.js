@@ -2,14 +2,14 @@ import * as THREE from 'three';
 import { TextureManager } from '../../managers/TextureManager.js';
 
 export class Submarine extends THREE.Object3D {
-	constructor(propellerBladeModel, lodLevel) {
+	constructor(propellerBladeModel, lodLevel, lightControls = null) {
 		super();
 		this.width = 7.42;
 		this.height = 1.5;
 		this.color = 0x000000;
 
 		this.propellerBladeObject = propellerBladeModel.scene;
-
+		this.lightControls = lightControls
 
 		this.cutNumber = lodLevel == 0 ? 64 : lodLevel == 1 ? 16 : lodLevel == 2 ? 4 : 1;
 
@@ -35,23 +35,12 @@ export class Submarine extends THREE.Object3D {
 
 	// ========== INITIALIZATION ==========
 	init() {
-		this.initLightControls();
 		this.initMaterials();
 		this.createBody();
 		this.addRectangleFins();
 		this.addEllipticalFins();
 		this.createMotorPropeller();
 		this.createBodyTopDetails();
-	}
-
-	initLightControls() {
-		this.lightControls = {
-			frontLightColor: 0xffffaa, 
-			frontLightIntensity: 200,   
-			frontLightDistance: 20,    
-			warningFlashFrequency: 5,  
-			warningLightIntensity: 10
-		};
 	}
 
 	initMaterials() {
@@ -875,4 +864,24 @@ export class Submarine extends THREE.Object3D {
 
 		return worldPos;
 	}
+
+	updateLights() {
+    const lc = this.lightControls;
+
+    if (this.frontLight) {
+		// Change lamp emissive color and intensity
+		this.yellowLensMaterial.emissive = new THREE.Color(lc.frontLightColor);
+		this.yellowLensMaterial.emissiveIntensity = lc.frontLightIntensity * 0.5;
+		this.yellowLensMaterial.color = new THREE.Color(lc.frontLightColor);
+		// Update spotlight properties
+        this.frontLight.color.set(lc.frontLightColor);
+        this.frontLight.intensity = lc.frontLightIntensity;
+        this.frontLight.distance = lc.frontLightDistance;
+    }
+
+    if (this.warningLight) {
+        this.warningLight.intensity = lc.warningLightIntensity;
+    }
+}
+
 }
