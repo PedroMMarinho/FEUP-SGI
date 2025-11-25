@@ -54,26 +54,28 @@ class Aquarium extends THREE.Object3D {
     }
 
     createTopLight() {
-        const topLight = new THREE.DirectionalLight(0xffffff, 10.0);
+        const topLight = new THREE.DirectionalLight(0xffffff, 2.0);
         
-        topLight.position.set(0, 100, 0);
+        topLight.position.set(30, 100, 20);
         topLight.castShadow = true;
 
         topLight.shadow.mapSize.width = 4096;
         topLight.shadow.mapSize.height = 4096;
 
-        const d = 2 * this.terrainWidth / 3; 
+        const d = 4 * this.terrainWidth / 5; 
         topLight.shadow.camera.left = -d;
         topLight.shadow.camera.right = d;
         topLight.shadow.camera.top = d;
         topLight.shadow.camera.bottom = -d;
         
         topLight.shadow.camera.near = 0.1;
-        topLight.shadow.camera.far = this.terrainHeight * 2;
+        topLight.shadow.camera.far = this.terrainHeight * 3;
 
         topLight.shadow.bias = -0.001;
+        /*
         const helper = new THREE.CameraHelper(topLight.shadow.camera);
         this.scene.add(helper);
+        */
         this.addToAquarium(topLight);
     }
 
@@ -203,7 +205,7 @@ class Aquarium extends THREE.Object3D {
         };
 
 		this.fishGroups = [
-			new FishGroup(400, this.terrainWidth / 2 - 8, this.terrainHeight / 2 + 10, this.boidProps),
+			new FishGroup(4, this.terrainWidth / 2 - 8, this.terrainHeight / 2 + 10, this.boidProps),
 		];
 		this.fishGroups[0].position.set(0,0,0);
         this.cameraManager.setTargetFish(this.fishGroups[0].getCameraTarget());
