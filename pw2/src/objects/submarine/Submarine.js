@@ -2,14 +2,14 @@ import * as THREE from 'three';
 import { TextureManager } from '../../managers/TextureManager.js';
 
 export class Submarine extends THREE.Object3D {
-	constructor(propellerBladeModel, lodLevel) {
+	constructor(propellerBladeModel, lodLevel, lightControls = null) {
 		super();
 		this.width = 7.42;
 		this.height = 1.5;
 		this.color = 0x000000;
 
 		this.propellerBladeObject = propellerBladeModel.scene;
-
+		this.lightControls = lightControls
 
 		this.cutNumber = lodLevel == 0 ? 64 : lodLevel == 1 ? 16 : lodLevel == 2 ? 4 : 1;
 
@@ -67,6 +67,14 @@ export class Submarine extends THREE.Object3D {
 			side: THREE.DoubleSide,
 		});
 
+		this.warningLightMaterial = new THREE.MeshPhysicalMaterial({
+			color: 0xff0000,
+			emissive: 0xff0000,
+			emissiveIntensity: 5,
+			roughness: 0.2,
+			metalness: 0.8,
+			toneMapped: false 
+		});
 
 		this.finMaterial = new THREE.MeshPhysicalMaterial({
 			map: metalColor,
@@ -80,28 +88,93 @@ export class Submarine extends THREE.Object3D {
 		this.motorMaterial = this.finMaterial.clone();
 
 		this.glassMaterial = new THREE.MeshPhysicalMaterial({
-		color: 0xffffff,          
-		transparent: true,
-		opacity: 0.15,            
-		roughness: 0.05,         
-		metalness: 0.0,
-		thickness: 0.2,
-		side: THREE.DoubleSide,
+			color: 0xffffff,
+			transparent: true,
+			opacity: 0.15,
+			roughness: 0.05,
+			metalness: 0.0,
+			thickness: 0.2,
+			side: THREE.DoubleSide,
 		});
-		
+
+		this.yellowLensMaterial = new THREE.MeshPhongMaterial({
+			color: this.lightControls.frontLightColor,
+			emissive: this.lightControls.frontLightColor,     
+			emissiveIntensity: 8,
+        });
+
+
 	}
 
 
 	// ========== BODY CREATION ==========
 	createBody() {
 		this.createBodyCore();
+		this.createFrontLight();
 		this.createBodyRearAssembly();
 		this.createTampSemiCircleRingGeometry();
 	}
 
+	createFrontLight() {
+		this.frontLight = new THREE.SpotLight(
+			this.lightControls.frontLightColor,
+			this.lightControls.frontLightIntensity
+		);
+
+		const domeBaseZ = -(this.width / 2 + this.height / 2);
+		const domeRadius = 1.31 * this.height / 2;
+		const domeLength = domeRadius * 1.932;
+		const tipZ = domeBaseZ - domeLength;
+
+		this.frontLight.castShadow = true;
+		this.frontLight.shadow.mapSize.width = 1024;
+		this.frontLight.shadow.mapSize.height = 1024;
+		this.frontLight.shadow.bias = -0.0001;
+
+		this.frontLight.distance = this.lightControls.frontLightDistance;
+		this.frontLight.decay = 0.8;
+		this.frontLight.angle = Math.PI / 3;
+		this.frontLight.penumbra = 0.5;
+
+		this.frontLight.position.set(0, 0, tipZ - 0.001);
+
+		this.frontLight.target.position.set(0, -6, tipZ - 20 - 0.001);
+
+		// Helpers
+		
+		//this.frontLightHelper = new THREE.SpotLightHelper(this.frontLight);
+
+		// Add to group
+		this.bodyGroup.add(this.frontLight);
+		//this.bodyGroup.add(this.frontLightHelper);
+		this.bodyGroup.add(this.frontLight.target);
+
+
+		const mainRadius = this.height / 12;
+		const tubeThick = 0.01;
+		const ringTipZ = tipZ + 0.006;
+		const ringGeo = new THREE.TorusGeometry(mainRadius, tubeThick, this.cutNumber, this.cutNumber);
+		const ringMesh = new THREE.Mesh(ringGeo, this.finMaterial);
+
+		ringMesh.position.set(0, 0, ringTipZ);
+
+		this.bodyGroup.add(ringMesh);
+		
+		const screenRadius = mainRadius - (tubeThick / 2);
+		const circleGeo = new THREE.CircleGeometry(screenRadius, this.cutNumber);
+
+		const screenMesh = new THREE.Mesh(circleGeo, this.yellowLensMaterial);
+
+		screenMesh.position.set(0, 0, ringTipZ - tubeThick * 0.8);
+
+		screenMesh.rotation.y = Math.PI;
+
+		this.bodyGroup.add(screenMesh);
+	}
+
 	createBodyCore() {
 		// Capsule body
-	const bodyGeometry = new THREE.CapsuleGeometry(this.height / 2, this.width, this.cutNumber, this.cutNumber, this.cutNumber);
+		const bodyGeometry = new THREE.CapsuleGeometry(this.height / 2, this.width, this.cutNumber, this.cutNumber, this.cutNumber);
 		const bodyMesh = new THREE.Mesh(bodyGeometry, this.bodyMaterial);
 		bodyMesh.rotation.x = Math.PI / 2;
 		bodyMesh.scale.set(1.31, 1, 1.31);
@@ -110,7 +183,7 @@ export class Submarine extends THREE.Object3D {
 		this.body = bodyMesh;
 
 		// Front dome
-	const frontGeometry = new THREE.SphereGeometry(1.31 * this.height / 2, this.cutNumber, this.cutNumber, 0, Math.PI * 2, 0, Math.PI / 2);
+		const frontGeometry = new THREE.SphereGeometry(1.31 * this.height / 2, this.cutNumber, this.cutNumber, 0, Math.PI * 2, 0, Math.PI / 2);
 		const frontMesh = new THREE.Mesh(frontGeometry, this.bodyMaterial);
 		frontMesh.position.set(0, 0, -(this.width / 2 + this.height / 2));
 		frontMesh.rotation.x = -Math.PI / 2;
@@ -118,7 +191,7 @@ export class Submarine extends THREE.Object3D {
 		this.bodyGroup.add(frontMesh);
 
 		// Back dome
-	const backGeometry = new THREE.SphereGeometry(1.31 * this.height / 2, this.cutNumber, this.cutNumber, 0, Math.PI * 2, Math.PI / 2, Math.PI / 2);
+		const backGeometry = new THREE.SphereGeometry(1.31 * this.height / 2, this.cutNumber, this.cutNumber, 0, Math.PI * 2, Math.PI / 2, Math.PI / 2);
 		const backMesh = new THREE.Mesh(backGeometry, this.bodyMaterial);
 		backMesh.position.set(0, 0, this.width / 2 - 0.8);
 		backMesh.rotation.x = -Math.PI / 2;
@@ -193,8 +266,8 @@ export class Submarine extends THREE.Object3D {
 	}
 
 	addEllipticalFins() {
-		this.createFinElipticalCylinder({ side: "right" }); 
-		this.createFinElipticalCylinder({ side: "left" }); 
+		this.createFinElipticalCylinder({ side: "right" });
+		this.createFinElipticalCylinder({ side: "left" });
 
 		this.createFinElipticalCylinder({
 			side: "left",
@@ -292,7 +365,7 @@ export class Submarine extends THREE.Object3D {
 
 
 	createFinElipticalCylinder({
-		side = "right", 
+		side = "right",
 		position = { x: 0, y: 0, z: -3.21 },
 		rotation = { x: 0, y: 0, z: 0 },
 		scale = { x: 0.6, y: 1, z: 4.1 },
@@ -479,8 +552,24 @@ export class Submarine extends THREE.Object3D {
 		}
 	}
 
+	createWarningLights() {
+		console.log(this.lightControls.warningLightIntensity);
+		this.warningLight = new THREE.PointLight(0xff0000, this.lightControls.warningLightIntensity, 2.5);
+		this.warningLight.position.set(0, 1.28 , - 3.61); 
+		this.upperBodyGroup.add(this.warningLight);
+
+		const bulbGeometry = new THREE.CapsuleGeometry(0.07, 0.1, this.cutNumber, this.cutNumber);
+		this.warningBulbMesh = new THREE.Mesh(bulbGeometry, this.warningLightMaterial);
+		
+		this.warningBulbMesh.position.copy(this.warningLight.position);
+		this.warningBulbMesh.position.y -= 0.15; 
+		
+		this.upperBodyGroup.add(this.warningBulbMesh);
+	}
+
 	createBodyTopDetails() {
 		this.createBodyTopBase();
+		this.createWarningLights();
 		this.createTopCylinders();
 		this.createFrontCylinder();
 		this.createWaterTanks();
@@ -567,8 +656,8 @@ export class Submarine extends THREE.Object3D {
 		const glassGeometry = new THREE.SphereGeometry(1, this.cutNumber, this.cutNumber, 0, Math.PI * 2, 0, Math.PI / 2);
 
 		const glassDome = new THREE.Mesh(glassGeometry, this.glassMaterial);
-		glassDome.rotation.x = Math.PI;      
-		glassDome.position.set(0, -0.35, 0);    
+		glassDome.rotation.x = Math.PI;
+		glassDome.position.set(0, -0.35, 0);
 		glassDome.scale.set(1.14, 0.38, 1.3);
 		sideCylinder2.add(glassDome);
 		this.glassDome = glassDome;
@@ -683,7 +772,7 @@ export class Submarine extends THREE.Object3D {
 			new THREE.Vector2(cylinderRadius * 1, 0),
 		];
 		const latheGeometry = new THREE.LatheGeometry(lathePoints, this.cutNumber);
-		latheGeometry.computeVertexNormals(); 
+		latheGeometry.computeVertexNormals();
 
 		const latheMesh = new THREE.Mesh(latheGeometry, this.finMaterial);
 
@@ -779,7 +868,7 @@ export class Submarine extends THREE.Object3D {
 
 		const geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
 		geometry.computeVertexNormals();
-		geometry.normalizeNormals(); 
+		geometry.normalizeNormals();
 
 		const mesh = new THREE.Mesh(geometry, this.bodyMaterial);
 		mesh.rotation.x = Math.PI / 2;
@@ -787,16 +876,59 @@ export class Submarine extends THREE.Object3D {
 		this.upperBodyGroup.add(mesh);
 	}
 
-getSubmarineCameraPosition() {
-    const worldPos = this.glassDome.getWorldPosition(new THREE.Vector3());
+	getSubmarineCameraPosition() {
+		const worldPos = this.glassDome.getWorldPosition(new THREE.Vector3());
 
-    const worldQuat = this.getWorldQuaternion(new THREE.Quaternion());
+		const worldQuat = this.getWorldQuaternion(new THREE.Quaternion());
 
-    const forwardOffset = new THREE.Vector3(0, 0, -0.5); 
-    forwardOffset.applyQuaternion(worldQuat); 
+		const forwardOffset = new THREE.Vector3(0, 0, -0.5);
+		forwardOffset.applyQuaternion(worldQuat);
 
-    worldPos.add(forwardOffset);
+		worldPos.add(forwardOffset);
 
-    return worldPos;
-}
+		return worldPos;
+	}
+
+	update(time) {
+		this.updateWarningLight(time);
+	}
+
+	updateWarningLight(time) {
+		if (!this.warningLight || !this.warningBulbMesh) return;
+
+		const frequency = this.lightControls.warningFlashFrequency; 
+		const maxIntensity = this.lightControls.warningLightIntensity;
+
+		const sinValue = Math.sin(time * frequency * 2 * Math.PI); 
+		const normalized = (sinValue + 1) / 2; 
+
+		this.warningLight.intensity = normalized * maxIntensity;
+
+		if (this.warningBulbMesh.material.emissive) {
+			this.warningBulbMesh.material.emissiveIntensity = normalized * maxIntensity;
+			const baseColor = new THREE.Color(0xff0000);
+			this.warningBulbMesh.material.emissive = baseColor.clone().multiplyScalar(normalized);
+		}
+	}
+
+
+	updateLights() {
+		const lc = this.lightControls;
+
+		if (this.frontLight) {
+			// Change lamp emissive color and intensity
+			this.yellowLensMaterial.emissive = new THREE.Color(lc.frontLightColor);
+			this.yellowLensMaterial.emissiveIntensity = lc.frontLightIntensity * 0.5;
+			this.yellowLensMaterial.color = new THREE.Color(lc.frontLightColor);
+			// Update spotlight properties
+			this.frontLight.color.set(lc.frontLightColor);
+			this.frontLight.intensity = lc.frontLightIntensity;
+			this.frontLight.distance = lc.frontLightDistance;
+		}
+
+		if (this.warningLight) {
+			this.warningLight.intensity = lc.warningLightIntensity;
+		}
+	}	
+
 }
