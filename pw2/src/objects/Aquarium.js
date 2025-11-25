@@ -30,6 +30,8 @@ class Aquarium extends THREE.Object3D {
         // Camera Manager 
         this.cameraManager.setAquariumHeight(this.terrainHeight);
 
+        this.shadowsEnabled = true;
+
         this.objects = [];
         this.envMap = null;
     }
@@ -55,19 +57,19 @@ class Aquarium extends THREE.Object3D {
 
     createTopLight() {
         const topLight = new THREE.DirectionalLight(0xffffff, 3.0);
-        
+
         topLight.position.set(30, 100, 20);
         topLight.castShadow = true;
 
         topLight.shadow.mapSize.width = 1024;
         topLight.shadow.mapSize.height = 1024;
 
-        const d = 4 * this.terrainWidth / 5; 
+        const d = 4 * this.terrainWidth / 5;
         topLight.shadow.camera.left = -d;
         topLight.shadow.camera.right = d;
         topLight.shadow.camera.top = d;
         topLight.shadow.camera.bottom = -d;
-        
+
         topLight.shadow.camera.near = 0.1;
         topLight.shadow.camera.far = this.terrainHeight * 3;
 
@@ -102,7 +104,7 @@ class Aquarium extends THREE.Object3D {
     }
 
     createWaterTopLayer() {
-        const water = new Water(this.assetManager.getTextureManager().getTexture('water-normal'), this.terrainWidth, 4* this.terrainHeight / 5, this.terrainWidth, this.envMap );
+        const water = new Water(this.assetManager.getTextureManager().getTexture('water-normal'), this.terrainWidth, 4 * this.terrainHeight / 5, this.terrainWidth, this.envMap);
         this.addToAquarium(water);
     }
 
@@ -165,17 +167,31 @@ class Aquarium extends THREE.Object3D {
         this.addToAquarium(this.seabed);
     }
 
-    setupShadows(){
-        this.enableShadows(this.seabed)
-        this.enableShadows(this.submarine)
-        this.enableShadows(this.seabed.terrain, false, true)
+    setupShadows() {
+        if (this.shadowsEnabled) {
+            this.enableShadows(this.seabed)
+            this.enableShadows(this.submarine)
+            this.enableShadows(this.seabed.terrain, false, true)
 
-        for( const fishGroup of this.fishGroups){
-            this.enableShadows(fishGroup)
+            for (const fishGroup of this.fishGroups) {
+                this.enableShadows(fishGroup)
+            }
+            for (const shark of this.sharks) {
+                this.enableShadows(shark)
+            }
+        } else {
+            this.enableShadows(this.seabed, false, false)
+            this.enableShadows(this.submarine, false, false)
+            this.enableShadows(this.seabed.terrain, false, false)
+
+            for (const fishGroup of this.fishGroups) {
+                this.enableShadows(fishGroup, false, false)
+            }
+            for (const shark of this.sharks) {
+                this.enableShadows(shark, false, false)
+            }
         }
-        for( const shark of this.sharks){
-            this.enableShadows(shark)
-        }
+
     }
 
     createBubbles() {
@@ -203,22 +219,22 @@ class Aquarium extends THREE.Object3D {
             awareness: 10
         };
 
-		this.fishGroups = [
-			new FishGroup(4, this.terrainWidth / 2 - 8, this.terrainHeight / 2 + 10, this.boidProps),
-		];
-		this.fishGroups[0].position.set(0,0,0);
+        this.fishGroups = [
+            new FishGroup(4, this.terrainWidth / 2 - 8, this.terrainHeight / 2 + 10, this.boidProps),
+        ];
+        this.fishGroups[0].position.set(0, 0, 0);
         this.cameraManager.setTargetFish(this.fishGroups[0].getCameraTarget());
-		this.addToAquarium(this.fishGroups[0]);
+        this.addToAquarium(this.fishGroups[0]);
     }
 
     createShark() {
         const aiOptions = {
             // Bounds
-            terrainWidth: this.terrainWidth* 9/10,
+            terrainWidth: this.terrainWidth * 9 / 10,
             terrainHeight: 4 * this.terrainHeight / 5,
             maxY: this.terrainHeight / 2,
         };
-    
+
         const sharkGLTF1 = this.assetManager.getBlenderManager().getAllLODs('shark1');
         const sharkGLTF2 = this.assetManager.getBlenderManager().getAllLODs('shark2');
         // Blue Shark
@@ -244,7 +260,7 @@ class Aquarium extends THREE.Object3D {
     createSubmarine() {
         const bounds = {
             minX: -this.terrainWidth / 2 - 5,
-            maxX: this.terrainWidth  / 2 - 5,
+            maxX: this.terrainWidth / 2 - 5,
             minY: 5,
             maxY: this.terrainHeight - 8,
             minZ: -this.terrainWidth / 2 - 5,
