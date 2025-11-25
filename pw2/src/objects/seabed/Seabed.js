@@ -88,8 +88,8 @@ class Seabed extends THREE.Object3D {
 
 	createRockGroup() {
 		const rockPositions = this.computePositions(this.rockCount);
-		const rockGroup = new RockGroup(rockPositions, this.rockModels);
-		this.add(rockGroup);
+		this.rockGroup = new RockGroup(rockPositions, this.rockModels);
+		this.add(this.rockGroup);
 		this.globalPositions.push(...rockPositions);
 	}
 
@@ -102,15 +102,16 @@ class Seabed extends THREE.Object3D {
 
     createShellGroup() {
         const shellPositions = this.computePositions(this.shellCount);
-        const shellGroup = new ShellGroup(shellPositions, this.shellModels);
-        this.add(shellGroup);
+        this.shellGroup = new ShellGroup(shellPositions, this.shellModels);
+        this.add(this.shellGroup);
         this.globalPositions.push(...shellPositions);
     }
 
 	createSeaweedGroup() {
 		const seaweedPositions = this.computePositions(this.seaweedCount);
-		const seaweedGroup = new SeaweedGroup(seaweedPositions);
-		this.add(seaweedGroup);
+		this.seaweedGroup = new SeaweedGroup(seaweedPositions);
+		this.add(this.seaweedGroup);
+		this.globalPositions.push(...seaweedPositions);
 	}
 
 	computePositions(count, objectMarginFactor = 1, maxTries = 50) {
