@@ -20,7 +20,7 @@ class Seabed extends THREE.Object3D {
         shellModels = [],
 		shipModels = [],
 		tvModels = [],
-		distanceRange = [0.005, 0.1],
+		distanceRange = [0.008, 0.1],
 	) {
 		super();
 		this.terrain = null;
