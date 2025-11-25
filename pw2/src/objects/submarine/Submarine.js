@@ -35,8 +35,8 @@ export class Submarine extends THREE.Object3D {
 
 	// ========== INITIALIZATION ==========
 	init() {
-		this.initMaterials();
 		this.initLightControls();
+		this.initMaterials();
 		this.createBody();
 		this.addRectangleFins();
 		this.addEllipticalFins();
@@ -46,10 +46,10 @@ export class Submarine extends THREE.Object3D {
 
 	initLightControls() {
 		this.lightControls = {
-			frontLightColor: 0xffffaa, // Yellowish
-			frontLightIntensity: 200,   // High intensity for water penetration
-			frontLightDistance: 20,    // Short distance for water attenuation
-			warningFlashFrequency: 5,  // How fast it blinks
+			frontLightColor: 0xffffaa, 
+			frontLightIntensity: 200,   
+			frontLightDistance: 20,    
+			warningFlashFrequency: 5,  
 			warningLightIntensity: 10
 		};
 	}
@@ -100,16 +100,10 @@ export class Submarine extends THREE.Object3D {
 			side: THREE.DoubleSide,
 		});
 
-		this.yellowLensMaterial = new THREE.MeshPhysicalMaterial({
-            color: 0xffff00,        
-            emissive: 0xffaa00,     
-            emissiveIntensity: 0.5, 
-            metalness: 0.0,
-            roughness: 0.1,         
-            transmission: 0.5,      
-            transparent: true,
-            opacity: 0.7,           
-            side: THREE.DoubleSide
+		this.yellowLensMaterial = new THREE.MeshPhongMaterial({
+			color: this.lightControls.frontLightColor,
+			emissive: this.lightControls.frontLightColor,     
+			emissiveIntensity: 8,
         });
 
 
@@ -145,9 +139,9 @@ export class Submarine extends THREE.Object3D {
 		this.frontLight.angle = Math.PI / 3;
 		this.frontLight.penumbra = 0.5;
 
-		this.frontLight.position.set(0, 0, tipZ);
+		this.frontLight.position.set(0, 0, tipZ - 0.001);
 
-		this.frontLight.target.position.set(0, -6, tipZ - 20);
+		this.frontLight.target.position.set(0, -6, tipZ - 20 - 0.001);
 
 		// Helpers
 		
