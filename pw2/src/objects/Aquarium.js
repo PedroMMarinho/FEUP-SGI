@@ -27,6 +27,9 @@ class Aquarium extends THREE.Object3D {
         this.terrainWidth = 150;
         this.terrainHeight = 50;
 
+        // Camera Manager 
+        this.cameraManager.setAquariumHeight(this.terrainHeight);
+
         this.objects = [];
         this.envMap = null;
     }
@@ -119,6 +122,7 @@ class Aquarium extends THREE.Object3D {
 
 
         const seabed = new Seabed(this.terrainWidth, rockCount, coralCount, shellCount, seaweedCount, shipCount, tvCount, rockModels, shellModels, shipModels, tvModels);
+        this.cameraManager.setTargetTV(seabed.getTV());
         this.addToAquarium(seabed);
     }
 
