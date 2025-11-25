@@ -23,6 +23,7 @@ export class SubmarineLOD extends THREE.LOD {
         this.type = EntityType.SUBMARINE;
         this.dangerLevel = DangerLevel.HIGH;
 
+        this.initLightControls();
         this.setupLODs();
 
         this.timeManager = TimeManager.getInstance();
@@ -49,12 +50,34 @@ export class SubmarineLOD extends THREE.LOD {
         this.ROTOR_MAX = 9;
     }
 
+    initLightControls() {
+		this.lightControls = {
+			frontLightColor: 0xffffaa, 
+			frontLightIntensity: 200,   
+			frontLightDistance: 20,    
+			warningFlashFrequency: 0.5,  
+			warningLightIntensity: 10
+		};
+	}
+
+    applyLightControls() {
+        for (const level of this.levels) {
+            const sub = level.object;
+            if (sub?.updateLights) {
+                sub.updateLights();
+            }
+        }
+    }
+
+
+
+
     setupLODs() {
         const lodCount = this.propellerBladeModel?.length || 3;
         let distance = this.distanceStart;
 
         for (let i = 0; i < lodCount; i++) {
-            const submarine = new Submarine(this.propellerBladeModel[i], i);
+            const submarine = new Submarine(this.propellerBladeModel[i], i, this.lightControls);
             this.addLevel(submarine, distance);
             distance += this.distanceOffset;
         }
@@ -64,6 +87,12 @@ export class SubmarineLOD extends THREE.LOD {
     }
 
     updateState() {
+        // Update submarine LODs
+        for (const level of this.levels) {
+            const sub = level.object;
+            if (sub.update) sub.update(this.timeManager.getElapsedTime());
+        }
+
         if (this.cameraManager.activeCameraName !== 'Submarine View') return;
         /*
         const delta = this.timeManager.getElapsedTime() - this.globalTime;

@@ -52,11 +52,50 @@ class CollisionManager {
     // for fish boid awareness
     getNearbyEntitiesForBoid(boid, radius) {
         if (this.bvhManager.isUsingBVH()) {
-            return this.getNearbySpatialGrid(boid.pos, radius);
+            return this.getNearbySpatialGrid(boid, radius);
         } else {
             return this.getNearbyBruteForce(boid.pos, radius);
         }
     }
+
+    // BVH-based detection using raycasting - unfeasible
+    getNearbyBVH(boid, radius) {
+        const nearby = [];
+        const numRays = 5;
+        const spreadAngle = Math.PI / 4;
+
+        // Get boid's forward direction
+        const direction = new THREE.Vector3(0, 0, 1);
+        direction.applyQuaternion(boid.quaternion);
+
+        // Check for collisions using BVH
+        const collisions = this.bvhManager.checkBoidCollisions(
+            boid.pos,
+            direction,
+            radius,
+            numRays,
+            spreadAngle
+        );
+
+        const radiusSq = radius * radius;
+        const processedEntities = new Set();
+
+        for (const collision of collisions) {
+            const entity = collision.object;
+
+            if (entity && !processedEntities.has(entity)) {
+                const distSq = boid.pos.distanceToSquared(entity.position);
+
+                if (distSq <= radiusSq) {
+                    nearby.push(entity);
+                    processedEntities.add(entity);
+                }
+            }
+        }
+
+        return nearby;
+    }
+
 
     // Spatial grid approach - check nearby cells only
     getNearbySpatialGrid(position, radius) {
