@@ -77,7 +77,7 @@ export class SubmarineLOD extends THREE.LOD {
         let distance = this.distanceStart;
 
         for (let i = 0; i < lodCount; i++) {
-            const submarine = new Submarine(this.propellerBladeModel[i], i, this.lightControls);
+            const submarine = new Submarine(this.propellerBladeModel[i], i, this.lightControls, this.cameraManager);
             this.addLevel(submarine, distance);
             distance += this.distanceOffset;
         }
