@@ -9,6 +9,8 @@ class CameraManager {
         this.frustumSize = frustumSize;
         this.cameras = {};
         this.activeCameraName = null;
+        this.bokehPass = null;
+        this.renderPass = null;
         this.lastCameraName = null;
         this.cameraSelection = "Free Fly";
         this.controls = null;
@@ -93,11 +95,17 @@ class CameraManager {
         this.lastCameraName = previous;
         this.activeCameraName = name;
         this.activeCamera = this.cameras[name];
+        if( this.renderPass) { this.renderPass.camera = this.activeCamera;}
+        if( this.bokehPass) { this.bokehPass.camera = this.activeCamera; }
         this.changeCamera(previous, name);
     }
 
     getActiveCamera() {
         return this.activeCamera;
+    }
+
+    getCameraByName(cameraName){
+        return this.cameras[cameraName];
     }
 
     update(renderer, submarine) {
@@ -208,8 +216,14 @@ class CameraManager {
             cam.lookAt(this.sunkenShip.position);
         }
 
+        if(newName === 'Free Fly') {
+            this.freeFlyActive = true;
+            if( this.bokehPass){ this.bokehPass.enabled = true;}
+        }
+
         if (oldName === 'Free Fly') {
             this.freeFlyActive = false;
+            if( this.bokehPass) { this.bokehPass.enabled = false;}
         }
         if (newName === 'Submarine View') {
     this.canvasDiv.style = `
@@ -304,6 +318,12 @@ class CameraManager {
         } else {
             canvas.requestPointerLock();
         }
+    }
+    setRenderPass(renderPass){
+        this.renderPass = renderPass;
+    }
+    setBokehPass(bokehPass){
+        this.bokehPass = bokehPass;
     }
 }
 
