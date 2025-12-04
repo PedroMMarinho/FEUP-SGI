@@ -129,12 +129,14 @@ class MyGuiInterface {
                 this.contents.aquarium.setupShadows(enabled);
             });
 
-
+        
+        const submarineFolder = this.datgui.addFolder('Submarine Controls');
         // Submarine light controls
         const submarine = this.contents.aquarium.submarine;
         if (submarine && submarine.lightControls) {
-            console.log(submarine.lightControls)
-            const lightFolder = this.datgui.addFolder('Submarine Lights');
+            // Chain folders
+
+            const lightFolder = submarineFolder.addFolder('Submarine Lights');
 
                     lightFolder.addColor(submarine.lightControls, "frontLightColor")
         .onChange(() => submarine.applyLightControls())
@@ -161,7 +163,7 @@ class MyGuiInterface {
 
         // submarine shield controls
         if (submarine && submarine.shieldControls) {
-            const shieldFolder = this.datgui.addFolder('Submarine Shield');
+            const shieldFolder = submarineFolder.addFolder('Submarine Shield');
             shieldFolder.add(submarine.shieldControls, "isActive")
         .name("Activate Shield")
         .onChange(() => submarine.applyShieldControls());
