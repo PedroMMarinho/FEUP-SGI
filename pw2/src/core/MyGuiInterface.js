@@ -159,6 +159,28 @@ class MyGuiInterface {
             lightFolder.open();
         }
 
+        // submarine shield controls
+        if (submarine && submarine.shieldControls) {
+            const shieldFolder = this.datgui.addFolder('Submarine Shield');
+            shieldFolder.add(submarine.shieldControls, "isActive")
+        .name("Activate Shield")
+        .onChange(() => submarine.applyShieldControls());
+
+            
+            shieldFolder.addColor(submarine.shieldControls, "shieldGlowColor")
+        .onChange(() => submarine.applyShieldControls())
+        .name("Shield Glow Color");
+        
+            shieldFolder.add(submarine.shieldControls, "c", 0, 5)
+        .onChange(() => submarine.applyShieldControls())
+        .name("Shield c Param");
+
+            shieldFolder.add(submarine.shieldControls, "p", 0, 5)
+        .onChange(() => submarine.applyShieldControls())
+        .name("Shield p Param");
+            shieldFolder.open();
+        }
+
 
     }
 }

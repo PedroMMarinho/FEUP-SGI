@@ -26,7 +26,27 @@ export class SubmarineShield {
 
         this.mesh.translateZ(1.0);
         this.mesh.translateY(0.15);
+        this.mesh.cannotCastShadow = true;
     }
+
+    updateShieldParams(params) {
+    if (!params) return;
+
+    if ('shieldGlowColor' in params)
+        this.uniforms.glowColor.value.set(params.shieldGlowColor);
+
+    if ('c' in params)
+        this.uniforms.c.value = params.c;
+
+    if ('p' in params)
+        this.uniforms.p.value = params.p;
+
+    if ('isActive' in params)
+        this.mesh.visible = params.isActive;
+
+
+    }   
+    
 
 
     initMaterial() {
