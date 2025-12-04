@@ -1,12 +1,11 @@
 import * as THREE from 'three';
 import Stats from 'three/addons/libs/stats.module.js';
-import { MyContents } from './MyContents.js';
-import { MyGuiInterface } from './MyGuiInterface.js';
 import { CameraManager } from '../managers/CameraManager.js';
 import { KeyManager } from '../managers/KeyManager.js';
 import { EffectComposer } from '/lib/jsm/postprocessing/EffectComposer.js';
 import { RenderPass } from '/lib/jsm/postprocessing/RenderPass.js';
 import { BokehPass } from '/lib/jsm/postprocessing/BokehPass.js';
+import { Color } from 'three';
 
 /**
  * This class contains the main application logic
@@ -40,6 +39,7 @@ class MyApp {
 
         // Renderer setup
         this.renderer = new THREE.WebGLRenderer({ antialias: true });
+        this.renderer.outputColorSpace = THREE.SRGBColorSpace;
         this.renderer.setPixelRatio(window.devicePixelRatio);
         this.renderer.setClearColor("#000000");
         this.renderer.shadowMap.enabled = true;
@@ -60,12 +60,16 @@ class MyApp {
 
         this.composer = new EffectComposer(this.renderer);
         this.renderPass = new RenderPass(this.scene, this.cameraManager.getActiveCamera()); // Camera will be set in render loop
+
+        this.renderPass.renderToScreen = false;
         this.composer.addPass(this.renderPass);
+
         this.bokehPass =  new BokehPass(this.scene, this.cameraManager.getCameraByName('Free Fly') ,{ 	
-            focus: 100,
-        	aperture: 0.0005,
-        	maxblur: 0.01
+            focus: 10,
+        	aperture: 0.0001,
+        	maxblur: 20,
         });
+        this.bokehPass.renderToScreen = true;
         this.composer.addPass(this.bokehPass);
 
         this.cameraManager.setRenderPass(this.renderPass);
@@ -102,7 +106,7 @@ class MyApp {
 
         if (this.contents) this.contents.update();
 
-        this.composer.render(this.scene, this.cameraManager.getActiveCamera());
+        this.composer.render();
 
         requestAnimationFrame(this.render.bind(this));
         this.stats.end();

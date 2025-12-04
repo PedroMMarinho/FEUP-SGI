@@ -39,7 +39,7 @@ class MyContents {
 
         
         // Lights TODO
-        const ambientLight = new THREE.AmbientLight(0xFFFFFF, 2.5);
+        const ambientLight = new THREE.AmbientLight(0xFFFFFF, 2);
         this.app.scene.add(ambientLight);
 
 

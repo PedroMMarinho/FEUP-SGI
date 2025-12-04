@@ -44,10 +44,13 @@ class Aquarium extends THREE.Object3D {
 
     createOutsideEnvironment() {
         const hdri = this.assetManager.getHDRI('fin-hall');
-        this.scene.environment = hdri.hdr;
-        this.scene.environment.intensity = 0.01;
+        this.scene.environment = hdri.envMap;
         this.scene.background = hdri.envMap;
         this.envMap = hdri.envMap;
+        
+
+        this.scene.environmentIntensity = 0.02; 
+        this.scene.backgroundIntensity = 0.5;
     }
 
     createWaterFog() {
@@ -56,7 +59,7 @@ class Aquarium extends THREE.Object3D {
     }
 
     createTopLight() {
-        const topLight = new THREE.DirectionalLight(0xffffff, 3.0);
+        const topLight = new THREE.DirectionalLight(0xffffff, 1.0);
 
         topLight.position.set(30, 100, 20);
         topLight.castShadow = true;
