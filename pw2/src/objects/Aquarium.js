@@ -86,7 +86,7 @@ class Aquarium extends THREE.Object3D {
 
         object.traverse((child) => {
             if (child.isMesh) {
-
+                if (child.cannotCastShadow !== undefined) return;
                 child.castShadow = cast;
                 child.receiveShadow = receive;
 

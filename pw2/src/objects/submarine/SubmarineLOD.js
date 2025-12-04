@@ -24,6 +24,7 @@ export class SubmarineLOD extends THREE.LOD {
         this.dangerLevel = DangerLevel.HIGH;
 
         this.initLightControls();
+        this.initShieldControls();
         this.setupLODs();
 
         this.timeManager = TimeManager.getInstance();
@@ -60,6 +61,15 @@ export class SubmarineLOD extends THREE.LOD {
 		};
 	}
 
+    initShieldControls() {
+        this.shieldControls = {
+            shieldGlowColor: 0xffff00,
+            c : 1.0,
+            p : 1.4,
+            isActive: true
+        };
+    }
+
     applyLightControls() {
         for (const level of this.levels) {
             const sub = level.object;
@@ -69,7 +79,14 @@ export class SubmarineLOD extends THREE.LOD {
         }
     }
 
-
+    applyShieldControls() {
+        for (const level of this.levels) {
+            const sub = level.object;
+            if (sub?.shield) {
+                sub.shield.updateShieldParams(this.shieldControls);
+            }
+        }
+    }
 
 
     setupLODs() {
@@ -77,7 +94,7 @@ export class SubmarineLOD extends THREE.LOD {
         let distance = this.distanceStart;
 
         for (let i = 0; i < lodCount; i++) {
-            const submarine = new Submarine(this.propellerBladeModel[i], i, this.lightControls);
+            const submarine = new Submarine(this.propellerBladeModel[i], i, this.lightControls, this.cameraManager);
             this.addLevel(submarine, distance);
             distance += this.distanceOffset;
         }
