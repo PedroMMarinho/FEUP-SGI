@@ -53,7 +53,7 @@ export class SubmarineLOD extends THREE.LOD {
     initLightControls() {
 		this.lightControls = {
 			frontLightColor: 0xffffaa, 
-			frontLightIntensity: 200,   
+			frontLightIntensity: 15,   
 			frontLightDistance: 20,    
 			warningFlashFrequency: 0.5,  
 			warningLightIntensity: 10
