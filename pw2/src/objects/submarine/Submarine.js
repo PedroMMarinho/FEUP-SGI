@@ -1,8 +1,9 @@
 import * as THREE from 'three';
 import { TextureManager } from '../../managers/TextureManager.js';
+import { SubmarineShield } from './SubmarineShield.js';
 
 export class Submarine extends THREE.Object3D {
-	constructor(propellerBladeModel, lodLevel, lightControls = null) {
+	constructor(propellerBladeModel, lodLevel, lightControls = null, cameraManager = null) {
 		super();
 		this.width = 7.42;
 		this.height = 1.5;
@@ -10,6 +11,7 @@ export class Submarine extends THREE.Object3D {
 
 		this.propellerBladeObject = propellerBladeModel.scene;
 		this.lightControls = lightControls
+		this.cameraManager = cameraManager;
 
 		this.cutNumber = lodLevel == 0 ? 64 : lodLevel == 1 ? 16 : lodLevel == 2 ? 4 : 1;
 
@@ -41,6 +43,12 @@ export class Submarine extends THREE.Object3D {
 		this.addEllipticalFins();
 		this.createMotorPropeller();
 		this.createBodyTopDetails();
+		this.createShield();
+	}
+
+	createShield() {
+		this.shield = new SubmarineShield(this.cameraManager, this, this.cutNumber);
+		this.add(this.shield.mesh);
 	}
 
 	initMaterials() {
@@ -889,8 +897,13 @@ export class Submarine extends THREE.Object3D {
 		return worldPos;
 	}
 
+	updateShield(){
+		this.shield.update();
+	}
+
 	update(time) {
 		this.updateWarningLight(time);
+		this.updateShield();
 	}
 
 	updateWarningLight(time) {
