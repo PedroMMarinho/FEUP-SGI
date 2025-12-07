@@ -141,12 +141,14 @@ class MyGuiInterface {
                 this.contents.aquarium.setupShadows(enabled);
             });
 
-
+        
+        const submarineFolder = this.datgui.addFolder('Submarine Controls');
         // Submarine light controls
         const submarine = this.contents.aquarium.submarine;
         if (submarine && submarine.lightControls) {
-            console.log(submarine.lightControls)
-            const lightFolder = this.datgui.addFolder('Submarine Lights');
+            // Chain folders
+
+            const lightFolder = submarineFolder.addFolder('Submarine Lights');
 
                     lightFolder.addColor(submarine.lightControls, "frontLightColor")
         .onChange(() => submarine.applyLightControls())
@@ -169,6 +171,28 @@ class MyGuiInterface {
         .onChange(() => submarine.applyLightControls())
         .name("Warning Light Intensity");
             lightFolder.open();
+        }
+
+        // submarine shield controls
+        if (submarine && submarine.shieldControls) {
+            const shieldFolder = submarineFolder.addFolder('Submarine Shield');
+            shieldFolder.add(submarine.shieldControls, "isActive")
+        .name("Activate Shield")
+        .onChange(() => submarine.applyShieldControls());
+
+            
+            shieldFolder.addColor(submarine.shieldControls, "shieldGlowColor")
+        .onChange(() => submarine.applyShieldControls())
+        .name("Shield Glow Color");
+        
+            shieldFolder.add(submarine.shieldControls, "c", 0, 5)
+        .onChange(() => submarine.applyShieldControls())
+        .name("Shield c Param");
+
+            shieldFolder.add(submarine.shieldControls, "p", 0, 5)
+        .onChange(() => submarine.applyShieldControls())
+        .name("Shield p Param");
+            shieldFolder.open();
         }
 
 
