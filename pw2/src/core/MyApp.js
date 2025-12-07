@@ -6,6 +6,7 @@ import { EffectComposer } from '/lib/jsm/postprocessing/EffectComposer.js';
 import { RenderPass } from '/lib/jsm/postprocessing/RenderPass.js';
 import { BokehPass } from '/lib/jsm/postprocessing/BokehPass.js';
 import { Color } from 'three';
+import { PassManager } from '../managers/PassManager.js';
 
 /**
  * This class contains the main application logic
@@ -53,28 +54,12 @@ class MyApp {
         // Handle window resize
         window.addEventListener('resize', () => this.cameraManager.onResize(this.renderer), false);
 
-
-        this.cameraManager = new CameraManager(this.aspect,this.keyManager, this.frustumSize);
+        // Initialize pass manager
+        
+        this.passManager = new PassManager(this.renderer, this.scene);
+        this.cameraManager = new CameraManager(this.aspect,this.keyManager, this.frustumSize, this.passManager);
 
         this.cameraManager.init();
-
-        this.composer = new EffectComposer(this.renderer);
-        this.renderPass = new RenderPass(this.scene, this.cameraManager.getActiveCamera()); // Camera will be set in render loop
-
-        this.renderPass.renderToScreen = false;
-        this.composer.addPass(this.renderPass);
-
-        this.bokehPass =  new BokehPass(this.scene, this.cameraManager.getCameraByName('Free Fly') ,{ 	
-            focus: 10,
-        	aperture: 0.0001,
-        	maxblur: 20,
-        });
-        this.bokehPass.renderToScreen = true;
-        this.composer.addPass(this.bokehPass);
-
-        this.cameraManager.setRenderPass(this.renderPass);
-        this.cameraManager.setBokehPass(this.bokehPass)
-
 
 
     }
@@ -106,7 +91,7 @@ class MyApp {
 
         if (this.contents) this.contents.update();
 
-        this.composer.render();
+        this.passManager.render();
 
         requestAnimationFrame(this.render.bind(this));
         this.stats.end();

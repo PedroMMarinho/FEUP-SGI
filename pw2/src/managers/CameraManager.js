@@ -3,17 +3,16 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { TimeManager } from './TimeManager.js';
 
 class CameraManager {
-    constructor(aspect, keyManager, frustumSize = 20) {
+    constructor(aspect, keyManager, frustumSize = 20, passManager) {
         this.keyManager = keyManager;
         this.aspect = aspect;
         this.frustumSize = frustumSize;
         this.cameras = {};
         this.activeCameraName = null;
-        this.bokehPass = null;
-        this.renderPass = null;
         this.lastCameraName = null;
         this.cameraSelection = "Free Fly";
         this.controls = null;
+        this.passManager = passManager;
 
         this.moveSpeed = 6; 
         this.lookSpeed = 0.5; 
@@ -21,7 +20,6 @@ class CameraManager {
         this.yaw = 0;
         this.pitch = 0;
 
-        this.freeFlyActive = false;
         this.timeManager = TimeManager.getInstance();
         this.globalTime = this.timeManager.getElapsedTime();
 
@@ -83,6 +81,7 @@ class CameraManager {
         this.cameras['TV View'] = tvCam;
 
         this.setActiveCamera('Free Fly');
+        this.passManager.init(this.activeCamera);
     }
 
     setTargetFish(fishObject) {
@@ -95,8 +94,7 @@ class CameraManager {
         this.lastCameraName = previous;
         this.activeCameraName = name;
         this.activeCamera = this.cameras[name];
-        if( this.renderPass) { this.renderPass.camera = this.activeCamera;}
-        if( this.bokehPass) { this.bokehPass.camera = this.activeCamera; }
+        this.passManager.updateCamera(this.activeCamera);
         this.changeCamera(previous, name);
     }
 
@@ -217,13 +215,11 @@ class CameraManager {
         }
 
         if(newName === 'Free Fly') {
-            this.freeFlyActive = true;
-            if( this.bokehPass){ this.bokehPass.enabled = true;}
+            this.passManager.togglePass('bokeh', true);
         }
 
         if (oldName === 'Free Fly') {
-            this.freeFlyActive = false;
-            if( this.bokehPass) { this.bokehPass.enabled = false;}
+            this.passManager.togglePass('bokeh', false);
         }
         if (newName === 'Submarine View') {
     this.canvasDiv.style = `
@@ -319,12 +315,7 @@ class CameraManager {
             canvas.requestPointerLock();
         }
     }
-    setRenderPass(renderPass){
-        this.renderPass = renderPass;
-    }
-    setBokehPass(bokehPass){
-        this.bokehPass = bokehPass;
-    }
+    
 }
 
 export { CameraManager };
