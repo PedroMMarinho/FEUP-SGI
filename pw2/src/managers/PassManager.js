@@ -1,6 +1,25 @@
 import { EffectComposer } from '/lib/jsm/postprocessing/EffectComposer.js';
 import { RenderPass } from '/lib/jsm/postprocessing/RenderPass.js';
 import { BokehPass } from '/lib/jsm/postprocessing/BokehPass.js';
+import { ShaderPass } from '/lib/jsm/postprocessing/ShaderPass.js';
+import { PeriscopeHUDType } from '../enums/PeriscopeHUDType.js';
+import { TintShader, 
+        ScratchesShader,
+        HUDShader,
+        ClipShader
+ } from '../hud/PeriscopeHUD.js';
+
+
+const HUD_STATE_CONFIG = {
+    [PeriscopeHUDType.VIEW]:      [],
+    [PeriscopeHUDType.DOF]:       ['bokeh'],
+    [PeriscopeHUDType.TINT]:      ['bokeh', 'tint'],
+    [PeriscopeHUDType.SCRATCHES]: ['bokeh', 'tint', 'scratches'],
+    [PeriscopeHUDType.HUD]:       ['bokeh', 'tint', 'scratches', 'hud'],
+    [PeriscopeHUDType.CLIP]:      ['bokeh', 'tint', 'scratches', 'hud', 'clip'],
+};
+
+const MANAGED_PASSES = ['bokeh', 'tint', 'scratches', 'hud', 'clip'];
 
 /**
  * PassManager handles all post-processing passes and effects
@@ -14,7 +33,11 @@ class PassManager {
         // Store references to passes
         this.passes = {
             render: null,
-            bokeh: null
+            bokeh: null,
+            tint: null,
+            scratches: null,
+            hud: null,
+            clip: null
         };
         
         // Effect composer
@@ -28,6 +51,7 @@ class PassManager {
                 maxblur: 20
             }
         };
+        this.currentPeriscopeHUD = PeriscopeHUDType.CLIP;
     }
 
 
@@ -43,6 +67,42 @@ class PassManager {
         
         // Setup post-processing passes
         this.setupBokehPass(activeCamera);
+        this.setupShaderPasses();
+    }
+
+    setupShaderPasses() {
+        this.setupTintPass();
+        this.setupScratchesPass();
+        this.setupHUDPass();
+        this.setupClipPass();
+    }
+
+     setupTintPass() {
+        this.passes.tint = new ShaderPass(TintShader);
+        this.passes.tint.renderToScreen = false;
+        this.passes.tint.enabled = false;
+        this.composer.addPass(this.passes.tint);
+    }
+
+    setupScratchesPass() {
+        this.passes.scratches = new ShaderPass(ScratchesShader);
+        this.passes.scratches.renderToScreen = false;
+        this.passes.scratches.enabled = false;
+        this.composer.addPass(this.passes.scratches);
+    }
+
+    setupHUDPass() {
+        this.passes.hud = new ShaderPass(HUDShader);
+        this.passes.hud.renderToScreen = false;
+        this.passes.hud.enabled = false;
+        this.composer.addPass(this.passes.hud);
+    }
+
+    setupClipPass() {
+        this.passes.clip = new ShaderPass(ClipShader);
+        this.passes.clip.renderToScreen = false;
+        this.passes.clip.enabled = false;
+        this.composer.addPass(this.passes.clip);
     }
 
     setScenarioManager(scenarioManager) {
@@ -57,8 +117,6 @@ class PassManager {
             this.scene,
             activeCamera
         );
-        
-        this.passes.render.renderToScreen = false;
         this.composer.addPass(this.passes.render);
     }
 
@@ -83,6 +141,20 @@ class PassManager {
             }
             pass.enabled = enabled;
         }
+    }
+
+    setHUDType(type, cameraName) {
+        console.log(`Setting HUD Type to ${type} for camera ${cameraName}`);
+
+        // Guard Clause
+        if (cameraName !== 'Submarine View') return;
+
+        const activePasses = HUD_STATE_CONFIG[type] || [];
+
+        MANAGED_PASSES.forEach(passName => {
+            const shouldEnable = activePasses.includes(passName);
+            this.togglePass(passName, shouldEnable);
+        });
     }
     
 

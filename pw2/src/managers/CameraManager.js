@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { TimeManager } from './TimeManager.js';
+import { PeriscopeHUDType } from '../enums/PeriscopeHUDType.js';
 
 class CameraManager {
     constructor(aspect, keyManager, frustumSize = 20, passManager) {
@@ -214,60 +215,17 @@ class CameraManager {
             cam.lookAt(this.sunkenShip.position);
         }
 
-        if(newName === 'Free Fly') {
-            this.passManager.togglePass('bokeh', true);
-        }
-
-        if (oldName === 'Free Fly') {
-            this.passManager.togglePass('bokeh', false);
-        }
         if (newName === 'Submarine View') {
-    this.canvasDiv.style = `
-        width: 50vw;
-        height: 50vw;
-        border-radius: 50%;
-        overflow: hidden;
-        border: 2px solid #000;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        position: relative;
-    `;
+            this.passManager.setHUDType(this.passManager.currentPeriscopeHUD, newName);
+        } else if (newName === 'Free Fly') {
+            // CleanUp lingering submarine HUD
+            this.passManager.setHUDType(PeriscopeHUDType.VIEW, 'Submarine View');
+            this.passManager.togglePass('bokeh', true);
+        }else {
+            this.passManager.setHUDType(PeriscopeHUDType.VIEW, 'Submarine View');
+        }
 
-    // Add the overlay if it doesn't exist yet
-    if (!this.canvasOverlay) {
-        const overlay = document.createElement('div');
-        overlay.className = 'submarine-overlay';
-        overlay.style = `
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            pointer-events: none;
-            z-index: 10;
-            background: radial-gradient(
-                circle at center,
-                rgba(255,255,255,0.15) 0%,
-                rgba(255,255,255,0.08) 20%,
-                rgba(0,0,0,1) 100%
-            );
-        `;
-        this.canvasDiv.appendChild(overlay);
-        this.canvasOverlay = overlay;
-    }
-} else {
-    this.canvasDiv.style = `
-        width: 100%;
-        height: 100%;
-        border-radius: 0;
-        overflow: visible;
-        position: relative;
-    `;
-    if (this.canvasOverlay) this.canvasOverlay.remove();
-    this.canvasOverlay = null;
-}
+
     }
 
     updateFreeFly(deltaTime) {
