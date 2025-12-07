@@ -195,9 +195,13 @@ class PassManager {
     /**
      * Handle window resize
      */
+    // Is this even needed?
     onResize(width, height) {
         if (this.composer) {
             this.composer.setSize(width, height);
+            if (this.passes.clip) {
+                this.passes.clip.uniforms['aspectRatio'].value = width / height;
+            }
         }
     }
 
