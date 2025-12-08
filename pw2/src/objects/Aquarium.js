@@ -111,6 +111,8 @@ class Aquarium extends THREE.Object3D {
             this.assetManager.getBlenderManager().getAllLODs('tv'),
         ];
 
+        const treasureChestModel = this.assetManager.getBlenderManager().getAllLODs('treasure-chest');
+
 
         const rockCount = 600;
         const coralCount = 120;
@@ -120,7 +122,7 @@ class Aquarium extends THREE.Object3D {
         const tvCount = 1;
 
 
-        this.seabed = new Seabed(this.terrainWidth, rockCount, coralCount, shellCount, seaweedCount, shipCount, tvCount, rockModels, shellModels, shipModels, tvModels);
+        this.seabed = new Seabed(this.terrainWidth, rockCount, coralCount, shellCount, seaweedCount, shipCount, tvCount, rockModels, shellModels, shipModels, tvModels, treasureChestModel);
         this.cameraManager.setTargetTV(this.seabed.getTV());
         this.cameraManager.setTargetShip(this.seabed.sunkenShip);
         this.addToAquarium(this.seabed);

@@ -55,6 +55,11 @@ export class AssetManager {
             { key: 'tv', url: 'tvs/TV-high.glb', lod: 0 },
             { key: 'tv', url: 'tvs/TV-medium.glb', lod: 1 },
             { key: 'tv', url: 'tvs/TV-low.glb', lod: 2 }, 
+
+            // Treasure Chest
+            { key: 'treasure-chest', url: 'treasure_chest/treasure-chest-high.glb', lod: 0 },
+            { key: 'treasure-chest', url: 'treasure_chest/treasure-chest-medium.glb', lod: 1 },
+            { key: 'treasure-chest', url: 'treasure_chest/treasure-chest-low.glb', lod: 2 },
         ];
         return modelList;
     }
@@ -99,6 +104,8 @@ export class AssetManager {
             'scratches': 'periscope/scratches.jpg',
             'hud': 'periscope/hud.png',
             'spritesheet': 'periscope/spritesheet.png',
+            // Treasure Chest Textures
+            'treasure-gold' : 'treasure_chest/gold.mp4',
         };
         return textureMap;
     }
