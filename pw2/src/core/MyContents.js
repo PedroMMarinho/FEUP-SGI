@@ -47,7 +47,7 @@ class MyContents {
         // Load aquarium
         this.app.scene.add(this.aquarium);
 
-        this.passManager.init(this.cameraManager.getActiveCamera());
+        this.passManager.init(this.cameraManager.getActiveCamera(),this.aquarium);
 
     }
 
