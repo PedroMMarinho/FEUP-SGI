@@ -82,7 +82,6 @@ class CameraManager {
         this.cameras['TV View'] = tvCam;
 
         this.setActiveCamera('Free Fly');
-        this.passManager.init(this.activeCamera);
     }
 
     setTargetFish(fishObject) {

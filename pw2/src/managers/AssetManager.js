@@ -95,6 +95,9 @@ export class AssetManager {
             'tv-screen3': 'tv/spongebob.mp4',
             // perlin noise  
             'perlin-noise': 'noise/perlin_noise.png',
+            // Periscope Textures
+            'scratches': 'periscope/scratches.jpg',
+            'hud': 'periscope/hud.png',
         };
         return textureMap;
     }
