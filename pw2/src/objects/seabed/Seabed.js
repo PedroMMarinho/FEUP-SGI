@@ -6,6 +6,7 @@ import { ShellGroup } from '../shell/ShellGroup.js';
 import { SeaweedGroup } from '../seaweed/SeaweedGroup.js';
 import { ShipGroup } from '../ship/ShipGroup.js';
 import { TVGroup } from '../tv/TVGroup.js';
+import { TreasureChestLOD } from '../tresure/TreasureChestLOD.js';
 
 class Seabed extends THREE.Object3D {
 	constructor(
@@ -20,6 +21,7 @@ class Seabed extends THREE.Object3D {
         shellModels = [],
 		shipModels = [],
 		tvModels = [],
+		treasureChestModel = null,
 		distanceRange = [0.008, 0.1],
 	) {
 		super();
@@ -39,6 +41,7 @@ class Seabed extends THREE.Object3D {
 		this.shellModels = shellModels;
 		this.shipModels = shipModels;
 		this.tvModels = tvModels;
+		this.treasureChestModel = treasureChestModel;
 
 
 		this.distanceRange = distanceRange;
@@ -66,10 +69,21 @@ class Seabed extends THREE.Object3D {
 		this.createTerrain();
 		this.createShipGroup();
 		this.createTVGroup();
+		this.createTreasureChest();
 		this.createRockGroup();
 		this.createCoralGroup();
         this.createShellGroup();
 		this.createSeaweedGroup();
+	}
+
+	createTreasureChest() {
+		// Place treasure chest at the center of the seabed
+		const position = this.computePositions(1)[0];
+		const treasureChest = new TreasureChestLOD(this.treasureChestModel);
+		treasureChest.position.copy(position);
+		this.add(treasureChest);
+		this.treasureChest = treasureChest;
+		this.globalPositions.push(position);
 	}
 
 	createShipGroup() {
