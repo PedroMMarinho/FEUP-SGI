@@ -42,45 +42,6 @@ class Aquarium extends THREE.Object3D {
         this.collisionManager.registerObject(object);
     }
 
-    createOutsideEnvironment() {
-        const hdri = this.assetManager.getHDRI('fin-hall');
-        this.scene.environment = hdri.hdr;
-        this.scene.environment.intensity = 0.01;
-        this.scene.background = hdri.envMap;
-        this.envMap = hdri.envMap;
-    }
-
-    createWaterFog() {
-        // Blue cyan color
-        this.scene.fog = new THREE.FogExp2(0x003d5c, 0.009);
-    }
-
-    createTopLight() {
-        const topLight = new THREE.DirectionalLight(0xffffff, 3.0);
-
-        topLight.position.set(30, 100, 20);
-        topLight.castShadow = true;
-
-        topLight.shadow.mapSize.width = 1024;
-        topLight.shadow.mapSize.height = 1024;
-
-        const d = 4 * this.terrainWidth / 5;
-        topLight.shadow.camera.left = -d;
-        topLight.shadow.camera.right = d;
-        topLight.shadow.camera.top = d;
-        topLight.shadow.camera.bottom = -d;
-
-        topLight.shadow.camera.near = 0.1;
-        topLight.shadow.camera.far = this.terrainHeight * 3;
-
-        topLight.shadow.bias = -0.001;
-        /*
-        const helper = new THREE.CameraHelper(topLight.shadow.camera);
-        this.scene.add(helper);
-        */
-        this.addToAquarium(topLight);
-    }
-
     enableShadows(object, cast = true, receive = true) {
         if (!object) return;
 
@@ -112,14 +73,8 @@ class Aquarium extends THREE.Object3D {
      * Initializes and adds all aquarium elements
      */
     init() {
-        // Create light
-        this.createTopLight();
-        // Create outside environment
-        this.createOutsideEnvironment();
         // Create aquarium geometry and material
         this.createGlassTank();
-        // Create water fog
-        this.createWaterFog();
         // Create water top layer
         this.createWaterTopLayer();
         // Create bubbles
@@ -133,9 +88,13 @@ class Aquarium extends THREE.Object3D {
         // create seabed
         this.createSeaBed();
         // Setup bvh for all objects
-        this.bvhManager.computeBVH(this.objects);
+        this.setupBVH();
         // Setup Shadows
         this.setupShadows();
+    }
+
+    setupBVH() {
+        this.bvhManager.computeBVH(this.objects);
     }
 
     createSeaBed() {
@@ -259,12 +218,12 @@ class Aquarium extends THREE.Object3D {
 
     createSubmarine() {
         const bounds = {
-            minX: -this.terrainWidth / 2 - 5,
-            maxX: this.terrainWidth / 2 - 5,
+            minX: -this.terrainWidth / 2 + 8,
+            maxX: this.terrainWidth / 2 - 8,
             minY: 5,
             maxY: this.terrainHeight - 8,
-            minZ: -this.terrainWidth / 2 - 5,
-            maxZ: this.terrainWidth / 2 - 5,
+            minZ: -this.terrainWidth / 2 + 8,
+            maxZ: this.terrainWidth / 2 - 8,
         };
         this.submarine = new SubmarineLOD(this.assetManager.getBlenderManager().getAllLODs('propeller-blade'), this.keyManager, this.cameraManager, bounds);
         this.addToAquarium(this.submarine);

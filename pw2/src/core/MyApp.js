@@ -1,9 +1,12 @@
 import * as THREE from 'three';
 import Stats from 'three/addons/libs/stats.module.js';
-import { MyContents } from './MyContents.js';
-import { MyGuiInterface } from './MyGuiInterface.js';
 import { CameraManager } from '../managers/CameraManager.js';
 import { KeyManager } from '../managers/KeyManager.js';
+import { EffectComposer } from '/lib/jsm/postprocessing/EffectComposer.js';
+import { RenderPass } from '/lib/jsm/postprocessing/RenderPass.js';
+import { BokehPass } from '/lib/jsm/postprocessing/BokehPass.js';
+import { Color } from 'three';
+import { PassManager } from '../managers/PassManager.js';
 
 /**
  * This class contains the main application logic
@@ -20,7 +23,6 @@ class MyApp {
         this.aspect = window.innerWidth / window.innerHeight;
         this.frustumSize = 20;
         this.keyManager = new KeyManager();
-        this.cameraManager = new CameraManager(this.aspect,this.keyManager, this.frustumSize);
     }
 
     /**
@@ -36,11 +38,9 @@ class MyApp {
         this.stats.showPanel(1);
         document.body.appendChild(this.stats.dom);
 
-        // Initialize cameras
-        this.cameraManager.init();
-
         // Renderer setup
         this.renderer = new THREE.WebGLRenderer({ antialias: true });
+        this.renderer.outputColorSpace = THREE.SRGBColorSpace;
         this.renderer.setPixelRatio(window.devicePixelRatio);
         this.renderer.setClearColor("#000000");
         this.renderer.shadowMap.enabled = true;
@@ -53,6 +53,15 @@ class MyApp {
 
         // Handle window resize
         window.addEventListener('resize', () => this.cameraManager.onResize(this.renderer), false);
+
+        // Initialize pass manager
+        
+        this.passManager = new PassManager(this.renderer, this.scene);
+        this.cameraManager = new CameraManager(this.aspect,this.keyManager, this.frustumSize, this.passManager);
+
+        this.cameraManager.init();
+
+
     }
 
     /**
@@ -82,7 +91,7 @@ class MyApp {
 
         if (this.contents) this.contents.update();
 
-        this.renderer.render(this.scene, this.cameraManager.getActiveCamera());
+        this.passManager.render();
 
         requestAnimationFrame(this.render.bind(this));
         this.stats.end();

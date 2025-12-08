@@ -2,7 +2,7 @@ import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 import * as THREE from 'three';
 import { MyApp } from './MyApp.js';
 import { MyContents } from './MyContents.js';
-
+import { PeriscopeHUDType } from '../enums/PeriscopeHUDType.js';
 /**
  * Custom GUI interface for the app
  */
@@ -50,6 +50,18 @@ class MyGuiInterface {
         });
 
         cameraFolder.open();
+
+        if (cameraFolder) {
+
+            const hudNames = Object.values(PeriscopeHUDType);;
+            const hudController = cameraFolder
+                .add(this.app.passManager, 'currentPeriscopeHUD', hudNames)
+                .name('Periscope HUD Type');
+
+            hudController.onChange((type) => {
+                this.app.passManager.setHUDType(type, this.app.cameraManager.activeCameraName);
+            });
+        }
 
         // --- Render mode controls (wireframe / fill) ---
         const renderFolder = this.datgui.addFolder('Render Mode');
@@ -173,11 +185,11 @@ class MyGuiInterface {
         .onChange(() => submarine.applyShieldControls())
         .name("Shield Glow Color");
         
-            shieldFolder.add(submarine.shieldControls, "c", 0, 5)
+            shieldFolder.add(submarine.shieldControls, "c", 1, 5)
         .onChange(() => submarine.applyShieldControls())
         .name("Shield c Param");
 
-            shieldFolder.add(submarine.shieldControls, "p", 0, 5)
+            shieldFolder.add(submarine.shieldControls, "p", 1, 5)
         .onChange(() => submarine.applyShieldControls())
         .name("Shield p Param");
             shieldFolder.open();
