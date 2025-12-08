@@ -79,8 +79,8 @@ class PassManager {
                 atlasSize:  { value: new THREE.Vector2(3328, 384) },
                 horizontalOffset: 0.002,
                 verticalOffset: 0.03,
-                xPosition: 0.44,
-                yPosition: 0.34,
+                xPosition: 0.465,
+                yPosition: 0.30,
                 scale: 0.1
             },
             clip: {
