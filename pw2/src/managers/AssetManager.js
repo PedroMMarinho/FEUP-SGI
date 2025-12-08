@@ -98,6 +98,7 @@ export class AssetManager {
             // Periscope Textures
             'scratches': 'periscope/scratches.jpg',
             'hud': 'periscope/hud.png',
+            'spritesheet': 'periscope/spritesheet.png',
         };
         return textureMap;
     }

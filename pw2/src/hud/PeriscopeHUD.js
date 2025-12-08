@@ -114,6 +114,112 @@ const HUDShader = {
     `
 };
 
+const MAX_CHARS = 64;
+
+const CHAR_MAP = { 
+    'A': 0,
+    'X': 23,
+    'Y': 24, 
+    'Z': 25, 
+    '0': 27, 
+    '1': 28, 
+    '2': 29, 
+    '3': 30, 
+    '4': 31, 
+    '5': 32, 
+    '6': 33, 
+    '7': 34, 
+    '8': 35, 
+    '9': 36, 
+    '-': 37, 
+    ':': 38, 
+    '.': 39, 
+    '/': 40,
+    ' ': 41
+};
+
+const CoordsShader = {
+    uniforms: {
+        tDiffuse: { value: null },
+        fontMap: { value: null },
+
+        intensity: { value: 1.0 },
+
+        charIndices: { value: new Array(MAX_CHARS).fill(0) },
+        charPositions: { value: new Array(MAX_CHARS * 2).fill(0) },
+
+        glyphSize:  { value: new THREE.Vector2(128, 128) },
+        atlasSize:  { value: new THREE.Vector2(2048, 1024) },
+
+        numChars: { value: 0 },
+        resolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) },
+        scale: { value: 1.0 }
+    },
+    vertexShader:`
+            varying vec2 vUv;
+        void main() {
+            vUv = uv;
+            gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+        }
+    `,
+    fragmentShader: `
+    uniform sampler2D tDiffuse;
+    uniform sampler2D fontMap;
+
+    uniform int numChars;
+    uniform float charIndices[` + MAX_CHARS + `];
+    uniform vec2  charPositions[` + MAX_CHARS + `];
+
+    uniform vec2 atlasSize;  
+    uniform vec2 glyphSize;  
+    uniform float intensity;
+    uniform vec2 resolution;
+    uniform float scale;
+
+    varying vec2 vUv;
+
+    void main() {
+        vec4 color = texture2D(tDiffuse, vUv);
+
+        float cols = atlasSize.x / glyphSize.x;
+        vec2 cellUV = glyphSize / atlasSize;
+
+        for (int i = 0; i < ` + MAX_CHARS + `; i++) {
+            if (i >= numChars) break;
+
+            float index = charIndices[i];
+            vec2 pos = charPositions[i];
+
+            // Scale glyph size to normalized screen space
+            vec2 size = vec2(glyphSize.x / resolution.x, glyphSize.y / resolution.y) * scale;
+
+
+            vec2 diff = vUv - pos;
+            if (diff.x >= 0.0 && diff.x <= size.x &&
+                diff.y >= 0.0 && diff.y <= size.y) {
+
+                vec2 local = diff / size;
+
+                float col = mod(index, cols);
+                float row = floor(index / cols);
+
+                // Inside the glyph sampling
+vec2 uv = local * (cellUV * 0.9) + vec2(col * cellUV.x + cellUV.x*0.05,
+                                         1.0 - (row + 1.0) * cellUV.y + cellUV.y*0.05);
+
+
+
+                vec4 g = texture2D(fontMap, uv);
+
+                color.rgb = mix(color.rgb, vec3(1.0), g.r * intensity);
+            }
+        }
+
+        gl_FragColor = color;
+    }    
+        `
+};
+
 
 /**
  * Custom shader for circular viewport clip
@@ -162,4 +268,5 @@ const ClipShader = {
     `
 };
 
-export { TintShader, ScratchesShader, HUDShader, ClipShader };
+
+export { TintShader, ScratchesShader, HUDShader, ClipShader, CoordsShader, MAX_CHARS, CHAR_MAP };
