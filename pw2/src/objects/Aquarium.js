@@ -218,12 +218,12 @@ class Aquarium extends THREE.Object3D {
 
     createSubmarine() {
         const bounds = {
-            minX: -this.terrainWidth / 2 - 5,
-            maxX: this.terrainWidth / 2 - 5,
+            minX: -this.terrainWidth / 2 + 8,
+            maxX: this.terrainWidth / 2 - 8,
             minY: 5,
             maxY: this.terrainHeight - 8,
-            minZ: -this.terrainWidth / 2 - 5,
-            maxZ: this.terrainWidth / 2 - 5,
+            minZ: -this.terrainWidth / 2 + 8,
+            maxZ: this.terrainWidth / 2 - 8,
         };
         this.submarine = new SubmarineLOD(this.assetManager.getBlenderManager().getAllLODs('propeller-blade'), this.keyManager, this.cameraManager, bounds);
         this.addToAquarium(this.submarine);

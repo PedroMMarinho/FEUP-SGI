@@ -185,11 +185,11 @@ class MyGuiInterface {
         .onChange(() => submarine.applyShieldControls())
         .name("Shield Glow Color");
         
-            shieldFolder.add(submarine.shieldControls, "c", 0, 5)
+            shieldFolder.add(submarine.shieldControls, "c", 1, 5)
         .onChange(() => submarine.applyShieldControls())
         .name("Shield c Param");
 
-            shieldFolder.add(submarine.shieldControls, "p", 0, 5)
+            shieldFolder.add(submarine.shieldControls, "p", 1, 5)
         .onChange(() => submarine.applyShieldControls())
         .name("Shield p Param");
             shieldFolder.open();
