@@ -1,4 +1,6 @@
+import * as THREE from 'three';
 import { EffectComposer } from '/lib/jsm/postprocessing/EffectComposer.js';
+import { TextureManager } from './TextureManager.js';
 import { RenderPass } from '/lib/jsm/postprocessing/RenderPass.js';
 import { BokehPass } from '/lib/jsm/postprocessing/BokehPass.js';
 import { ShaderPass } from '/lib/jsm/postprocessing/ShaderPass.js';
@@ -28,7 +30,7 @@ class PassManager {
     constructor(renderer, scene) {
         this.renderer = renderer;
         this.scene = scene;
-        this.scenarioManager = null;
+        this.textureManager = TextureManager.getInstance();
         
         // Store references to passes
         this.passes = {
@@ -49,6 +51,25 @@ class PassManager {
                 focus: 10,
                 aperture: 0.0001,
                 maxblur: 20
+            },
+            tint: {
+                tintColor: new THREE.Color(0.2, 1.0, 0.4),
+                intensity: 0.5,
+                
+            },
+            scratches: {
+                tScratches: 'scratches', 
+                intensity: 0.8,
+                
+            },
+            hud: {
+                tHUD: 'hud', 
+                intensity: 0.8,
+                
+            },
+            clip: {
+                radius: 0.45,
+                borderWidth: 0.05,
             }
         };
         this.currentPeriscopeHUD = PeriscopeHUDType.CLIP;
@@ -82,13 +103,26 @@ class PassManager {
         this.passes.tint.renderToScreen = false;
         this.passes.tint.enabled = false;
         this.composer.addPass(this.passes.tint);
+
+        this.passes.tint.uniforms['tintColor'].value = this.config.tint.tintColor;
+        this.passes.tint.uniforms['intensity'].value = this.config.tint.intensity;
     }
 
     setupScratchesPass() {
         this.passes.scratches = new ShaderPass(ScratchesShader);
+
         this.passes.scratches.renderToScreen = false;
         this.passes.scratches.enabled = false;
         this.composer.addPass(this.passes.scratches);
+        const tex = this.textureManager.getTexture(this.config.scratches.tScratches)
+        console.log(tex)
+        this.passes.scratches.uniforms['tScratches'].value = tex;
+        this.passes.scratches.uniforms['intensity'].value = this.config.scratches.intensity;
+        this.passes.scratches.uniforms['aspectRatio'].value  = window.innerWidth / window.innerHeight;
+        
+        window.addEventListener('resize', () => {
+            this.passes.scratches.uniforms['aspectRatio'].value  = window.innerWidth / window.innerHeight;
+        });
     }
 
     setupHUDPass() {
@@ -96,6 +130,14 @@ class PassManager {
         this.passes.hud.renderToScreen = false;
         this.passes.hud.enabled = false;
         this.composer.addPass(this.passes.hud);
+
+        this.passes.hud.uniforms['tHUD'].value = this.textureManager.getTexture(this.config.hud.tHUD);
+        this.passes.hud.uniforms['intensity'].value = this.config.hud.intensity;
+        this.passes.hud.uniforms['aspectRatio'].value  = window.innerWidth / window.innerHeight;
+
+        window.addEventListener('resize', () => {
+            this.passes.hud.uniforms['aspectRatio'].value  = window.innerWidth / window.innerHeight;
+        });
     }
 
     setupClipPass() {
@@ -103,6 +145,14 @@ class PassManager {
         this.passes.clip.renderToScreen = false;
         this.passes.clip.enabled = false;
         this.composer.addPass(this.passes.clip);
+
+        this.passes.clip.uniforms['radius'].value = this.config.clip.radius;
+        this.passes.clip.uniforms['borderWidth'].value = this.config.clip.borderWidth;
+        this.passes.clip.uniforms['aspectRatio'].value  = window.innerWidth / window.innerHeight;
+
+        window.addEventListener('resize', () => {
+            this.passes.clip.uniforms['aspectRatio'].value  = window.innerWidth / window.innerHeight;
+        });
     }
 
     setScenarioManager(scenarioManager) {

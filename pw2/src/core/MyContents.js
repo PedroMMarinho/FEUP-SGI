@@ -46,6 +46,9 @@ class MyContents {
         this.app.scene.add(this.axis);
         // Load aquarium
         this.app.scene.add(this.aquarium);
+
+        this.passManager.init(this.cameraManager.getActiveCamera());
+
     }
 
     enableAxis(value){

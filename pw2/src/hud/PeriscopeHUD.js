@@ -7,8 +7,8 @@ import * as THREE from 'three';
 const TintShader = {
     uniforms: {
         'tDiffuse': { value: null },
-        'tintColor': { value: new THREE.Color(0.2, 0.6, 0.4) }, // Greenish-yellowish
-        'intensity': { value: 0.3 }
+        'tintColor': { value: new THREE.Color(0.2, 1.0, 0.4) }, // Greenish-yellowish
+        'intensity': { value: 0.5 }
     },
     vertexShader: `
         varying vec2 vUv;
@@ -38,7 +38,8 @@ const ScratchesShader = {
     uniforms: {
         'tDiffuse': { value: null },
         'tScratches': { value: null },
-        'intensity': { value: 0.5 }
+        'intensity': { value: 0.5 },
+        'aspectRatio': { value: 1.0 }
     },
     vertexShader: `
         varying vec2 vUv;
@@ -51,29 +52,36 @@ const ScratchesShader = {
         uniform sampler2D tDiffuse;
         uniform sampler2D tScratches;
         uniform float intensity;
+        uniform float aspectRatio;
         varying vec2 vUv;
         
         void main() {
+            // Aspect-corrected UV for scratches
+            vec2 uv = vUv - 0.5;
+            uv.x *= aspectRatio;
+            uv += 0.5;
+
             vec4 color = texture2D(tDiffuse, vUv);
-            vec4 scratches = texture2D(tScratches, vUv);
-            
-            // Darken based on scratch pattern
+            vec4 scratches = texture2D(tScratches, uv);
+
             float scratchFactor = 1.0 - (scratches.r * intensity);
             gl_FragColor = vec4(color.rgb * scratchFactor, color.a);
         }
     `
 };
 
+
 /**
- * Custom shader for crosshair HUD overlay
+ * HUD overlay shader using tHud texture
  */
 const HUDShader = {
     uniforms: {
         'tDiffuse': { value: null },
-        'crosshairSize': { value: 0.02 },
-        'crosshairThickness': { value: 0.002 },
-        'crosshairColor': { value: new THREE.Color(0.0, 1.0, 0.0) }
+        'tHUD': { value: null },      // HUD texture
+        'intensity': { value: 1.0 },
+        'aspectRatio': { value: 1.0 } // width / height
     },
+
     vertexShader: `
         varying vec2 vUv;
         void main() {
@@ -81,31 +89,31 @@ const HUDShader = {
             gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
         }
     `,
+
     fragmentShader: `
         uniform sampler2D tDiffuse;
-        uniform float crosshairSize;
-        uniform float crosshairThickness;
-        uniform vec3 crosshairColor;
+        uniform sampler2D tHUD;
+        uniform float intensity;
+        uniform float aspectRatio;
         varying vec2 vUv;
-        
+
         void main() {
-            vec4 color = texture2D(tDiffuse, vUv);
-            vec2 center = vec2(0.5, 0.5);
-            vec2 diff = abs(vUv - center);
-            
-            // Horizontal line
-            bool horizLine = diff.x < crosshairSize && diff.y < crosshairThickness;
-            // Vertical line
-            bool vertLine = diff.y < crosshairSize && diff.x < crosshairThickness;
-            
-            if (horizLine || vertLine) {
-                gl_FragColor = vec4(mix(color.rgb, crosshairColor, 0.8), color.a);
-            } else {
-                gl_FragColor = color;
-            }
+            vec4 baseColor = texture2D(tDiffuse, vUv);
+
+            // Aspect-corrected UV for HUD
+            vec2 uv = vUv - 0.5;
+            uv.x *= aspectRatio;
+            uv += 0.5;
+
+            vec4 hudTex = texture2D(tHUD, uv);
+
+            // Multiply HUD texture over the base color
+            float factor = hudTex.a * intensity;
+            gl_FragColor = mix(baseColor, hudTex, factor);
         }
     `
 };
+
 
 /**
  * Custom shader for circular viewport clip
