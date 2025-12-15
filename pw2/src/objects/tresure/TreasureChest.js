@@ -11,12 +11,6 @@ class TreasureChest extends THREE.Object3D {
 
     getModel() {
         const model = this.gltf.scene.clone();
-        model.position.y -= 0.06;
-        model.scale.set(0.04, 0.04, 0.04);
-        // apply random rotation around Y axis
-        model.rotation.y = Math.random() * Math.PI * 2;
-        // slight tilt for more natural look
-        model.rotation.z = Math.random() * 0.1 - 0.05;
         this.changeVideoTexture(model);
         return model;
     }

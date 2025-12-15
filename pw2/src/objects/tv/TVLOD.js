@@ -17,8 +17,11 @@ export class TVLOD extends THREE.LOD {
 
 	init() {
 		const lodNumber = this.lods.length;
+
 		for (let level = 0; level < lodNumber; level++) {
 			const tv = new TV(this.lods[level]);
+			tv.rotateX(Math.PI/2);
+			tv.position.y += 0.5;
 			this.addLevel(tv, this.distanceStart + this.distanceOffset * level);
 		}
 
