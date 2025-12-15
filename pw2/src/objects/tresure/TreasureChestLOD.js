@@ -17,8 +17,18 @@ export class TreasureChestLOD extends THREE.LOD {
 
 	init() {
 		const lodNumber = this.lods.length;
+
+        let rotationY = Math.random() * Math.PI * 2;
+        let rotationZ = Math.random() * 0.1 - 0.05;
+
 		for (let level = 0; level < lodNumber; level++) {
 			const treasureChest = new TreasureChest(this.lods[level]);
+			// Apply transformations
+			treasureChest.rotation.y = rotationY;
+			treasureChest.rotation.z = rotationZ;
+			treasureChest.position.y -= 0.06;
+			treasureChest.scale.set(0.04, 0.04, 0.04);
+
 			this.addLevel(treasureChest, this.distanceStart + this.distanceOffset * level);
 		}
 

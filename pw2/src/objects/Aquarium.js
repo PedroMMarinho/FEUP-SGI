@@ -100,6 +100,7 @@ class Aquarium extends THREE.Object3D {
     createSeaBed() {
         const rockModels = [
             this.assetManager.getBlenderManager().getAllLODs('granite'),
+            this.assetManager.getBlenderManager().getAllLODs('dark-stone'),
         ];
         const shellModels = [
             this.assetManager.getBlenderManager().getAllLODs('whelk'),
