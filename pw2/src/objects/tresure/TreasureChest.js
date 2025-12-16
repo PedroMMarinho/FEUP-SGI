@@ -4,6 +4,8 @@ import { TextureManager } from '../../managers/TextureManager.js';
 class TreasureChest extends THREE.Object3D {
     constructor(gltf) {
         super();
+        console.log('Creating TreasureChest');
+        console.log(gltf);
         this.gltf = gltf;
         this.textureManager = TextureManager.getInstance();
         this.add(this.getModel());
