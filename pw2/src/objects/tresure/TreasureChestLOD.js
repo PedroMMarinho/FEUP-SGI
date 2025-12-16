@@ -19,6 +19,7 @@ export class TreasureChestLOD extends THREE.LOD {
 		const lodNumber = this.lods.length;
 		for (let level = 0; level < lodNumber; level++) {
 			const treasureChest = new TreasureChest(this.lods[level]);
+
 			this.addLevel(treasureChest, this.distanceStart + this.distanceOffset * level);
 		}
 
