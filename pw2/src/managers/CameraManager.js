@@ -169,12 +169,11 @@ class CameraManager {
 
         const camera = this.cameras['TV View'];
         const tv = this.targetTelevision;
-
         camera.position.copy(tv.position);
         
         camera.quaternion.copy(tv.quaternion);
-        camera.translateZ(1.5);
-        camera.translateY(0.6)
+        camera.translateY(1.2);
+        camera.translateZ(-1);
 
         camera.lookAt(tv.position);
     }
