@@ -6,6 +6,7 @@ import { SubmarineLOD } from './submarine/SubmarineLOD.js';
 import { GlassTank } from './glassTank/GlassTank.js';
 import { Seabed } from './seabed/Seabed.js';
 import { Water } from './water/Water.js';
+import { MarineSnow } from './particles/MarineSnow.js';
 
 /**
  * Main Aquarium class
@@ -24,8 +25,8 @@ class Aquarium extends THREE.Object3D {
         this.scene = scene;
 
         // Terrain dimensions
-        this.terrainWidth = 150;
-        this.terrainHeight = 50;
+        this.terrainWidth = 90;
+        this.terrainHeight = 30;
 
         // Camera Manager 
         this.cameraManager.setAquariumHeight(this.terrainHeight);
@@ -65,7 +66,7 @@ class Aquarium extends THREE.Object3D {
     }
 
     createWaterTopLayer() {
-        const water = new Water(this.assetManager.getTextureManager().getTexture('water-normal'), this.terrainWidth, 4 * this.terrainHeight / 5, this.terrainWidth, this.envMap);
+        const water = new Water(this.assetManager.getTextureManager().getTexture('water-normal'), this.terrainWidth, 3 * this.terrainHeight / 5, this.terrainWidth, this.envMap);
         this.addToAquarium(water);
     }
 
@@ -91,6 +92,21 @@ class Aquarium extends THREE.Object3D {
         this.setupBVH();
         // Setup Shadows
         this.setupShadows();
+        // Add Marine Snow
+        this.addMarineSnow();
+    }
+
+    addMarineSnow() {
+    const marineSnow = new MarineSnow(
+        1000, 
+        {
+            width: this.terrainWidth,
+            height: this.terrainHeight - this.terrainHeight / 4,
+            depth: this.terrainWidth
+        },
+        (x, z) => this.seabed.terrain.getHeightAt(x, z)
+    );
+    this.addToAquarium(marineSnow);
     }
 
     setupBVH() {
@@ -115,10 +131,10 @@ class Aquarium extends THREE.Object3D {
         const treasureChestModel = [this.assetManager.getBlenderManager().getAllLODs('treasure-chest')];
 
 
-        const rockCount = 600;
-        const coralCount = 120;
-        const shellCount = 200;
-        const seaweedCount = 120;
+        const rockCount = 100;
+        const coralCount = 30;
+        const shellCount = 20;
+        const seaweedCount = 30;
         const shipCount = 1;
         const tvCount = 1;
         const tvreasureChestCount = 1;
@@ -183,7 +199,7 @@ class Aquarium extends THREE.Object3D {
         };
 
         this.fishGroups = [
-            new FishGroup(4, this.terrainWidth / 2 - 8, this.terrainHeight / 2 + 10, this.boidProps),
+            new FishGroup(350, this.terrainWidth / 2 - 8, this.terrainHeight / 2, this.boidProps),
         ];
         this.fishGroups[0].position.set(0, 0, 0);
         this.cameraManager.setTargetFish(this.fishGroups[0].getCameraTarget());

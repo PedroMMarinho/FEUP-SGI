@@ -14,8 +14,8 @@ class ScenarioManager {
 
         this.envMap = null;
         this.originalLightsIntensity = {
-            directional: 0.3,
-            ambient: 0.6
+            directional: 0.8,
+            ambient: 0.8
         };
         this.originalFogIntensity = 0.018;
     }
