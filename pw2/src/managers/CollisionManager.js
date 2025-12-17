@@ -139,10 +139,10 @@ class CollisionManager {
 
     registerObject(object) {
         // Recursively traverse and register
+        // TODO : Optimize fish obstacle registration
         const traverse = (obj) => {
             if (obj.type === EntityType.SHARK || 
                 obj.type === EntityType.SUBMARINE || 
-                obj.type === EntityType.FISH || 
                 obj.type === EntityType.STATIC_OBSTACLE) {
                 this.entities.push(obj);
                 this.createAwarenessBox(obj);
