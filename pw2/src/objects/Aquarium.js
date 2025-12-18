@@ -25,7 +25,7 @@ class Aquarium extends THREE.Object3D {
         this.scene = scene;
 
         // Terrain dimensions
-        this.terrainWidth = 90;
+        this.terrainWidth = 80;
         this.terrainHeight = 30;
 
         // Camera Manager 

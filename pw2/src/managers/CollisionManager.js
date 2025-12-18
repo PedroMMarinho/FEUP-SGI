@@ -193,8 +193,22 @@ class CollisionManager {
         
         const localCenter = new THREE.Vector3();
         bbox.getCenter(localCenter);
+        let offsetMultiplier = 0;
 
-        const offsetMultiplier = this.fleeRadiusBase * (1 + 0.8 * (danger - 1));
+        switch (danger) {
+            case DangerLevel.NONE:
+                break;
+            case DangerLevel.LOW:
+                offsetMultiplier += 0.1;
+                break;
+            case DangerLevel.MEDIUM:
+                offsetMultiplier += 0.5;
+                break;
+            // No need for offset for HIGH danger
+            case DangerLevel.HIGH:
+                break;
+        }
+
         const boxSize = new THREE.Vector3(
             objectSize.x + offsetMultiplier,
             objectSize.y + offsetMultiplier,

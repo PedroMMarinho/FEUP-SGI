@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { TimeManager } from './TimeManager.js';
 import { PeriscopeHUDType } from '../enums/PeriscopeHUDType.js';
+import { RenderType } from '../enums/RenderType.js';
 
 class CameraManager {
     constructor(aspect, keyManager, frustumSize = 20, passManager) {
@@ -213,16 +214,14 @@ class CameraManager {
             cam.lookAt(this.sunkenShip.position);
         }
 
+        this.passManager.setRenderType(this.passManager.currentRenderType);
+
         if (newName === 'Submarine View') {
             this.passManager.setHUDType(this.passManager.currentPeriscopeHUD, newName);
-        } else if (newName === 'Free Fly') {
-            // CleanUp lingering submarine HUD
-            this.passManager.setHUDType(PeriscopeHUDType.VIEW, 'Submarine View');
-            this.passManager.togglePass('bokeh', true);
-        }else {
-            this.passManager.setHUDType(PeriscopeHUDType.VIEW, 'Submarine View');
+        } 
+        else {
+            this.passManager.setHUDType(PeriscopeHUDType.NONE, 'Submarine View');
         }
-
 
     }
 
