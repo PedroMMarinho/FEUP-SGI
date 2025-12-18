@@ -1,126 +1,211 @@
 import * as THREE from "three";
 import { TimeManager } from "../../managers/TimeManager.js";
-import { TextureManager } from "../../managers/TextureManager.js";
+import { SandParticle } from "./SandParticle.js";
+import { CollisionManager } from "../../managers/CollisionManager.js";
 
 export class MarineSnow extends THREE.Group {
-  constructor(particleCount = 1000, bounds = { width: 100, height: 100, depth: 100 }, heightAt = null) {
-    super();
-
-    this.bounds = bounds;
-    this.particleCount = particleCount; 
-    
-    this.getHeightAt = heightAt; 
-
-    this.timeManager = TimeManager.getInstance();
-    this.textureManager = TextureManager.getInstance();
-    
-    const geometry = new THREE.BufferGeometry();
-    const positions = [];
-    this._particleData = [];
-
-    // Initialize particles
-    for (let i = 0; i < this.particleCount; i++) {
-      const x = (Math.random() - 0.5) * this.bounds.width;
-      const z = (Math.random() - 0.5) * this.bounds.depth;
-      const y = Math.random() * this.bounds.height; 
-      
-      positions.push(x, y, z);
-
-      // Store separate drift components so we can reverse them individually
-      this._particleData.push({
-        velocityY: 0.2 + Math.random() * 0.5,
-        driftX: (Math.random() - 0.5) * 0.2, 
-        driftZ: (Math.random() - 0.5) * 0.2, 
-        swayFreq: 0.5 + Math.random(),
-        swayOffset: Math.random() * Math.PI
-      });
-    }
-    
-    geometry.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3));
-    
-    const texture = this.textureManager.getTexture("sand-particle") || null;
-    const material = new THREE.PointsMaterial({
-      color: 0xffffff, size: 0.2, map: texture, transparent: true, 
-      opacity: 0.6, depthWrite: false, blending: THREE.AdditiveBlending,
-    });
-    
-    this.points = new THREE.Points(geometry, material);
-    this.add(this.points);
-  }
-
-  updateState() {
-    if (!this.points) return;
-
-    const positions = this.points.geometry.attributes.position.array;
-    const timeScale = this.timeManager.getElapsedTime() * 0.001;
-
-    const halfWidth = this.bounds.width / 2;
-    const halfDepth = this.bounds.depth / 2;
-    const topY = this.bounds.height;
-
-    for (let i = 0; i < this.particleCount; i++) {
-      const i3 = i * 3;
-      
-      let px = positions[i3];
-      let py = positions[i3 + 1];
-      let pz = positions[i3 + 2];
-
-      const data = this._particleData[i];
-
-      // --- 1. MOVEMENT ---
-      // Gravity
-      py -= data.velocityY;
-
-      // Base Drift (Directional movement)
-      px += data.driftX;
-      pz += data.driftZ;
-
-      // Sway (Visual noise on top of drift)
-      // Note: We add sway only to position, not drift, so it doesn't affect reflection logic
-      const sway = Math.sin(timeScale * data.swayFreq + data.swayOffset) * 0.05;
-      px += sway;
-      pz += sway;
-
-      // --- 2. WALL REFLECTION (Bounce) ---
-      // Check X walls
-      if (px > halfWidth) {
-        px = halfWidth;       
-        data.driftX *= -1;    
-      } else if (px < -halfWidth) {
-        px = -halfWidth;
-        data.driftX *= -1;
-      }
-
-      // Check Z walls
-      if (pz > halfDepth) {
-        pz = halfDepth;
-        data.driftZ *= -1;
-      } else if (pz < -halfDepth) {
-        pz = -halfDepth;
-        data.driftZ *= -1;
-      }
-
-      let floorY = 0; 
-      if (this.getHeightAt) {
-          floorY = this.getHeightAt(px, pz);
-      }
-
-      if (py < floorY) {
-        py = topY; 
+    constructor(
+        particleCount = 1000, 
+        bounds = { width: 100, height: 100, depth: 100 }, 
+        heightAt = null,
+        config = {},
         
-        px = (Math.random() - 0.5) * this.bounds.width;
-        pz = (Math.random() - 0.5) * this.bounds.depth;
-        
-        data.driftX = (Math.random() - 0.5) * 0.2;
-        data.driftZ = (Math.random() - 0.5) * 0.2;
-      }
+    ) {
+        super();
 
-      // --- 4. UPDATE ARRAY ---
-      positions[i3] = px;
-      positions[i3 + 1] = py;
-      positions[i3 + 2] = pz;
+        this.bounds = bounds;
+        this.heightAt = heightAt;
+
+        // --- CONFIGURATION ---
+        this.settings = {
+            particleSize: config.particleSize ,
+            
+            // Speed: [min, max]
+            fallSpeed: config.fallSpeed, 
+            driftSpeed: config.driftSpeed,
+            
+            // Meandering (Swaying back and forth)
+            swayFrequency: config.swayFrequency,
+            swayAmplitude: config.swayAmplitude,        
+            
+            // Physics
+            gravity: config.gravity,        
+            bounceRestitution: config.bounce, 
+            
+            // Life & Fading
+            fadeSpeed: config.fadeSpeed,    
+        };
+
+        this.collisionManager = CollisionManager.getInstance();
+        this.obstacles = []
+
+        // 1. Setup Render Data
+        this.renderData = new SandParticle(particleCount, this.settings.particleSize);
+        this.add(this.renderData.mesh);
+
+        // 2. Setup Time Manager
+        this.timeManager = TimeManager.getInstance();
+        this.lastTime = this.timeManager.getElapsedTime();
+        
+        // 3. Setup Particles
+        this.particles = []; 
+        this.initParticles();
     }
 
-    this.points.geometry.attributes.position.needsUpdate = true;
-  }
+    // Helper to get random number between min and max
+    randomRange(min, max) {
+        return min + Math.random() * (max - min);
+    }
+
+    initParticles() {
+        const { width, height, depth } = this.bounds;
+        const positions = this.renderData.positions;
+        const colors = this.renderData.colors;
+
+        for (let i = 0; i < this.renderData.particleCount; i++) {
+            const i3 = i * 3;
+
+            // Start Position
+            positions[i3] = (Math.random() - 0.5) * width;
+            positions[i3 + 1] = Math.random() * height;
+            positions[i3 + 2] = (Math.random() - 0.5) * depth;
+            
+            // Start Color (White)
+            colors[i3] = 1; colors[i3 + 1] = 1; colors[i3 + 2] = 1;
+
+            this.particles.push(this.createParticleData(i3));
+        }
+    }
+
+    createParticleData(index) {
+        // Generate random physics properties
+        const fallSpeed = this.randomRange(this.settings.fallSpeed[0], this.settings.fallSpeed[1]);
+        const driftX = this.randomRange(this.settings.driftSpeed[0], this.settings.driftSpeed[1]);
+        const driftZ = this.randomRange(this.settings.driftSpeed[0], this.settings.driftSpeed[1]);
+        const swayFreq = this.randomRange(this.settings.swayFrequency[0], this.settings.swayFrequency[1]);
+
+        return {
+            index: index,
+            baseFallSpeed: fallSpeed,
+            velocity: new THREE.Vector3(0, -fallSpeed, 0),
+            drift: new THREE.Vector3(
+                Math.random() < 0.5 ? driftX : -driftX, 
+                0, 
+                Math.random() < 0.5 ? driftZ : -driftZ
+            ),
+            sway: {
+                freq: swayFreq,
+                offset: Math.random() * Math.PI 
+            },
+            isDying: false,
+            life: 1.0 
+        };
+    }
+
+    updateState() {
+        if (!this.particles || this.particles.length === 0) return;
+
+        const currentTime = this.timeManager.getElapsedTime();
+        let dt = currentTime - this.lastTime;
+        this.lastTime = currentTime;
+
+        if (dt > 0.1) dt = 0.1; 
+
+        const positions = this.renderData.positions;
+        const colors = this.renderData.colors;
+        const halfW = this.bounds.width / 2;
+        const halfD = this.bounds.depth / 2;
+
+        for (let i = 0; i < this.particles.length; i++) {
+            const p = this.particles[i];
+            const i3 = p.index;
+
+            // --- 1. MOVEMENT & PREVIOUS POS ---
+            let px = positions[i3];
+            let py = positions[i3 + 1];
+            let pz = positions[i3 + 2];
+
+            //const prevX = px;
+            //const prevY = py;
+            //const prevZ = pz;
+
+            const sway = Math.sin(currentTime * p.sway.freq + p.sway.offset) * this.settings.swayAmplitude * dt;
+            px += (p.drift.x * dt) + sway;
+            pz += (p.drift.z * dt) + sway;
+            py += p.velocity.y * dt;
+
+            // --- 2. WALL COLLISIONS (BOUNCE INSTEAD OF WRAP) ---
+            if (px > halfW) { px = halfW; p.drift.x *= -1; }
+            else if (px < -halfW) { px = -halfW; p.drift.x *= -1; }
+
+            if (pz > halfD) { pz = halfD; p.drift.z *= -1; }
+            else if (pz < -halfD) { pz = -halfD; p.drift.z *= -1; }
+
+            // --- 2.5 OBSTACLE COLLISIONS TODO ---
+            //if (!p.isDying) {
+            //    for (let o = 0; o < this.obstacles.length; o++) {
+            //        const box = this.obstacles[o];
+            //        if (px >= box.minX && px <= box.maxX &&
+            //            py >= box.minY && py <= box.maxY &&
+            //            pz >= box.minZ && pz <= box.maxZ) {
+            //            
+            //            px = prevX; 
+            //            py = prevY; 
+            //            pz = prevZ;
+            //
+            //            p.drift.x *= -0.8;
+            //            p.drift.z *= -0.8;
+            //            
+            //            if (p.velocity.y < 0) p.velocity.y *= -0.3;
+            //            
+            //            break; 
+            //        }
+            //    }
+            //}
+
+            // --- 3. FLOOR COLLISION & GRAVITY ---
+            let floorY = -1000;
+            if (this.heightAt) floorY = this.heightAt(px, pz);
+
+            if (py <= floorY && !p.isDying) {
+                py = floorY; 
+                p.velocity.y = Math.abs(p.velocity.y) * this.settings.bounceRestitution;
+                p.isDying = true;
+            } 
+            else if (py > floorY) {
+                if(p.isDying) {
+                    p.velocity.y -= this.settings.gravity * dt;
+                } else {
+                    p.velocity.y = -p.baseFallSpeed; 
+                }
+            }
+
+            // --- 4. FADING & RESPAWN ---
+            if (p.isDying) {
+                p.life -= this.settings.fadeSpeed * dt;
+                
+                const displayLife = Math.max(0, p.life);
+                colors[i3] = displayLife;
+                colors[i3 + 1] = displayLife;
+                colors[i3 + 2] = displayLife;
+
+                if (p.life <= 0) {
+                    const newData = this.createParticleData(i3);
+                    Object.assign(p, newData); 
+
+                    px = (Math.random() - 0.5) * this.bounds.width;
+                    py = this.bounds.height;
+                    pz = (Math.random() - 0.5) * this.bounds.depth;
+                    
+                    colors[i3] = 1; colors[i3 + 1] = 1; colors[i3 + 2] = 1;
+                }
+            }
+
+            positions[i3] = px;
+            positions[i3 + 1] = py;
+            positions[i3 + 2] = pz;
+        }
+
+        this.renderData.flagUpdates();
+    }
 }
