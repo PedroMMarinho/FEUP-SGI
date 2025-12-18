@@ -99,13 +99,24 @@ class Aquarium extends THREE.Object3D {
 
     addMarineSnow() {
     const marineSnow = new MarineSnow(
-        1000, 
+        600, 
         {
             width: this.terrainWidth,
             height: this.terrainHeight - this.terrainHeight / 4,
             depth: this.terrainWidth
         },
-        (x, z) => this.seabed.terrain.getHeightAt(x, z)
+        (x, z) => this.seabed.terrain.getHeightAt(x, z),
+        {
+            // YOUR CUSTOM SETTINGS
+            particleSize: 0.15,
+            fallSpeed: [0.1, 0.5],       // Random speed between 0.5 and 2.0
+            driftSpeed: [0.04, 0.01],      // Horizontal drift speed
+            swayFrequency: [0.5, 2.0],   // Faster swaying
+            swayAmplitude: 0.2,          // More pronounced sway
+            gravity: 0.4,                // Reduced gravity effect
+            bounce: 1.4,      // Less bounce
+            fadeSpeed: 1,              // Fades fast 
+        },
     );
     this.addToAquarium(marineSnow);
     }
