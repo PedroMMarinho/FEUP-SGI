@@ -13,6 +13,7 @@ class BVHManager {
         this.selected = null;
         this.originalMaterials = new Map();
         this.highlightColor = 'yellow';
+        this.highlightIntensity = 0.8;
         this.originalRaycastingMethods = {
             mesh: THREE.Mesh.prototype.raycast,
             batchedMesh: THREE.BatchedMesh.prototype.raycast
@@ -102,6 +103,11 @@ class BVHManager {
             object.material = object.material.clone();
             if (object.material.color) {
                 object.material.color.set(color);
+            }
+            if (object.material.emissive) {
+                object.material.emissive.set(color);
+                
+                object.material.emissiveIntensity = this.highlightIntensity; 
             }
         }
 

@@ -19,7 +19,7 @@ class MyContents {
     constructor(app) {
         this.app = app
         this.axis = new MyAxis(this);
-        this.showAxis = true;
+        this.axis.visible = false;
         this.assetManager = new AssetManager(app.renderer); // Asset Manager
         this.keyManager = this.app.keyManager;
         this.cameraManager = this.app.cameraManager;

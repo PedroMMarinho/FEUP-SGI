@@ -11,17 +11,19 @@ class CollisionManager {
             return CollisionManager._instance;
         }
         this.entities = [];
-        this.fleeRadiusBase = 1.2;
+        this.boidEntities = [];
+        this.fleeRadiusBase = 1;
         this.awarenessBoxes = new Map();
         this.scene = scene;
         this.bvhManager = bvhManager;
 
         // Spatial grid for optimization
-        this.gridCellSize = 40;
+        this.gridCellSize = 25;
         this.spatialGrid = new Map();
         
         // Visualization toggle
         this.showBoxes = false;
+        this.tempMatrix = new THREE.Matrix4();
         
         CollisionManager._instance = this;
     }
@@ -52,7 +54,7 @@ class CollisionManager {
     // for fish boid awareness
     getNearbyEntitiesForBoid(boid, radius) {
         if (this.bvhManager.isUsingBVH()) {
-            return this.getNearbySpatialGrid(boid, radius);
+            return this.getNearbySpatialGrid(boid.pos, radius);
         } else {
             return this.getNearbyBruteForce(boid.pos, radius);
         }
@@ -96,6 +98,15 @@ class CollisionManager {
         return nearby;
     }
 
+    getEntityRadius(entity) {
+        const boxData = this.awarenessBoxes.get(entity);
+        
+        if (boxData && boxData.size) {
+            return Math.max(boxData.size.x, boxData.size.y, boxData.size.z) * 0.5;
+        }
+        console.log('CollisionManager: Entity has no awareness box data.');
+    }
+
 
     // Spatial grid approach - check nearby cells only
     getNearbySpatialGrid(position, radius) {
@@ -124,8 +135,8 @@ class CollisionManager {
     getNearbyBruteForce(position, radius) {
         const nearby = [];
         const radiusSq = radius * radius;
-
-        for (const entity of this.entities) {
+        const allEntities = [...this.entities, ...this.boidEntities];
+        for (const entity of allEntities) {
             const entityPos = entity.pos || entity.position;
             const distSq = position.distanceToSquared(entityPos);
 
@@ -140,9 +151,14 @@ class CollisionManager {
     registerObject(object) {
         // Recursively traverse and register
         const traverse = (obj) => {
+            // Logic will be seperate
+            if (obj.type === EntityType.FISH){
+                this.boidEntities.push(obj);
+                return;
+            }
+
             if (obj.type === EntityType.SHARK || 
                 obj.type === EntityType.SUBMARINE || 
-                obj.type === EntityType.FISH || 
                 obj.type === EntityType.STATIC_OBSTACLE) {
                 this.entities.push(obj);
                 this.createAwarenessBox(obj);
@@ -162,11 +178,36 @@ class CollisionManager {
     createAwarenessBox(object) {
         const danger = object.dangerLevel;
 
+        // --- STEP 1: CAPTURE TRUE DIMENSIONS ---
+        const originalRotation = object.rotation.clone();
+        object.rotation.set(0, 0, 0); 
+        object.updateMatrixWorld(true); 
+
         const bbox = new THREE.Box3().setFromObject(object);
+        
+        object.rotation.copy(originalRotation);
+        object.updateMatrixWorld(true);
+
         const objectSize = new THREE.Vector3();
         bbox.getSize(objectSize);
+        
+        const localCenter = new THREE.Vector3();
+        bbox.getCenter(localCenter);
+        let offsetMultiplier = 0;
 
-        const offsetMultiplier = this.fleeRadiusBase * (1 + 0.8 * (danger - 1));
+        switch (danger) {
+            case DangerLevel.NONE:
+                break;
+            case DangerLevel.LOW:
+                offsetMultiplier += 0.1;
+                break;
+            case DangerLevel.MEDIUM:
+                offsetMultiplier += 0.5;
+                break;
+            // No need for offset for HIGH danger
+            case DangerLevel.HIGH:
+                break;
+        }
 
         const boxSize = new THREE.Vector3(
             objectSize.x + offsetMultiplier,
@@ -174,15 +215,11 @@ class CollisionManager {
             objectSize.z + offsetMultiplier
         );
 
-        // Visual representation of Boxes
         const color =
-            danger === DangerLevel.NONE
-                ? 0x808080      // Gray - static obstacles
-                : danger === DangerLevel.LOW
-                    ? 0x00ff00  // Green - fish
-                    : danger === DangerLevel.MEDIUM
-                        ? 0xffff00  // Yellow - sharks
-                        : 0xff0000; // Red - submarine
+            danger === DangerLevel.NONE ? 0x808080
+            : danger === DangerLevel.LOW ? 0x00ff00
+            : danger === DangerLevel.MEDIUM ? 0xffff00
+            : 0xff0000;
 
         const geometry = new THREE.BoxGeometry(boxSize.x, boxSize.y, boxSize.z);
         const material = new THREE.MeshBasicMaterial({
@@ -193,21 +230,21 @@ class CollisionManager {
         });
 
         const box = new THREE.Mesh(geometry, material);
+        
 
-        // Collision OBB
+        // --- STEP 4: OBB SETUP ---
         const collisionBox = new OBB();
-        collisionBox.center = new THREE.Vector3();
-        collisionBox.halfSize = new THREE.Vector3();
-        collisionBox.rotation = new THREE.Matrix4();
-
         collisionBox.halfSize.copy(boxSize.clone().multiplyScalar(0.5));
-        collisionBox.rotation.copy(object.matrix);
+        collisionBox.rotation.setFromMatrix4(object.matrix);
         collisionBox.center.copy(object.position);
+
+        const localCenterOffset = localCenter.sub(object.position); 
 
         this.awarenessBoxes.set(object, {
             mesh: box,
             size: boxSize,
-            collisionBox: collisionBox
+            collisionBox: collisionBox,
+            localCenterOffset: localCenterOffset 
         });
     }
 
@@ -239,11 +276,16 @@ class CollisionManager {
 
         for (const entity of this.entities) {
             const key = this.getGridKey(entity.position);
-            if (!this.spatialGrid.has(key)) {
-                this.spatialGrid.set(key, []);
-            }
+            if (!this.spatialGrid.has(key)) this.spatialGrid.set(key, []);
             this.spatialGrid.get(key).push(entity);
         }
+
+            for (const fish of this.boidEntities) {
+                const key = this.getGridKey(fish.pos);
+                if (!this.spatialGrid.has(key)) this.spatialGrid.set(key, []);
+                this.spatialGrid.get(key).push(fish);
+            }
+        
     }
 
     checkForDangers(entity, boxData) {
@@ -365,17 +407,25 @@ class CollisionManager {
 
         for (const entity of this.entities) {
             const boxData = this.awarenessBoxes.get(entity);
+            if (!boxData) continue;
 
-            // Update visual box position and rotation
+            // 1. Calculate OBB Center
+            const rotatedOffset = boxData.localCenterOffset.clone().applyQuaternion(entity.quaternion);
+            const worldCenter = entity.position.clone().add(rotatedOffset);
+
+            // 2. Update OBB Rotation (THE FIX)
+            // Convert Quaternion -> Matrix4 -> Matrix3
+            this.tempMatrix.makeRotationFromQuaternion(entity.quaternion);
+            boxData.collisionBox.rotation.setFromMatrix4(this.tempMatrix);
+
+            // 3. Update OBB Center
+            boxData.collisionBox.center.copy(worldCenter);
+
+            // 4. Update Visual Mesh
             if (boxData.mesh) {
-                boxData.mesh.position.copy(entity.position);
+                boxData.mesh.position.copy(worldCenter);
                 boxData.mesh.quaternion.copy(entity.quaternion);
             }
-
-            // Update collision OBB
-            boxData.collisionBox.center.copy(entity.position);
-            boxData.collisionBox.halfSize.copy(boxData.size.clone().multiplyScalar(0.5));
-            boxData.collisionBox.rotation.makeRotationFromQuaternion(entity.quaternion);
 
             this.checkForDangers(entity, boxData);
         }
