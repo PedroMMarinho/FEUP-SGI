@@ -1,5 +1,7 @@
 import * as THREE from 'three';
 import { TreasureChest } from './TreasureChest.js';
+import { EntityType } from '../../enums/EntityType.js';
+import { DangerLevel } from '../../enums/DangerLevel.js';
 
 export class TreasureChestLOD extends THREE.LOD {
 	constructor(lods) {
@@ -13,6 +15,10 @@ export class TreasureChestLOD extends THREE.LOD {
 		// BVH parameters
 		this.rootObject = true;
 		this.bvhSelectable = true;
+
+		// Entity properties
+		this.type = EntityType.STATIC_OBSTACLE;
+		this.dangerLevel = DangerLevel.NONE;
 	}
 
 	init() {

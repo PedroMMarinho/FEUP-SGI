@@ -77,87 +77,88 @@ export class FishLOD extends THREE.LOD {
 	}
 
 	flock() {
-		let alignment = new THREE.Vector3(0, 0, 0);
-		let cohesion = new THREE.Vector3(0, 0, 0);
-		let separation = new THREE.Vector3(0, 0, 0);
-		let avoidance = new THREE.Vector3(0, 0, 0);
+        let alignment = new THREE.Vector3();
+        let cohesion = new THREE.Vector3();
+        let separation = new THREE.Vector3();
+        let avoidance = new THREE.Vector3();
 
-		let totalBoids = 0;
+        let totalBoids = 0;
 
-		const nearbyEntities = this.collisionManager.getNearbyEntitiesForBoid(
-			this,
-			this.boidProperties.awareness
-		);
+        const nearbyEntities = this.collisionManager.getNearbyEntitiesForBoid(
+            this,
+            this.boidProperties.awareness
+        );
 
-		for (let other of nearbyEntities) {
-			if (other === this) continue;
+        for (let other of nearbyEntities) {
+            if (other === this) continue;
 
-			const otherPos = other.pos || other.position;
-			let distance = this.pos.distanceTo(otherPos);
+            const otherPos = other.pos || other.position;
+            const distToCenter = this.pos.distanceTo(otherPos);
 
-			if (distance === 0) continue;
+            if (distToCenter === 0) continue;
 
-			// Boid flocking with other fish
-			if (other.type === EntityType.FISH && this.viewingAngle(other.pos)) {
-				alignment.add(other.velocity);
-				cohesion.add(other.pos);
-				separation.addScaledVector(this.pos.clone().sub(other.pos), 1 / distance);
-				totalBoids++;
-			}
-			// Other entities avoidance
-			else if (other.type === EntityType.SHARK || other.type === EntityType.SUBMARINE) {
-				const avoidDir = this.pos.clone().sub(otherPos);
-				const avoidStrength = 5 / (distance * distance); 
-				avoidance.addScaledVector(avoidDir, avoidStrength);
-			}
-			else if (other.type === EntityType.STATIC_OBSTACLE) {
-				const avoidDir = this.pos.clone().sub(otherPos);
-				const avoidStrength = 1.1 / (distance * distance); 
-				avoidance.addScaledVector(avoidDir, avoidStrength);
-			}
-		}
+            // --- 1. BOID FLOCKING (Fish to Fish) ---
+            if (other.type === EntityType.FISH && this.viewingAngle(other.pos)) {
+                alignment.add(other.velocity);
+                cohesion.add(other.pos);
+                separation.addScaledVector(this.pos.clone().sub(other.pos), 1 / distToCenter);
+                totalBoids++;
+            }
+            
+            // --- 2. PREDATOR AVOIDANCE (Stronger when Closer) ---
+            else if (other.type === EntityType.SHARK || other.type === EntityType.SUBMARINE) {
+				const objectRadius = this.collisionManager.getEntityRadius(other);
+                const distToSurface = distToCenter - objectRadius;
 
-		// Apply boid forces
-		if (totalBoids > 0) {
-			alignment.setLength(Math.min(this.boidProperties.moveSpeed, this.boidProperties.alignment));
+                const panicRadius = objectRadius / 4; 
+                
+                if (distToSurface < panicRadius) {
+                    const avoidDir = this.pos.clone().sub(otherPos).normalize();
 
-			cohesion.divideScalar(totalBoids);
-			cohesion.sub(this.pos);
-			cohesion.setLength(Math.min(this.boidProperties.moveSpeed, this.boidProperties.cohesion));
+					const proximityFactor = 1.0 - (Math.max(distToSurface, 0.1) / panicRadius);
+                    const strength = Math.pow(proximityFactor, 2) * (this.boidProperties.moveSpeed * 3);
 
-			separation.setLength(Math.min(this.boidProperties.moveSpeed, this.boidProperties.separation));
+                    avoidance.addScaledVector(avoidDir, strength);
+                }
+            }
+            // --- 3. STATIC OBSTACLE AVOIDANCE ---
+            else if (other.type === EntityType.STATIC_OBSTACLE) {
+                const avoidDir = this.pos.clone().sub(otherPos);
+                const avoidStrength = 8.5 / (distToCenter * distToCenter); 
+                avoidance.addScaledVector(avoidDir, avoidStrength);
+            }
+        }
 
-			this.acceleration.add(alignment);
-			this.acceleration.add(cohesion);
-			this.acceleration.add(separation);
-		}
+        // Apply standard boid forces
+        if (totalBoids > 0) {
+            alignment.setLength(Math.min(this.boidProperties.moveSpeed, this.boidProperties.alignment));
+            cohesion.divideScalar(totalBoids).sub(this.pos).setLength(Math.min(this.boidProperties.moveSpeed, this.boidProperties.cohesion));
+            separation.setLength(Math.min(this.boidProperties.moveSpeed, this.boidProperties.separation));
 
-		// Apply obstacle avoidance
-		if (avoidance.lengthSq() > 0) {
-			avoidance.setLength(this.boidProperties.moveSpeed * 1.5);
-			this.acceleration.add(avoidance);
-		}
+            this.acceleration.add(alignment);
+            this.acceleration.add(cohesion);
+            this.acceleration.add(separation);
+        }
 
-		let avoidForce = new THREE.Vector3(0, 0, 0);
+        if (avoidance.lengthSq() > 0) {
+            avoidance.clampLength(0, this.boidProperties.moveSpeed * 5.0); 
+            this.acceleration.add(avoidance);
+        }
 
-		const margin = 5;
-		const vertMargin = 1;
-		const limit = this.sparseness;
+        let boundaryForce = new THREE.Vector3();
+        const margin = 5;
+        const limit = this.sparseness;
 
-		if (this.pos.x < -limit + margin) avoidForce.x = (-limit + margin - this.pos.x) / margin;
-		else if (this.pos.x > limit - margin) avoidForce.x = (limit - margin - this.pos.x) / margin;
+        if (this.pos.x < -limit + margin) boundaryForce.x = (-limit + margin - this.pos.x) / margin;
+        else if (this.pos.x > limit - margin) boundaryForce.x = (limit - margin - this.pos.x) / margin;
+        if (this.pos.y < this.baseHeight + 1) boundaryForce.y = (this.baseHeight + 1 - this.pos.y);
+        else if (this.pos.y > this.maxHeight - 1) boundaryForce.y = (this.maxHeight - 1 - this.pos.y);
+        if (this.pos.z < -limit + margin) boundaryForce.z = (-limit + margin - this.pos.z) / margin;
+        else if (this.pos.z > limit - margin) boundaryForce.z = (limit - margin - this.pos.z) / margin;
 
-		if (this.pos.y < this.baseHeight + vertMargin)
-			avoidForce.y = (this.baseHeight + vertMargin - this.pos.y) / vertMargin;
-		else if (this.pos.y > this.maxHeight - vertMargin)
-			avoidForce.y = (this.maxHeight - vertMargin - this.pos.y) / vertMargin;
-
-		if (this.pos.z < -limit + margin) avoidForce.z = (-limit + margin - this.pos.z) / margin;
-		else if (this.pos.z > limit - margin) avoidForce.z = (limit - margin - this.pos.z) / margin;
-
-		avoidForce.multiplyScalar(this.boidProperties.moveSpeed * 0.5);
-		this.acceleration.add(avoidForce);
-	}
+        boundaryForce.multiplyScalar(this.boidProperties.moveSpeed);
+        this.acceleration.add(boundaryForce);
+    }
 
 	updateState() {
 		const now = this.timeManager.getElapsedTime();
