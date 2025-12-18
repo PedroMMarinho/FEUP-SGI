@@ -194,7 +194,7 @@ class Seabed extends THREE.Object3D {
             const modelLODs = this.shipModels[typeIndex];
             const baseRadius = baseRadii[typeIndex];
 
-            const scale = THREE.MathUtils.randFloat(5.2, 6.8);
+            const scale = THREE.MathUtils.randFloat(6.2, 6.8);
             
             // B. CALCULATE EXACT RADIUS
             let actualRadius = baseRadius * scale;

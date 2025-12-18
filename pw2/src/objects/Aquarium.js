@@ -143,6 +143,7 @@ class Aquarium extends THREE.Object3D {
         this.seabed = new Seabed(this.terrainWidth, rockCount, coralCount, shellCount, seaweedCount, shipCount, tvCount, tvreasureChestCount, rockModels, shellModels, shipModels, tvModels, treasureChestModel);
         this.cameraManager.setTargetTV(this.seabed.getTV());
         this.cameraManager.setTargetShip(this.seabed.sunkenShip);
+        this.cameraManager.setTreasureChest(this.seabed.treasureChest);
         this.addToAquarium(this.seabed);
     }
 
