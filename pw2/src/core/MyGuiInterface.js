@@ -3,6 +3,7 @@ import * as THREE from 'three';
 import { MyApp } from './MyApp.js';
 import { MyContents } from './MyContents.js';
 import { PeriscopeHUDType } from '../enums/PeriscopeHUDType.js';
+import { RenderType } from '../enums/RenderType.js';
 /**
  * Custom GUI interface for the app
  */
@@ -50,18 +51,30 @@ class MyGuiInterface {
         });
 
         cameraFolder.open();
+        const hudFolder = this.datgui.addFolder('HUD');
 
-        if (cameraFolder) {
+        if (hudFolder) {
 
-            const hudNames = Object.values(PeriscopeHUDType);;
-            const hudController = cameraFolder
-                .add(this.app.passManager, 'currentPeriscopeHUD', hudNames)
+            const hudNamesPeriscope = Object.values(PeriscopeHUDType);;
+            const hudController = hudFolder
+                .add(this.app.passManager, 'currentPeriscopeHUD', hudNamesPeriscope)
                 .name('Periscope HUD Type');
 
             hudController.onChange((type) => {
                 this.app.passManager.setHUDType(type, this.app.cameraManager.activeCameraName);
             });
+
+            const hudRender = Object.values(RenderType);
+            const renderController = hudFolder
+                .add(this.app.passManager, 'currentRenderType', hudRender)
+                .name('Render Type');
+            
+            renderController.onChange((type) => {
+                this.app.passManager.setRenderType(type);
+            });
         }
+
+
 
         // --- Render mode controls (wireframe / fill) ---
         const renderFolder = this.datgui.addFolder('Render Mode');

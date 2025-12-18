@@ -116,7 +116,7 @@ export class FishLOD extends THREE.LOD {
                     const avoidDir = this.pos.clone().sub(otherPos).normalize();
 
 					const proximityFactor = 1.0 - (Math.max(distToSurface, 0.1) / panicRadius);
-                    const strength = Math.pow(proximityFactor, 2) * (this.boidProperties.moveSpeed * 3);
+                    const strength = Math.pow(proximityFactor, 2) * (this.boidProperties.moveSpeed * 3.5);
 
                     avoidance.addScaledVector(avoidDir, strength);
                 }
