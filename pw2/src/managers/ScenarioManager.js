@@ -30,6 +30,23 @@ class ScenarioManager {
         this.createAmbientLight();
     }
 
+    updateFogIntensity(value) {
+        if (this.scene.fog) {
+            this.scene.fog.density = value;
+        }
+    }
+
+    updateAmbientLight(value) {
+        if (this.lights.ambient) {
+            this.lights.ambient.intensity = value;
+        }
+    }
+    updateDirectionalLight(value) {
+        if (this.lights.directional) {
+            this.lights.directional.intensity = value;
+        }
+    }
+
     /**
      * Creates the outside HDRI environment
      */
@@ -93,20 +110,6 @@ class ScenarioManager {
         this.scene.add(ambientLight);
         
         return ambientLight;
-    }
-
-    changeToBokehLighting() {
-        // Starting Lights
-        if (this.lights.ambient) this.lights.ambient.intensity = this.originalLightsIntensity.ambient;
-        if (this.lights.directional) this.lights.directional.intensity = this.originalLightsIntensity.directional;
-        if (this.scene.fog) this.scene.fog.density = this.originalFogIntensity;
-    }
-    
-    changeToNormalLighting() {
-        // Other lights when changing camera
-        if (this.lights.ambient) this.lights.ambient.intensity = this.originalLightsIntensity.ambient * 2;
-        if (this.lights.directional) this.lights.directional.intensity = this.originalLightsIntensity.directional * 2;
-        if (this.scene.fog) this.scene.fog.density = this.originalFogIntensity  - this.originalFogIntensity / 4;
     }
 
     
