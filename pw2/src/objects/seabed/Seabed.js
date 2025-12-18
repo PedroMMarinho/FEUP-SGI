@@ -8,7 +8,7 @@ import { ShipGroup } from '../ship/ShipGroup.js';
 import { TVGroup } from '../tv/TVGroup.js';
 import { CoralLOD } from '../coral/CoralLOD.js';
 import { SeaweedLOD } from '../seaweed/SeaweedLOD.js';
-import { TreasureChestGroup } from '../tresure/TreasureChestGroup.js';
+import { TreasureChestGroup } from '../treasure/TreasureChestGroup.js';
 
 class Seabed extends THREE.Object3D {
 	constructor(
@@ -194,7 +194,7 @@ class Seabed extends THREE.Object3D {
             const modelLODs = this.shipModels[typeIndex];
             const baseRadius = baseRadii[typeIndex];
 
-            const scale = THREE.MathUtils.randFloat(7.2, 7.8);
+            const scale = THREE.MathUtils.randFloat(6.2, 6.8);
             
             // B. CALCULATE EXACT RADIUS
             let actualRadius = baseRadius * scale;

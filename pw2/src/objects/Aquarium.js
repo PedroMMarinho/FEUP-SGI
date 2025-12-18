@@ -6,6 +6,7 @@ import { SubmarineLOD } from './submarine/SubmarineLOD.js';
 import { GlassTank } from './glassTank/GlassTank.js';
 import { Seabed } from './seabed/Seabed.js';
 import { Water } from './water/Water.js';
+import { MarineSnow } from './particles/MarineSnow.js';
 
 /**
  * Main Aquarium class
@@ -24,11 +25,12 @@ class Aquarium extends THREE.Object3D {
         this.scene = scene;
 
         // Terrain dimensions
-        this.terrainWidth = 150;
-        this.terrainHeight = 50;
+        this.terrainWidth = 80;
+        this.terrainHeight = 30;
 
         // Camera Manager 
         this.cameraManager.setAquariumHeight(this.terrainHeight);
+        this.cameraManager.setAquariumWidth(this.terrainWidth);
 
         this.shadowsEnabled = true;
 
@@ -65,7 +67,7 @@ class Aquarium extends THREE.Object3D {
     }
 
     createWaterTopLayer() {
-        const water = new Water(this.assetManager.getTextureManager().getTexture('water-normal'), this.terrainWidth, 4 * this.terrainHeight / 5, this.terrainWidth, this.envMap);
+        const water = new Water(this.assetManager.getTextureManager().getTexture('water-normal'), this.terrainWidth, 3 * this.terrainHeight / 5, this.terrainWidth, this.envMap);
         this.addToAquarium(water);
     }
 
@@ -91,6 +93,32 @@ class Aquarium extends THREE.Object3D {
         this.setupBVH();
         // Setup Shadows
         this.setupShadows();
+        // Add Marine Snow
+        this.addMarineSnow();
+    }
+
+    addMarineSnow() {
+    const marineSnow = new MarineSnow(
+        600, 
+        {
+            width: this.terrainWidth,
+            height: this.terrainHeight - this.terrainHeight / 4,
+            depth: this.terrainWidth
+        },
+        (x, z) => this.seabed.terrain.getHeightAt(x, z),
+        {
+            // YOUR CUSTOM SETTINGS
+            particleSize: 0.15,
+            fallSpeed: [0.1, 0.5],       // Random speed between 0.5 and 2.0
+            driftSpeed: [0.04, 0.01],      // Horizontal drift speed
+            swayFrequency: [0.5, 2.0],   // Faster swaying
+            swayAmplitude: 0.2,          // More pronounced sway
+            gravity: 0.4,                // Reduced gravity effect
+            bounce: 1.4,      // Less bounce
+            fadeSpeed: 1,              // Fades fast 
+        },
+    );
+    this.addToAquarium(marineSnow);
     }
 
     setupBVH() {
@@ -115,10 +143,10 @@ class Aquarium extends THREE.Object3D {
         const treasureChestModel = [this.assetManager.getBlenderManager().getAllLODs('treasure-chest')];
 
 
-        const rockCount = 600;
-        const coralCount = 120;
-        const shellCount = 200;
-        const seaweedCount = 120;
+        const rockCount = 100;
+        const coralCount = 30;
+        const shellCount = 20;
+        const seaweedCount = 30;
         const shipCount = 1;
         const tvCount = 1;
         const tvreasureChestCount = 1;
@@ -127,6 +155,7 @@ class Aquarium extends THREE.Object3D {
         this.seabed = new Seabed(this.terrainWidth, rockCount, coralCount, shellCount, seaweedCount, shipCount, tvCount, tvreasureChestCount, rockModels, shellModels, shipModels, tvModels, treasureChestModel);
         this.cameraManager.setTargetTV(this.seabed.getTV());
         this.cameraManager.setTargetShip(this.seabed.sunkenShip);
+        this.cameraManager.setTreasureChest(this.seabed.treasureChest);
         this.addToAquarium(this.seabed);
     }
 
@@ -183,7 +212,7 @@ class Aquarium extends THREE.Object3D {
         };
 
         this.fishGroups = [
-            new FishGroup(4, this.terrainWidth / 2 - 8, this.terrainHeight / 2 + 10, this.boidProps),
+            new FishGroup(400, this.terrainWidth / 2 - 8, this.terrainHeight / 2, this.boidProps),
         ];
         this.fishGroups[0].position.set(0, 0, 0);
         this.cameraManager.setTargetFish(this.fishGroups[0].getCameraTarget());
@@ -210,7 +239,7 @@ class Aquarium extends THREE.Object3D {
         // Grey Shark
         const position2 = new THREE.Vector3(5, 10, -15);
         const shark2 = new SharkLOD(sharkGLTF2, position2, null, aiOptions);
-        shark2.scale.set(0.5, 0.5, 0.5);
+        shark2.scale.set(0.45, 0.45, 0.45);
 
         this.sharks = [
             shark1,
@@ -229,7 +258,9 @@ class Aquarium extends THREE.Object3D {
             minZ: -this.terrainWidth / 2 + 8,
             maxZ: this.terrainWidth / 2 - 8,
         };
-        this.submarine = new SubmarineLOD(this.assetManager.getBlenderManager().getAllLODs('propeller-blade'), this.keyManager, this.cameraManager, bounds);
+        const initialPos = new THREE.Vector3(this.terrainWidth / 8 , this.terrainHeight / 2, this.terrainWidth / 4 );
+        this.submarine = new SubmarineLOD(this.assetManager.getBlenderManager().getAllLODs('propeller-blade'), this.keyManager, this.cameraManager, bounds, initialPos);
+        this.submarine.scale.set(0.9, 0.9, 0.9);
         this.addToAquarium(this.submarine);
     }
 

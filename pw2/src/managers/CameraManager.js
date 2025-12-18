@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { TimeManager } from './TimeManager.js';
 import { PeriscopeHUDType } from '../enums/PeriscopeHUDType.js';
+import { RenderType } from '../enums/RenderType.js';
 
 class CameraManager {
     constructor(aspect, keyManager, frustumSize = 20, passManager) {
@@ -37,11 +38,16 @@ class CameraManager {
         this.targetFish = null;
         this.targetTelevision = null;
         this.aquariumHeight = null;
+        this.aquariumWidth = null;
         this.sunkenShip = null;
+        this.treasureChest = null;
     }
 
     setAquariumHeight(height){
         this.aquariumHeight = height;
+    }
+    setAquariumWidth(width){
+        this.aquariumWidth = width;
     }
 
     setTargetShip(shipObject) {
@@ -50,6 +56,10 @@ class CameraManager {
 
     setTargetTV(tv){
         this.targetTelevision = tv;
+    }
+
+    setTreasureChest(treasureChest){
+        this.treasureChest = treasureChest;
     }
 
     init() {
@@ -69,6 +79,9 @@ class CameraManager {
 
         const fishCam = new THREE.PerspectiveCamera(90, this.aspect, 0.1, 1000);
         this.cameras['Fish View'] = fishCam;
+
+        const treasureCam = new THREE.PerspectiveCamera(50, this.aspect, 0.1, 1000);
+        this.cameras['Treasure View'] = treasureCam;
 
         const tvSize = 5;
         const tvCam = new THREE.OrthographicCamera(
@@ -110,29 +123,50 @@ class CameraManager {
         const deltaTime = this.timeManager.getElapsedTime() - this.globalTime;
         this.globalTime += deltaTime;
 
-        if (this.activeCameraName === 'Ship View' && !this.controls) {
-            this.controls = new OrbitControls(this.activeCamera, renderer.domElement);
-            if (this.sunkenShip) {
-                this.controls.target.copy(this.sunkenShip.position);
-            } else {
-                this.controls.target.set(0, 1, 0);
-            }            
-            this.controls.enableZoom = true;
-            this.controls.enablePan = false;
+
+       
+        this.updateOrbitViews(renderer);
+        if (this.activeCameraName === 'Free Fly') this.updateFreeFly(deltaTime);
+        if (this.activeCameraName === 'Submarine View') this.updateSubmarineView(submarine);
+        if (this.activeCameraName === 'Fish View') this.updateFishView();
+        if (this.activeCameraName === 'TV View') this.updateTVView();
+    }
+
+    updateOrbitViews(renderer) {
+        const orbitCameras = ['Ship View', 'Treasure View'];
+        const isOrbitCamera = orbitCameras.includes(this.activeCameraName);
+
+        if (this.controls && this.controls.object !== this.activeCamera) {
+            this.controls.dispose();
+            this.controls = null;
+        }
+
+        if (isOrbitCamera) {
+            if (!this.controls) {
+                this.controls = new OrbitControls(this.activeCamera, renderer.domElement);
+                this.controls.enableZoom = true;
+                this.controls.enablePan = false;
+
+                if (this.activeCameraName === 'Ship View' && this.sunkenShip) {
+                    this.controls.target.copy(this.sunkenShip.position);
+                } 
+                else if (this.activeCameraName === 'Treasure View' && this.treasureChest) {
+                    this.controls.target.copy(this.treasureChest.position);
+                } else {
+                    this.controls.target.set(0, 0, 0);
+                }
+            }
             this.controls.update();
-        } else if (this.activeCameraName !== 'Ship View') {
+        } 
+        else {
             if (this.controls) {
                 this.controls.dispose();
                 this.controls = null;
             }
         }
 
-        if (this.controls) this.controls.update();
-        if (this.activeCameraName === 'Free Fly') this.updateFreeFly(deltaTime);
-        if (this.activeCameraName === 'Submarine View') this.updateSubmarineView(submarine);
-        if (this.activeCameraName === 'Fish View') this.updateFishView();
-        if (this.activeCameraName === 'TV View') this.updateTVView();
     }
+
 
     updateFishView() {
         if (!this.targetFish) return;
@@ -201,28 +235,33 @@ class CameraManager {
     changeCamera(oldName, newName) {
         if (newName === 'Aquarium View') {
             const cam = this.cameras['Aquarium View'];
-            cam.position.set(-50, this.aquariumHeight + 10, -50);
-            cam.lookAt(8, 0, 8);
+            cam.position.set(-this.aquariumWidth/2, this.aquariumHeight + 4, -this.aquariumWidth/2);
+            cam.lookAt(this.aquariumWidth/2, 0, this.aquariumWidth/2);
         }
 
         if (newName === 'Ship View' && this.sunkenShip) {
             const cam = this.cameras['Ship View'];
             cam.position.copy(this.sunkenShip.position);
-            cam.position.y += 15; 
-            cam.position.z += 5;  
+            cam.position.y += 12; 
+            cam.position.z += 7;  
             cam.lookAt(this.sunkenShip.position);
         }
+        if (newName === 'Treasure View' && this.treasureChest) {
+            const cam = this.cameras['Treasure View'];
+            cam.position.copy(this.treasureChest.position);
+            cam.position.y += 5; 
+            cam.position.z += 10;  
+            cam.lookAt(this.treasureChest.position);
+        }
+
+        this.passManager.setRenderType(this.passManager.currentRenderType);
 
         if (newName === 'Submarine View') {
             this.passManager.setHUDType(this.passManager.currentPeriscopeHUD, newName);
-        } else if (newName === 'Free Fly') {
-            // CleanUp lingering submarine HUD
-            this.passManager.setHUDType(PeriscopeHUDType.VIEW, 'Submarine View');
-            this.passManager.togglePass('bokeh', true);
-        }else {
-            this.passManager.setHUDType(PeriscopeHUDType.VIEW, 'Submarine View');
+        } 
+        else {
+            this.passManager.setHUDType(PeriscopeHUDType.NONE, 'Submarine View');
         }
-
 
     }
 

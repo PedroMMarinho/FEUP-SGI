@@ -26,6 +26,36 @@ export class Fish {
 
 	}
 
+	createMesh(bodyMaterial, finMaterial) {
+        
+        let bodyMesh, tailMesh, dorsalMesh;
+
+        if (this.isLowRes) {
+             const group = new THREE.Group();
+             group.add(new THREE.Mesh(this.bodyGeometry, bodyMaterial));
+             group.add(new THREE.Mesh(this.tailGeometry, finMaterial));
+             return group;
+        } 
+
+        bodyMesh = new THREE.SkinnedMesh(this.bodyGeometry, bodyMaterial);
+        tailMesh = new THREE.SkinnedMesh(this.tailGeometry, finMaterial);
+        dorsalMesh = new THREE.SkinnedMesh(this.dorsalFinGeometry, finMaterial);
+
+        // 3. CLONE THE SKELETON
+        const skeleton = this.skeleton.clone();
+        
+        bodyMesh.bind(skeleton);
+        tailMesh.bind(skeleton);
+        dorsalMesh.bind(skeleton);
+
+        const group = new THREE.Group();
+        group.add(bodyMesh, tailMesh, dorsalMesh);
+        
+        group.add(skeleton.bones[0]); 
+
+        return { mesh: group, skeleton: skeleton };
+    }
+
 	initLowResBody() {
 		const vertices = new Float32Array([
 			0, -0.4 * this.fatFishRatio, 0,  // v0 bottom spine
