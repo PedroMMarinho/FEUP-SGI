@@ -30,6 +30,7 @@ class Aquarium extends THREE.Object3D {
 
         // Camera Manager 
         this.cameraManager.setAquariumHeight(this.terrainHeight);
+        this.cameraManager.setAquariumWidth(this.terrainWidth);
 
         this.shadowsEnabled = true;
 

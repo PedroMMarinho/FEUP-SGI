@@ -38,12 +38,16 @@ class CameraManager {
         this.targetFish = null;
         this.targetTelevision = null;
         this.aquariumHeight = null;
+        this.aquariumWidth = null;
         this.sunkenShip = null;
         this.treasureChest = null;
     }
 
     setAquariumHeight(height){
         this.aquariumHeight = height;
+    }
+    setAquariumWidth(width){
+        this.aquariumWidth = width;
     }
 
     setTargetShip(shipObject) {
@@ -231,8 +235,8 @@ class CameraManager {
     changeCamera(oldName, newName) {
         if (newName === 'Aquarium View') {
             const cam = this.cameras['Aquarium View'];
-            cam.position.set(-50, this.aquariumHeight + 10, -50);
-            cam.lookAt(8, 0, 8);
+            cam.position.set(-this.aquariumWidth/2, this.aquariumHeight + 4, -this.aquariumWidth/2);
+            cam.lookAt(this.aquariumWidth/2, 0, this.aquariumWidth/2);
         }
 
         if (newName === 'Ship View' && this.sunkenShip) {
