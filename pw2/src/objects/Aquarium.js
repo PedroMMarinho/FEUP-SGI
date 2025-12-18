@@ -199,7 +199,7 @@ class Aquarium extends THREE.Object3D {
         };
 
         this.fishGroups = [
-            new FishGroup(350, this.terrainWidth / 2 - 8, this.terrainHeight / 2, this.boidProps),
+            new FishGroup(400, this.terrainWidth / 2 - 8, this.terrainHeight / 2, this.boidProps),
         ];
         this.fishGroups[0].position.set(0, 0, 0);
         this.cameraManager.setTargetFish(this.fishGroups[0].getCameraTarget());
@@ -226,7 +226,7 @@ class Aquarium extends THREE.Object3D {
         // Grey Shark
         const position2 = new THREE.Vector3(5, 10, -15);
         const shark2 = new SharkLOD(sharkGLTF2, position2, null, aiOptions);
-        shark2.scale.set(0.5, 0.5, 0.5);
+        shark2.scale.set(0.45, 0.45, 0.45);
 
         this.sharks = [
             shark1,
@@ -245,7 +245,9 @@ class Aquarium extends THREE.Object3D {
             minZ: -this.terrainWidth / 2 + 8,
             maxZ: this.terrainWidth / 2 - 8,
         };
-        this.submarine = new SubmarineLOD(this.assetManager.getBlenderManager().getAllLODs('propeller-blade'), this.keyManager, this.cameraManager, bounds);
+        const initialPos = new THREE.Vector3(this.terrainWidth / 8 , this.terrainHeight / 2, this.terrainWidth / 4 );
+        this.submarine = new SubmarineLOD(this.assetManager.getBlenderManager().getAllLODs('propeller-blade'), this.keyManager, this.cameraManager, bounds, initialPos);
+        this.submarine.scale.set(0.9, 0.9, 0.9);
         this.addToAquarium(this.submarine);
     }
 

@@ -30,13 +30,13 @@ class MyGuiInterface {
      */
     init() {
         // --- Axis controls ---
-        const axisFolder = this.datgui.addFolder('Axis');
-        axisFolder
-            .add(this.contents, 'showAxis')
-            .name('Show Axis')
-            .onChange((value) => {
-                this.contents.enableAxis(value);
-            });
+        //const axisFolder = this.datgui.addFolder('Axis');
+        //axisFolder
+        //    .add(this.contents.axis, 'visible')
+        //    .name('Show Axis')
+        //    .onChange((value) => {
+        //        this.contents.enableAxis(value);
+        //    });
 
         // --- Camera controls ---
         const cameraFolder = this.datgui.addFolder('Camera');
@@ -206,6 +206,23 @@ class MyGuiInterface {
         .onChange(() => submarine.applyShieldControls())
         .name("Shield p Param");
             shieldFolder.open();
+        }
+        // Scenario controls
+        const scenarioFolder = this.datgui.addFolder('Scenario');
+        const scenario = this.contents.scenarioManager;
+        if (scenario) {
+            const intensities = scenario.originalLightsIntensity;
+            scenarioFolder
+                .add(intensities,'directional' , 0, 1, 0.01).name('Directional Light')
+                .onChange((value) => {
+                    scenario.updateDirectionalLight(value);
+                });
+            scenarioFolder.add(intensities, 'ambient', 0, 1, 0.01).name('Ambient Light').onChange((value) => {
+                scenario.updateAmbientLight(value);
+            });
+            scenarioFolder.add(scenario, 'originalFogIntensity', 0, 0.1, 0.001).name('Fog Density').onChange((value) => {
+                scenario.updateFogIntensity(value);
+            });
         }
 
 
