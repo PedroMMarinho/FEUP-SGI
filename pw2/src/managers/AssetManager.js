@@ -94,6 +94,7 @@ export class AssetManager {
             'sand': 'sand/sandwaves.png',
             'sand-normal': 'sand/sandwavesNormal.png',
             'sand-noise': 'sand/sandNoise.png',
+            'rift-map': 'sand/riftMap.png',
             // TV Screen Video Texture
             'tv-screen': 'tv/marinho_i_need_this.mp4',
             'tv-screen2': 'tv/bro_dance.mp4',
