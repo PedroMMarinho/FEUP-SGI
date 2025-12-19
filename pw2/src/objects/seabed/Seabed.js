@@ -53,7 +53,7 @@ class Seabed extends THREE.Object3D {
 	}
 
 	createTVGroup() {
-		const tvPositions = this.computePositions(this.tvCount);
+		const tvPositions = this.computeGroundPositions(this.tvCount);
 		const tvGroup = new TVGroup(tvPositions, this.tvModels);
 		this.add(tvGroup);
 		this.globalPositions.push(...tvPositions);
@@ -78,7 +78,7 @@ class Seabed extends THREE.Object3D {
 
 	createTreasureChest() {
 		// Place treasure chest at the center of the seabed
-		const position = this.computePositions(1)[0];
+		const position = this.computeGroundPositions(1)[0];
 		const treasureChest = new TreasureChestLOD(this.treasureChestModel);
 		treasureChest.position.copy(position);
 		this.add(treasureChest);
@@ -87,7 +87,7 @@ class Seabed extends THREE.Object3D {
 	}
 
 	createShipGroup() {
-		const shipPositions = this.computePositions(this.shipCount, 0.85);
+		const shipPositions = this.computeGroundPositions(this.shipCount, 0.85);
 		const shipGroup = new ShipGroup(shipPositions, this.shipModels);
 		this.add(shipGroup);
 		this.globalPositions.push(...shipPositions);
@@ -101,57 +101,100 @@ class Seabed extends THREE.Object3D {
 	}
 
 	createRockGroup() {
-		const rockPositions = this.computePositions(this.rockCount);
+		const rockPositions = this.computeGroundPositions(this.rockCount);
 		this.rockGroup = new RockGroup(rockPositions, this.rockModels);
 		this.add(this.rockGroup);
 		this.globalPositions.push(...rockPositions);
 	}
 
 	createCoralGroup() {
-		const coralPositions = this.computePositions(this.coralCount);
+		const coralPositions = this.computeGroundPositions(this.coralCount);
 		const coralGroup = new CoralGroup(coralPositions);
 		this.add(coralGroup);
 		this.globalPositions.push(...coralPositions);
 	}
 
     createShellGroup() {
-        const shellPositions = this.computePositions(this.shellCount);
+        const shellPositions = this.computeGroundPositions(this.shellCount);
         this.shellGroup = new ShellGroup(shellPositions, this.shellModels);
         this.add(this.shellGroup);
         this.globalPositions.push(...shellPositions);
     }
 
 	createSeaweedGroup() {
-		const seaweedPositions = this.computePositions(this.seaweedCount);
+		const seaweedPositions = this.computeGroundPositions(this.seaweedCount);
+		console.log('Seaweed positions:', seaweedPositions);
 		this.seaweedGroup = new SeaweedGroup(seaweedPositions);
+		console.log('Created SeaweedGroup:', this.seaweedGroup);
 		this.add(this.seaweedGroup);
 		this.globalPositions.push(...seaweedPositions);
 	}
 
-	computePositions(count, objectMarginFactor = 1, maxTries = 50) {
+	computeGroundPositions(count, objectMarginFactor = 1, maxTries = 50) {
+	const positions = [];
+
+	const effectiveSize = this.terrainSize * this.marginFactor * objectMarginFactor;
+	const halfSize = effectiveSize / 2;
+
+	for (let i = 0; i < count; i++) {
+		const minDist = THREE.MathUtils.randFloat(...this.distanceRange);
+		let pos, tries = 0;
+
+		do {
+		const x = THREE.MathUtils.randFloat(-halfSize, halfSize);
+		const z = THREE.MathUtils.randFloat(-halfSize, halfSize);
+
+		const { height, inRiftZone } = this.terrain.getHeightAt(x, z);
+
+		// Reject rift zones
+		if (inRiftZone) {
+			console.warn('Rejected position in rift zone');
+			tries++;
+			continue;
+		}
+
+		pos = new THREE.Vector3(x, height, z);
+		tries++;
+		} while ((!pos || !this.isFarEnough(pos, minDist)) && tries < maxTries);
+
+		if (pos && tries < maxTries) {
+		positions.push(pos);
+		}
+	}
+
+	return positions;
+	}
+
+	computeRiftPositions(count, maxTries = 50) {
 		const positions = [];
 
-		const effectiveSize = this.terrainSize * this.marginFactor * objectMarginFactor;
+		const effectiveSize = this.terrainSize * this.marginFactor;
 		const halfSize = effectiveSize / 2;
 
 		for (let i = 0; i < count; i++) {
-			const minDist = THREE.MathUtils.randFloat(...this.distanceRange);
 			let pos, tries = 0;
 
 			do {
 				const x = THREE.MathUtils.randFloat(-halfSize, halfSize);
 				const z = THREE.MathUtils.randFloat(-halfSize, halfSize);
-				pos = new THREE.Vector3(
-					x,
-					this.terrain.getHeightAt(x, z),
-					z
-				);
+
+				const { height, inRiftZone } = this.terrain.getHeightAt(x, z);
+
+				// Accept only rift zones
+				if (!inRiftZone) {
+					tries++;
+					continue;
+				}
+
+				pos = new THREE.Vector3(x, height, z);
 				tries++;
-			} while (!this.isFarEnough(pos, minDist) && tries < maxTries);
+			} while ((!pos) && tries < maxTries);
 
-			if (tries < maxTries) positions.push(pos);
+			if (pos && tries < maxTries) {
+				positions.push(pos);
+			}
 		}
-
+		
 		return positions;
 	}
 
