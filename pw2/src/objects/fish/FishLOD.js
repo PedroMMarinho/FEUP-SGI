@@ -7,14 +7,15 @@ import { CollisionManager } from '../../managers/CollisionManager.js';
 import { TextureManager } from '../../managers/TextureManager.js';
 
 export class FishLOD extends THREE.LOD {
-	constructor(lods, sparseness, baseHeight, maxHeight, boidProperties) {
+	constructor(lods, sparseness, baseHeight, maxHeight, boidProperties, bodyLenRatio) {
 		super();
 
 		this.collisionManager = CollisionManager.getInstance();
 		// Entity properties
 		this.type = EntityType.FISH;
 		this.dangerLevel = DangerLevel.LOW;
-
+		
+		this.bodyLenRatio = bodyLenRatio; // Used for collision radius calculation
 		this.boidProperties = boidProperties;
 		this.distanceStart = 40;
 		this.distanceOffset = 20;
@@ -146,7 +147,7 @@ export class FishLOD extends THREE.LOD {
         }
 
         let boundaryForce = new THREE.Vector3();
-        const margin = 5;
+        const margin = 8;
         const limit = this.sparseness;
 
         if (this.pos.x < -limit + margin) boundaryForce.x = (-limit + margin - this.pos.x) / margin;

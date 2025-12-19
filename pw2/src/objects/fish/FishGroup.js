@@ -304,7 +304,8 @@ class FishGroup extends THREE.Object3D {
                 this.sparseness,
                 this.baseHeight, 
                 this.maxHeight, 
-                this.boidProps
+                this.boidProps,
+                1.0 // default bodyLenRatio
             );
 
 

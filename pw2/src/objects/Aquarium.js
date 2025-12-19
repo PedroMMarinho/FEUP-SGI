@@ -143,10 +143,10 @@ class Aquarium extends THREE.Object3D {
         const treasureChestModel = [this.assetManager.getBlenderManager().getAllLODs('treasure-chest')];
 
 
-        const rockCount = 100;
-        const coralCount = 30;
-        const shellCount = 20;
-        const seaweedCount = 30;
+        const rockCount = 70;
+        const coralCount = 35;
+        const shellCount = 15;
+        const seaweedCount = 35;
         const shipCount = 1;
         const tvCount = 1;
         const tvreasureChestCount = 1;
@@ -212,7 +212,7 @@ class Aquarium extends THREE.Object3D {
         };
 
         this.fishGroups = [
-            new FishGroup(400, this.terrainWidth / 2 - 8, this.terrainHeight / 2, this.boidProps),
+            new FishGroup(400, this.terrainWidth / 2 - 5, this.terrainHeight / 2, this.boidProps),
         ];
         this.fishGroups[0].position.set(0, 0, 0);
         this.cameraManager.setTargetFish(this.fishGroups[0].getCameraTarget());
