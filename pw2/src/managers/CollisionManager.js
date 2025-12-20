@@ -18,7 +18,7 @@ class CollisionManager {
         this.bvhManager = bvhManager;
 
         // Spatial grid for optimization
-        this.gridCellSize = 25;
+        this.gridCellSize = 40;
         this.spatialGrid = new Map();
         
         // Visualization toggle
@@ -54,48 +54,34 @@ class CollisionManager {
     // for fish boid awareness
     getNearbyEntitiesForBoid(boid, radius) {
         if (this.bvhManager.isUsingBVH()) {
-            return this.getNearbySpatialGrid(boid.pos, radius);
+            return this.getNearbyBVH(boid, radius);
         } else {
-            return this.getNearbyBruteForce(boid.pos, radius);
+            return this.getNearbySpatialGrid(boid.pos, radius);
         }
     }
 
-    // BVH-based detection using raycasting - unfeasible
-    getNearbyBVH(boid, radius) {
-        const nearby = [];
-        const numRays = 5;
+    // BVH-based detection using raycasting
+   getNearbyBVH(boid, radius) {
+        const numRays = 4;
         const spreadAngle = Math.PI / 4;
 
-        // Get boid's forward direction
         const direction = new THREE.Vector3(0, 0, 1);
         direction.applyQuaternion(boid.quaternion);
 
-        // Check for collisions using BVH
-        const collisions = this.bvhManager.checkBoidCollisions(
-            boid.pos,
+        // Calculate the fish's nose position
+        const noseOffset = new THREE.Vector3(0, 0, 1.2 * boid.bodyLenRatio);
+        noseOffset.applyQuaternion(boid.quaternion);
+        const rayOrigin = new THREE.Vector3().copy(boid.pos).add(noseOffset);
+
+        const nearbyEntities = this.bvhManager.checkBoidCollisions(
+            rayOrigin,
             direction,
-            radius,
+            radius, 
             numRays,
             spreadAngle
         );
-
-        const radiusSq = radius * radius;
-        const processedEntities = new Set();
-
-        for (const collision of collisions) {
-            const entity = collision.object;
-
-            if (entity && !processedEntities.has(entity)) {
-                const distSq = boid.pos.distanceToSquared(entity.position);
-
-                if (distSq <= radiusSq) {
-                    nearby.push(entity);
-                    processedEntities.add(entity);
-                }
-            }
-        }
-
-        return nearby;
+        
+        return nearbyEntities; 
     }
 
     getEntityRadius(entity) {
@@ -104,7 +90,6 @@ class CollisionManager {
         if (boxData && boxData.size) {
             return Math.max(boxData.size.x, boxData.size.y, boxData.size.z) * 0.5;
         }
-        console.log('CollisionManager: Entity has no awareness box data.');
     }
 
 
@@ -127,7 +112,6 @@ class CollisionManager {
                 }
             }
         }
-
         return nearby;
     }
 
@@ -197,6 +181,7 @@ class CollisionManager {
 
         switch (danger) {
             case DangerLevel.NONE:
+                offsetMultiplier += 0.3;
                 break;
             case DangerLevel.LOW:
                 offsetMultiplier += 0.1;
@@ -280,11 +265,11 @@ class CollisionManager {
             this.spatialGrid.get(key).push(entity);
         }
 
-            for (const fish of this.boidEntities) {
-                const key = this.getGridKey(fish.pos);
-                if (!this.spatialGrid.has(key)) this.spatialGrid.set(key, []);
-                this.spatialGrid.get(key).push(fish);
-            }
+        for (const fish of this.boidEntities) {
+            const key = this.getGridKey(fish.pos);
+            if (!this.spatialGrid.has(key)) this.spatialGrid.set(key, []);
+            this.spatialGrid.get(key).push(fish);
+        }
         
     }
 

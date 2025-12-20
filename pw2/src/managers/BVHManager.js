@@ -9,7 +9,7 @@ class BVHManager {
         this.scene = scene;
         this.keyManager = keyManager;
         this.cameraManager = cameraManager;
-        this.useBVH = true;
+        this.useBVH = false;
         this.selected = null;
         this.originalMaterials = new Map();
         this.highlightColor = 'yellow';
@@ -19,6 +19,12 @@ class BVHManager {
             batchedMesh: THREE.BatchedMesh.prototype.raycast
         };
         this.meshes = [];
+        // --- VISUALIZER STATE ---
+        //this.debugGroup = new THREE.Group();
+        //this.scene.add(this.debugGroup);
+        this.isDebugEnabled = false;
+        this.arrowHelpers = [];
+        // ------------------------
         this.init();
     }
 
@@ -40,6 +46,8 @@ class BVHManager {
 
     setupBVH(object) {
         if (!object) return;
+        // Optimization: skip if rootObject but not selectable
+        if (object.rootObject && !object.bvhSelectable) return;
 
         // Handle regular Mesh
         if (object.isMesh) {
@@ -181,36 +189,28 @@ class BVHManager {
     }
 
     checkBoidCollisions(origin, direction, maxDistance, numRays = 5, spreadAngle = Math.PI / 6) {
-        if (!this.useBVH) {
-            return []; 
-        }
+        if (!this.useBVH) return [];
 
         const raycaster = new THREE.Raycaster();
         raycaster.far = maxDistance;
-        raycaster.firstHitOnly = true; 
+        raycaster.firstHitOnly = true;
 
-        const collisions = [];
+        const objectsHit = new Set();
 
+        // 1. Calculate Basis Vectors
         const forward = direction.clone().normalize();
-
-        const up = Math.abs(forward.y) < 0.99
-            ? new THREE.Vector3(0, 1, 0)
-            : new THREE.Vector3(1, 0, 0);
+        const up = Math.abs(forward.y) < 0.99 ? new THREE.Vector3(0, 1, 0) : new THREE.Vector3(1, 0, 0);
         const right = new THREE.Vector3().crossVectors(forward, up).normalize();
         const actualUp = new THREE.Vector3().crossVectors(right, forward).normalize();
 
         const rayDirections = [];
 
+        // 2. Generate Ray Directions
         if (numRays === 1) {
-            // Single ray straight ahead
             rayDirections.push(forward.clone());
         } else {
-            // Center ray
-            rayDirections.push(forward.clone());
-
-            // Calculate rays in a cone pattern
+            rayDirections.push(forward.clone()); // Center ray
             const angleStep = (Math.PI * 2) / (numRays - 1);
-
             for (let i = 0; i < numRays - 1; i++) {
                 const angle = angleStep * i;
                 const offsetRight = Math.cos(angle) * Math.sin(spreadAngle);
@@ -226,28 +226,71 @@ class BVHManager {
                 rayDirections.push(rayDir);
             }
         }
-        // Cast each ray and collect results
+
+        // --- UPDATE VISUALIZER IF ENABLED ---
+        if (this.isDebugEnabled) {
+            this.updateDebugVisuals(origin, rayDirections, maxDistance);
+        }
+        // ------------------------------------
+
+        // 3. Cast Rays
         for (let i = 0; i < rayDirections.length; i++) {
             raycaster.set(origin, rayDirections[i]);
-
             const intersects = raycaster.intersectObjects(this.meshes, true);
 
             if (intersects.length > 0) {
                 const hit = intersects[0];
-                collisions.push({
-                    distance: hit.distance,
-                    point: hit.point,
-                    normal: hit.face ? hit.face.normal : null,
-                    object: hit.object,
-                    rayIndex: i,
-                    rayDirection: rayDirections[i].clone()
-                });
+                const root = this.findRoot(hit.object);
+                
+                objectsHit.add(root);
+                
+                // Optional: Color the hit ray red in debug mode
+                if (this.isDebugEnabled && this.arrowHelpers[i]) {
+                    this.arrowHelpers[i].setColor(0xff0000); 
+                }
             }
         }
 
-        collisions.sort((a, b) => a.distance - b.distance);
+        return objectsHit;
+    }
 
-        return collisions;
+    // --- NEW VISUALIZER METHODS ---
+
+    setDebug(enabled) {
+        this.isDebugEnabled = enabled;
+        this.debugGroup.visible = enabled;
+        if (!enabled) {
+             // Clean up visuals when disabled to save performance
+             this.arrowHelpers.forEach(helper => {
+                 this.debugGroup.remove(helper);
+                 helper.dispose(); // Important for memory
+             });
+             this.arrowHelpers = [];
+        }
+    }
+
+    updateDebugVisuals(origin, directions, length) {
+        // 1. Ensure we have enough arrow helpers
+        while (this.arrowHelpers.length < directions.length) {
+            const arrow = new THREE.ArrowHelper(new THREE.Vector3(1, 0, 0), origin, length, 0x00ff00);
+            this.arrowHelpers.push(arrow);
+            this.debugGroup.add(arrow);
+        }
+
+        // 2. Hide unused helpers if we have too many
+        for (let i = directions.length; i < this.arrowHelpers.length; i++) {
+            this.arrowHelpers[i].visible = false;
+        }
+
+        // 3. Update positions and directions
+        for (let i = 0; i < directions.length; i++) {
+            const arrow = this.arrowHelpers[i];
+            arrow.visible = true;
+            arrow.position.copy(origin);
+            arrow.setDirection(directions[i]);
+            arrow.setLength(length);
+            arrow.setColor(0x00ff00); 
+        }
     }
 
     toggleBVH(enabled) {

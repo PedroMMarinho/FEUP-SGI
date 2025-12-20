@@ -251,7 +251,7 @@ class Seabed extends THREE.Object3D {
             const modelLODs = this.rockModels[typeIndex];
             const baseRadius = baseRadii[typeIndex];
 
-            const scale = THREE.MathUtils.randFloat(0.2, 0.8);
+            const scale = THREE.MathUtils.randFloat(0.8, 1.6);
             
             const rotation = new THREE.Euler(
                 THREE.MathUtils.randFloat(0, Math.PI / 8),  
@@ -304,7 +304,7 @@ class Seabed extends THREE.Object3D {
 
         for (let i = 0; i < this.coralCount; i++) {
             // A. SCALE
-            const scale = THREE.MathUtils.randFloat(0.5, 1.2);
+            const scale = THREE.MathUtils.randFloat(0.8, 1.4);
             
             // B. ACTUAL RADIUS 
             const actualRadius = baseRadius * scale;
@@ -345,7 +345,7 @@ class Seabed extends THREE.Object3D {
             const modelLODs = this.shellModels[typeIndex];
             const baseRadius = baseRadii[typeIndex];
 
-            const scale = THREE.MathUtils.randFloat(0.1, 0.6);
+            const scale = THREE.MathUtils.randFloat(0.5, 0.8);
             
             // B. CALCULATE EXACT RADIUS
             const actualRadius = baseRadius * scale;
