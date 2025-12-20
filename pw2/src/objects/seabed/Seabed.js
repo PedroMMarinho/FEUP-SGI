@@ -141,7 +141,7 @@ class Seabed extends THREE.Object3D {
             const modelLODs = this.treasureChestModel[typeIndex];
             const baseRadius = baseRadii[typeIndex];
 
-            const scale = 0.04;
+            const scale = 1;
 
             const actualRadius = baseRadius * scale;
 
