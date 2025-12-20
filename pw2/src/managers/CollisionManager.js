@@ -18,7 +18,7 @@ class CollisionManager {
         this.bvhManager = bvhManager;
 
         // Spatial grid for optimization
-        this.gridCellSize = 25;
+        this.gridCellSize = 40;
         this.spatialGrid = new Map();
         
         // Visualization toggle
@@ -181,6 +181,7 @@ class CollisionManager {
 
         switch (danger) {
             case DangerLevel.NONE:
+                offsetMultiplier += 0.3;
                 break;
             case DangerLevel.LOW:
                 offsetMultiplier += 0.1;
@@ -264,11 +265,11 @@ class CollisionManager {
             this.spatialGrid.get(key).push(entity);
         }
 
-            for (const fish of this.boidEntities) {
-                const key = this.getGridKey(fish.pos);
-                if (!this.spatialGrid.has(key)) this.spatialGrid.set(key, []);
-                this.spatialGrid.get(key).push(fish);
-            }
+        for (const fish of this.boidEntities) {
+            const key = this.getGridKey(fish.pos);
+            if (!this.spatialGrid.has(key)) this.spatialGrid.set(key, []);
+            this.spatialGrid.get(key).push(fish);
+        }
         
     }
 

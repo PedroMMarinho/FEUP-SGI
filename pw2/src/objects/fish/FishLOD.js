@@ -106,27 +106,66 @@ export class FishLOD extends THREE.LOD {
                 totalBoids++;
             }
             
-            // --- 2. PREDATOR AVOIDANCE (Stronger when Closer) ---
-            else if (other.type === EntityType.SHARK || other.type === EntityType.SUBMARINE) {
-				const objectRadius = this.collisionManager.getEntityRadius(other);
-                const distToSurface = distToCenter - objectRadius;
-
-                const panicRadius = objectRadius / 4; 
+            // --- 2. SUBMARINE: REPULSIVE GRAVITY ---
+            else if (other.type === EntityType.SUBMARINE) {
+                const pushDir = this.pos.clone().sub(otherPos).normalize();
                 
-                if (distToSurface < panicRadius) {
-                    const avoidDir = this.pos.clone().sub(otherPos).normalize();
+                // Inverse Square Law: Force = Constant / Distance^2
+                const safeDist = Math.max(distToCenter, 1.0);
+                const repulsionStrength = 350.0; 
+                const forceMagnitude = repulsionStrength / (safeDist * safeDist);
 
-					const proximityFactor = 1.0 - (Math.max(distToSurface, 0.1) / panicRadius);
-                    const strength = Math.pow(proximityFactor, 2) * (this.boidProperties.moveSpeed * 3.5);
+                avoidance.addScaledVector(pushDir, forceMagnitude);
+            }
 
-                    avoidance.addScaledVector(avoidDir, strength);
+            // --- 3. SHARK: FLOW AROUND (Less Aggressive) ---
+            else if (other.type === EntityType.SHARK) {
+                const objectRadius = this.collisionManager.getEntityRadius(other);
+                const detectionRange = objectRadius * 3.0; 
+
+                if (distToCenter < detectionRange) {
+                    const awayDir = this.pos.clone().sub(otherPos).normalize();
+
+                    const tangent = new THREE.Vector3().crossVectors(awayDir, new THREE.Vector3(0, 1, 0));
+
+                    if (tangent.dot(this.velocity) < 0) {
+                        tangent.negate();
+                    }
+
+                    const proximityFactor = 1.0 - (distToCenter / detectionRange);
+                    
+                    // Mix forces: 
+                    // 30% "Push Away" (to ensure they don't clip the model)
+                    // 70% "Go Around" (to create the flow effect)
+                    avoidance.addScaledVector(awayDir, proximityFactor * 1.5); 
+                    avoidance.addScaledVector(tangent, proximityFactor * 4.0); 
                 }
             }
-            // --- 3. STATIC OBSTACLE AVOIDANCE ---
+
+            // --- 4. STATIC OBSTACLE AVOIDANCE ---
             else if (other.type === EntityType.STATIC_OBSTACLE) {
-                const avoidDir = this.pos.clone().sub(otherPos);
-                const avoidStrength = 8.5 / (distToCenter * distToCenter); 
-                avoidance.addScaledVector(avoidDir, avoidStrength);
+                const objectRadius = this.collisionManager.getEntityRadius(other);
+                
+
+                if (distToCenter) {
+                    const avoidDir = this.pos.clone().sub(otherPos).normalize();
+
+                    const tangent = new THREE.Vector3().crossVectors(avoidDir, new THREE.Vector3(0, 1, 0));
+                    if (tangent.dot(this.velocity) < 0) tangent.negate();
+
+                    const distToSurface = distToCenter - objectRadius;
+                    
+                    const safeDist = Math.max(distToSurface, 0.01);
+
+                    // 1. Repulsion:
+                    const repulsionStrength = 4.0 / safeDist; 
+
+                    // 2. Flow:
+                    const flowStrength = this.boidProperties.moveSpeed * 3.0;
+
+                    avoidance.addScaledVector(avoidDir, repulsionStrength);
+                    avoidance.addScaledVector(tangent, flowStrength);
+                }
             }
         }
 
@@ -141,8 +180,9 @@ export class FishLOD extends THREE.LOD {
             this.acceleration.add(separation);
         }
 
+        // Apply the accumulated avoidance force
         if (avoidance.lengthSq() > 0) {
-            avoidance.clampLength(0, this.boidProperties.moveSpeed * 5.0); 
+            avoidance.clampLength(0, this.boidProperties.moveSpeed * 6.0); 
             this.acceleration.add(avoidance);
         }
 
