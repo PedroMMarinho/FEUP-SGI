@@ -141,7 +141,7 @@ class Seabed extends THREE.Object3D {
             const modelLODs = this.treasureChestModel[typeIndex];
             const baseRadius = baseRadii[typeIndex];
 
-            const scale = 1;
+            const scale = 1.1;
 
             const actualRadius = baseRadius * scale;
 
@@ -194,12 +194,12 @@ class Seabed extends THREE.Object3D {
             const modelLODs = this.shipModels[typeIndex];
             const baseRadius = baseRadii[typeIndex];
 
-            const scale = THREE.MathUtils.randFloat(6.2, 6.8);
+            const scale = THREE.MathUtils.randFloat(1.2, 1.5);
             
             // B. CALCULATE EXACT RADIUS
             let actualRadius = baseRadius * scale;
 			// Scale down a little for collision purposes
-			actualRadius = actualRadius * 0.85;
+			actualRadius = actualRadius * 0.95;
             // C. FIND POSITION 
             const positions = this.computePositions(1, actualRadius, 0.85);
 

@@ -158,10 +158,10 @@ export class FishLOD extends THREE.LOD {
                     const safeDist = Math.max(distToSurface, 0.01);
 
                     // 1. Repulsion:
-                    const repulsionStrength = 4.0 / safeDist; 
+                    const repulsionStrength = 6.0 / safeDist; 
 
                     // 2. Flow:
-                    const flowStrength = this.boidProperties.moveSpeed * 3.0;
+                    const flowStrength = this.boidProperties.moveSpeed * 2.0;
 
                     avoidance.addScaledVector(avoidDir, repulsionStrength);
                     avoidance.addScaledVector(tangent, flowStrength);
