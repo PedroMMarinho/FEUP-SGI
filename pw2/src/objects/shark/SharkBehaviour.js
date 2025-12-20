@@ -34,8 +34,8 @@ export class SharkBehaviour {
     // Navigation
     this.targetTolerance = options.targetTolerance ?? 5.0;
     this.lastPathChange = 0;
-    this.pathChangeIntervalMin = options.pathChangeIntervalMin ?? 6;
-    this.pathChangeIntervalMax = options.pathChangeIntervalMax ?? 15;
+    this.pathChangeIntervalMin = options.pathChangeIntervalMin ?? 15;
+    this.pathChangeIntervalMax = options.pathChangeIntervalMax ?? 20;
     this.pathChangeInterval = this.getRandomInterval();
 
     // Movement smoothing
