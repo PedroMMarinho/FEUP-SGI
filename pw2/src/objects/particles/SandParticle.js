@@ -24,7 +24,8 @@ export class SandParticle {
             opacity: 0.4,
             vertexColors: true,
             depthWrite: false,
-            blending: THREE.AdditiveBlending
+            blending: THREE.AdditiveBlending,
+            fog: true,
         });
 
         this.mesh = new THREE.Points(this.geometry, this.material);
