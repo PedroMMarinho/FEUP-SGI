@@ -207,8 +207,8 @@ class Aquarium extends THREE.Object3D {
             cohesion: 2,
             separation: 2.7,
             alignment: 1.4,
-            moveSpeed: 4,
-            awareness: 10
+            moveSpeed: 3.6,
+            awareness: 8
         };
 
         this.fishGroups = [
