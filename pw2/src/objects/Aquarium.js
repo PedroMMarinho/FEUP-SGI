@@ -205,7 +205,7 @@ class Aquarium extends THREE.Object3D {
 
         this.boidProps = {
             cohesion: 2,
-            separation: 2,
+            separation: 2.7,
             alignment: 1.4,
             moveSpeed: 4,
             awareness: 10
@@ -215,7 +215,8 @@ class Aquarium extends THREE.Object3D {
             new FishGroup(400, this.terrainWidth / 2 - 5, this.terrainHeight / 2, this.boidProps),
         ];
         this.fishGroups[0].position.set(0, 0, 0);
-        this.cameraManager.setTargetFish(this.fishGroups[0].getCameraTarget());
+        this.cameraManager.setTargetBoid(this.fishGroups[0].getCameraTarget());
+        this.cameraManager.setTargetJumpingFish(this.fishGroups[0].animatedFishes[0]);
         this.addToAquarium(this.fishGroups[0]);
     }
 
