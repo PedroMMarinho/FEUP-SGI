@@ -245,6 +245,9 @@ class FishGroup extends THREE.Object3D {
 	init() {
 		this.initMaterials();
         this.initializePrototypes();     
+
+        this.boidCount = Math.floor(this.count * 0.95);
+
         // Boid fish group
 		for (let i = 0; i < this.count; i++) {
 
@@ -265,7 +268,7 @@ class FishGroup extends THREE.Object3D {
 
 
 			fishLOD.rotation.y = THREE.MathUtils.randFloat(0, Math.PI * 2);
-			const scale = THREE.MathUtils.randFloat(0.8, 1.2);
+			const scale = THREE.MathUtils.randFloat(0.8, 1.8);
 			fishLOD.scale.set(scale, scale, scale);
 
 			this.add(fishLOD);
@@ -274,7 +277,7 @@ class FishGroup extends THREE.Object3D {
 
         
        // 2. KEYFRAMED JUMPING FISH
-        const animatedFishesCount = 20;
+        const animatedFishesCount = this.count - this.boidCount;
         
         for (let i = 0; i < animatedFishesCount; i++) {
             const highResClone = cloneSkinnedMesh(this.keyFramedHighProto);
@@ -287,14 +290,14 @@ class FishGroup extends THREE.Object3D {
             );
 
             // Grouping logic for schools
-            const groupIndex = Math.floor(i / 3); 
-            const indexInGroup = i % 3;
+            const groupIndex = Math.floor(i / 4); 
+            const indexInGroup = i % 4;
 
             const duration = 25 + (Math.random() * 8); 
             
             const baseRadius = (this.sparseness / 2) - 4; 
             
-            const jumpHeight = 5.5 + Math.random() * 5; 
+            const jumpHeight = 8 + Math.random() * 2.6; 
             
             const radiusOffset = (indexInGroup * -2.0) - (Math.random() * 2);
             
@@ -332,7 +335,7 @@ class FishGroup extends THREE.Object3D {
         const positions = [];
         const quaternions = [];
         const times = [];
-        const steps = 80; 
+        const steps = 60; 
 
         const noiseOffset = Math.random() * 100;
 
