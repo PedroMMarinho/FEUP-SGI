@@ -107,6 +107,8 @@ export class AssetManager {
             'spritesheet': 'periscope/spritesheet.png',
             // Treasure Chest Textures
             'treasure-gold' : 'treasure_chest/gold.mp4',
+            // bubble texture
+            'bubble-particle': 'bubbles/bubble.png',
         };
         return textureMap;
     }

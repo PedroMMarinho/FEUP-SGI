@@ -1,11 +1,11 @@
 import * as THREE from 'three';
-import { BubbleGroup } from './bubble/BubbleGroup.js';
 import { FishGroup } from './fish/FishGroup.js';
 import { SharkLOD } from './shark/SharkLOD.js';
 import { SubmarineLOD } from './submarine/SubmarineLOD.js';
 import { GlassTank } from './glassTank/GlassTank.js';
 import { Seabed } from './seabed/Seabed.js';
 import { Water } from './water/Water.js';
+import { BubbleColumns } from './bubble/BubbleColumns.js';
 
 /**
  * Main Aquarium class
@@ -77,8 +77,7 @@ class Aquarium extends THREE.Object3D {
         this.createGlassTank();
         // Create water top layer
         this.createWaterTopLayer();
-        // Create bubbles
-        this.createBubbles();
+
         // create fishes
         this.createFishes();
         // create shark
@@ -120,9 +119,10 @@ class Aquarium extends THREE.Object3D {
         const seaweedCount = 120;
         const shipCount = 1;
         const tvCount = 1;
+        const bubbleColumnsCount = 50;
 
 
-        this.seabed = new Seabed(this.terrainWidth, rockCount, coralCount, shellCount, seaweedCount, shipCount, tvCount, rockModels, shellModels, shipModels, tvModels, treasureChestModel);
+        this.seabed = new Seabed(this.terrainWidth, rockCount, coralCount, shellCount, seaweedCount, shipCount, tvCount, bubbleColumnsCount, rockModels, shellModels, shipModels, tvModels, treasureChestModel);
         this.cameraManager.setTargetTV(this.seabed.getTV());
         this.cameraManager.setTargetShip(this.seabed.sunkenShip);
         this.addToAquarium(this.seabed);
@@ -155,10 +155,6 @@ class Aquarium extends THREE.Object3D {
 
     }
 
-    createBubbles() {
-        const bubbleGroup = new BubbleGroup(10);
-        this.addToAquarium(bubbleGroup);
-    }
 
     createFishes() {
         /*this.fishGroups = [
