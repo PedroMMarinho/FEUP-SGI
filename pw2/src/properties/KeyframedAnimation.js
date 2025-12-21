@@ -1,134 +1,155 @@
+import * as THREE from 'three';
+
 export class KeyframedAnimation {
-	static interpolationFunctions = {
-		discrete: (start, end, progress) => start,
-		linear: (start, end, progress) => start + (end - start) * progress,
-		quadratic: (start, end, progress) => {
-			const p = progress < 0.5
-				? 2 * progress * progress 
-				: 1 - Math.pow(-2 * progress + 2, 2) / 2;
-			return start + (end - start) * p;
-		},
-		cubic: (p0, p1, p2, p3, progress) => {
-			const t = progress;
-			const t2 = t * t;
-			const t3 = t2 * t;
-			return 0.5 * (
-				(2 * p1) +
-        		(-p0 + p2) * t +
-        		(2 * p0 - 5 * p1 + 4 * p2 - p3) * t2 +
-        		(-p0 + 3 * p1 - 3 * p2 + p3) * t3
-			);
-		}
-	};
+    static interpolationFunctions = {
+        discrete: (start, end, progress) => start,
+        linear: (start, end, progress) => start + (end - start) * progress,
+        quadratic: (start, end, progress) => {
+            const p = progress < 0.5
+                ? 2 * progress * progress 
+                : 1 - Math.pow(-2 * progress + 2, 2) / 2;
+            return start + (end - start) * p;
+        },
+        // Catmull-Rom Spline
+        cubic: (p0, p1, p2, p3, progress) => {
+            const t = progress;
+            const t2 = t * t;
+            const t3 = t2 * t;
+            return 0.5 * (
+                (2 * p1) +
+                (-p0 + p2) * t +
+                (2 * p0 - 5 * p1 + 4 * p2 - p3) * t2 +
+                (-p0 + 3 * p1 - 3 * p2 + p3) * t3
+            );
+        }
+    };
 
-	static properties = ["x", "y", "z", "angle"];
+    constructor(inputData, interpType = "linear", durationOrSteps = 10, loop = true) {
+        
+        if (typeof inputData === 'object' && inputData.positions) {
+            this.mode = 'route';
+            this.keyframes = [];
+            this.animLength = durationOrSteps; 
+            this.loop = loop;
+            this.interpType = interpType === "catmullrom" ? "cubic" : interpType;
 
-	constructor(
-		animLengthMS,
-		interpType = "linear",
-		stepNr = 6, 
-		animationYDelta = 30,
-		animationXDelta = 30, 
-		animationZDelta = 30, 
-		keyframes = null
-	) {
-		this.animLength = animLengthMS;
-		this.stepNr = stepNr;
-		this.keyframes = keyframes ?? [];
-		this.interpType = interpType;
+            const count = inputData.times.length;
+            for(let i=0; i<count; i++) {
+                this.keyframes.push({
+                    time: inputData.times[i],
+                    position: inputData.positions[i],    
+                    quaternion: inputData.quaternions[i]  
+                });
+            }
+        } 
+        else {
+            this.mode = 'random';
+            this.animLength = inputData; 
+            this.loop = true;
+            this.interpType = interpType;
+            this.stepNr = durationOrSteps || 6;
+            
+            this.animationYDelta = 30;
+            this.animationXDelta = 30;
+            this.animationZDelta = 30;
+            
+            this.keyframes = [];
+            this.generateRandomKeyframes();
+        }
+    }
 
-		this.selectedKeyframeIndex = null;
-		this.draggedProperty = null;
-		this.isDragging = null;
-		this.isRotating = null;
-		this.isDraggingChart = null;
+    generateRandomKeyframes() {
+        const step = this.animLength / this.stepNr;
+        const times = Array.from({ length: this.stepNr}, (_, index) => index * step);
 
-		this.animationYDelta = animationYDelta;
-		this.animationXDelta = animationXDelta;
-		this.animationZDelta = animationZDelta;
+        this.keyframes = times.map(time => ({
+            time,
+            position: new THREE.Vector3(
+                Math.random() * this.animationXDelta,
+                Math.random() * this.animationYDelta,
+                Math.random() * this.animationZDelta
+            ),
+            quaternion: new THREE.Quaternion().setFromAxisAngle(
+                new THREE.Vector3(0, 1, 0), 
+                Math.random() * Math.PI * 2
+            )
+        }));
+    }
 
-		if (!keyframes) {
-			console.warn("No keyframes provided; will use random keyframe generation.");
-			this.generateKeyframes();
-		}
-	}
+    getSegment(time) {
+        if (this.loop) {
+            time = time % this.animLength;
+            if (time < 0) time += this.animLength;
+        } else {
+            if (time >= this.animLength) time = this.animLength - 0.001;
+            if (time < 0) time = 0;
+        }
 
-	generateKeyframes() {
-		const step = this.animLength / this.stepNr;
-		const times = Array.from(
-			{ length: this.stepNr},
-			(_, index) => 0 + index * step
-		);
+        for (let i = 0; i < this.keyframes.length - 1; i++) {
+            if (time >= this.keyframes[i].time && time < this.keyframes[i+1].time) {
+                const start = this.keyframes[i];                
+                const end = this.keyframes[i+1];
+                const duration = end.time - start.time;
+                const progress = duration === 0 ? 1 : (time - start.time) / duration;
+                return { start, end, progress, i };
+            }
+        }
 
-		this.keyframes = times.map((time, _) => ({
-			time,
-			x: Math.random() * this.animationXDelta,
-			y: Math.random() * this.animationYDelta,
-			z: Math.random() * this.animationZDelta,
-			angle: Math.random() * Math.PI * 2,
-		}));
-	}
-	
-	// get keyframe segment progress for animation time
-	// returns: { startFrame, endFrame, progressFraction, segmentNr }
-	getSegment(time) {
-		if (this.keyframes.length < 2) {
-			const only = this.keyframes[0] ?? {};
-			return {start: only, end: only, progress: 1, i: 0};
-		}
-		
-		time = time % this.animLength; // wrap around to start of animation
+        if (this.loop) {
+            const start = this.keyframes[this.keyframes.length - 1];
+            const end = this.keyframes[0];
+            const duration = this.animLength - start.time; 
+            
+            let progress = 0;
+            if (duration > 0.0001) {
+                progress = (time - start.time) / duration;
+            }
+            return { start, end, progress, i: this.keyframes.length - 1 };
+        }
 
-		for (let i = 0; i < this.keyframes.length - 1; i++) {
-			if (time >= this.keyframes[i].time && time < this.keyframes[i+1].time) {
-				const start = this.keyframes[i];				
-				const end = this.keyframes[i+1];
-				const duration = end.time - start.time;
-				const progress = duration === 0 ? 1 : (time - start.time) / duration;
-				return { start, end, progress, i };
-			}
-		}
-		/*return {
-			start: this.keyframes[this.keyframes.length - 1],
-			end: this.keyframes[this.keyframes.length - 1], 
-			progress: 1, 
-			i: this.keyframes.length - 2 
-		};*/
-		// Wrap-around: last → first
-		const start = this.keyframes[this.keyframes.length - 1];
-		const end = this.keyframes[0];
-		const duration = this.animLength - start.time;
-		const progress = duration === 0 ? 1 : (time - start.time) / duration;
-		return { start, end, progress, i: this.keyframes.length - 1 };
-	}
+        const last = this.keyframes[this.keyframes.length - 1];
+        return { start: last, end: last, progress: 1, i: this.keyframes.length - 1 };
+    }
 
-	getInterpolatedValue(time, property) {
-		if (this.interpType === "discrete" && time >= this.animLength) {
-			return this.keyframes[this.keyframes.length - 1][property];
-		}
+    getWrappedIndex(index) {
+        const len = this.keyframes.length;
+        return ((index % len) + len) % len;
+    }
 
-		const { start, end, progress, i } = this.getSegment(time);
+    update(time) {
+        return this.getPose(time);
+    }
 
-		if (this.interpType === "cubic") {
-			const p0 = this.keyframes[i > 0 ? i - 1 : 0][property];
-			const p1 = start[property];
-			const p2 = end[property];
-			const p3 = this.keyframes[i < this.keyframes.length - 2 ? i + 2 : this.keyframes.length - 1][property];
-			return KeyframedAnimation.interpolationFunctions.cubic(p0, p1, p2, p3, progress);
-		}
+    getPose(time) {
+        if (this.keyframes.length === 0) return null;
 
-		if (this.interpType !== "linear" && this.interpType !== "quadratic") {
-			this.interpType = "linear";
-			console.warn("Invalid interpolation method provided. Selecting 'linear' instead.");
-		}
-		return KeyframedAnimation.interpolationFunctions[this.interpType](start[property], end[property], progress);
-	}
+        const { start, end, progress, i } = this.getSegment(time);
+        
+        const resultPos = new THREE.Vector3();
+        const resultQuat = new THREE.Quaternion();
 
-	getPose(time) {
-		const pose = {};
-		for (const prop of KeyframedAnimation.properties) {
-			pose[prop] = this.getInterpolatedValue(time, prop);
-		}
-		return pose;
-	}
+        // --- 1. POSITION INTERPOLATION ---
+        if (this.interpType === "cubic") {
+            const p0 = this.keyframes[this.getWrappedIndex(i - 1)].position;
+            const p1 = start.position;
+            const p2 = end.position;
+            const p3 = this.keyframes[this.getWrappedIndex(i + 2)].position;
+
+            resultPos.x = KeyframedAnimation.interpolationFunctions.cubic(p0.x, p1.x, p2.x, p3.x, progress);
+            resultPos.y = KeyframedAnimation.interpolationFunctions.cubic(p0.y, p1.y, p2.y, p3.y, progress);
+            resultPos.z = KeyframedAnimation.interpolationFunctions.cubic(p0.z, p1.z, p2.z, p3.z, progress);
+        } 
+        else {
+            // Linear / Quadratic / Discrete
+            const func = KeyframedAnimation.interpolationFunctions[this.interpType] || KeyframedAnimation.interpolationFunctions.linear;
+            resultPos.x = func(start.position.x, end.position.x, progress);
+            resultPos.y = func(start.position.y, end.position.y, progress);
+            resultPos.z = func(start.position.z, end.position.z, progress);
+        }
+
+        // --- 2. ROTATION INTERPOLATION ---
+        resultQuat.copy(start.quaternion).slerp(end.quaternion, progress);
+
+        return { position: resultPos, quaternion: resultQuat };
+    }
 }
