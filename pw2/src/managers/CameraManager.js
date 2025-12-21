@@ -35,7 +35,8 @@ class CameraManager {
         this.canvasDiv = document.getElementById('canvas');    
 
         // Special Cameras
-        this.targetFish = null;
+        this.targetBoid = null;
+        this.targetJumpingFish = null;
         this.targetTelevision = null;
         this.aquariumHeight = null;
         this.aquariumWidth = null;
@@ -62,6 +63,7 @@ class CameraManager {
         this.treasureChest = treasureChest;
     }
 
+
     init() {
         const perspective = new THREE.PerspectiveCamera(75, this.aspect, 0.1, 1000);
         perspective.position.set(10, 10, 3);
@@ -77,11 +79,14 @@ class CameraManager {
         const submarineCam = new THREE.PerspectiveCamera(100, this.aspect, 0.1, 1000);
         this.cameras['Submarine View'] = submarineCam;
 
-        const fishCam = new THREE.PerspectiveCamera(90, this.aspect, 0.1, 1000);
-        this.cameras['Fish View'] = fishCam;
+        const boidCam = new THREE.PerspectiveCamera(90, this.aspect, 0.1, 1000);
+        this.cameras['Boid View'] = boidCam;
 
         const treasureCam = new THREE.PerspectiveCamera(50, this.aspect, 0.1, 1000);
         this.cameras['Treasure View'] = treasureCam;
+
+        const jumpFishCam = new THREE.PerspectiveCamera(80, this.aspect, 0.1, 1000);
+        this.cameras['Jumping Fish View'] = jumpFishCam;
 
         const tvSize = 5;
         const tvCam = new THREE.OrthographicCamera(
@@ -97,8 +102,12 @@ class CameraManager {
         this.setActiveCamera('Free Fly');
     }
 
-    setTargetFish(fishObject) {
-        this.targetFish = fishObject;
+    setTargetBoid(boidObject) {
+        this.targetBoid = boidObject;
+    }
+
+    setTargetJumpingFish(fishObject) {
+        this.targetJumpingFish = fishObject;
     }
 
     setActiveCamera(name) {
@@ -128,9 +137,25 @@ class CameraManager {
         this.updateOrbitViews(renderer);
         if (this.activeCameraName === 'Free Fly') this.updateFreeFly(deltaTime);
         if (this.activeCameraName === 'Submarine View') this.updateSubmarineView(submarine);
-        if (this.activeCameraName === 'Fish View') this.updateFishView();
+        if (this.activeCameraName === 'Boid View') this.updateBoidView();
         if (this.activeCameraName === 'TV View') this.updateTVView();
+        if (this.activeCameraName === 'Jumping Fish View') this.updateJumpFishView();
     }
+
+    updateJumpFishView() {
+        if (!this.targetJumpingFish) return;
+        
+        const camera = this.cameras['Jumping Fish View'];
+        const fish = this.targetJumpingFish;
+        camera.position.copy(fish.position);
+        camera.quaternion.copy(fish.quaternion);
+        camera.translateY(1.0);
+        camera.translateZ(-1.4);
+        camera.translateX(-0.25);
+
+        camera.lookAt(fish.position);
+    }
+
 
     updateOrbitViews(renderer) {
         const orbitCameras = ['Ship View', 'Treasure View'];
@@ -168,20 +193,21 @@ class CameraManager {
     }
 
 
-    updateFishView() {
-        if (!this.targetFish) return;
+    updateBoidView() {
+        if (!this.targetBoid) return;
 
-        const camera = this.cameras['Fish View'];
-        const fish = this.targetFish;
+        const camera = this.cameras['Boid View'];
+        const boid = this.targetBoid;
 
-        camera.position.copy(fish.position);
+        camera.position.copy(boid.position);
         
-        camera.quaternion.copy(fish.quaternion);
+        camera.quaternion.copy(boid.quaternion);
 
         camera.rotateY(Math.PI);
  
         camera.translateZ(1.5); 
         camera.translateY(1.0);
+        camera.translateX(0.2);
 
         camera.rotateX(-0.2); 
     }

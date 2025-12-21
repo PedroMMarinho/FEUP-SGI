@@ -67,7 +67,7 @@ class Aquarium extends THREE.Object3D {
     }
 
     createWaterTopLayer() {
-        const water = new Water(this.assetManager.getTextureManager().getTexture('water-normal'), this.terrainWidth, 3 * this.terrainHeight / 5, this.terrainWidth, this.envMap);
+        const water = new Water(this.assetManager.getTextureManager().getTexture('water-normal'), this.terrainWidth, 4 * this.terrainHeight / 5 - 5, this.terrainWidth, this.envMap);
         this.addToAquarium(water);
     }
 
@@ -102,7 +102,7 @@ class Aquarium extends THREE.Object3D {
         600, 
         {
             width: this.terrainWidth,
-            height: this.terrainHeight - this.terrainHeight / 4,
+            height: this.terrainHeight - this.terrainHeight / 3,
             depth: this.terrainWidth
         },
         (x, z) => this.seabed.terrain.getHeightAt(x, z),
@@ -205,17 +205,18 @@ class Aquarium extends THREE.Object3D {
 
         this.boidProps = {
             cohesion: 2,
-            separation: 2,
+            separation: 2.7,
             alignment: 1.4,
-            moveSpeed: 4,
-            awareness: 10
+            moveSpeed: 3.6,
+            awareness: 8
         };
 
         this.fishGroups = [
             new FishGroup(400, this.terrainWidth / 2 - 5, this.terrainHeight / 2, this.boidProps),
         ];
         this.fishGroups[0].position.set(0, 0, 0);
-        this.cameraManager.setTargetFish(this.fishGroups[0].getCameraTarget());
+        this.cameraManager.setTargetBoid(this.fishGroups[0].getCameraTarget());
+        this.cameraManager.setTargetJumpingFish(this.fishGroups[0].animatedFishes[0]);
         this.addToAquarium(this.fishGroups[0]);
     }
 
