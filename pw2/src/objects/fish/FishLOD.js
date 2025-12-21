@@ -225,6 +225,7 @@ export class FishLOD extends THREE.LOD {
 		} else {
 			fishGroup.rotation.y = Math.sin(time) * 0.2;
 		}
+		if (this.keyframedAnimation !== null) return;
 
 		// flocking
 		this.pos.addScaledVector(this.velocity, delta);
@@ -238,15 +239,19 @@ export class FishLOD extends THREE.LOD {
 	}
 
 	updateAnimation() {
-		const delta = this.timeManager.getElapsedTime() - this.globalTime;
-		this.globalTime += delta;
+        const currentTime = this.timeManager.getElapsedTime();
+        
+        const animTime = currentTime + (this.animationOffset || 0);
 
-		const timeMS = (this.globalTime * 1000);
-		const pose = this.keyframedAnimation.getPose(timeMS);
+        const pose = this.keyframedAnimation.getPose(animTime);
 
-		//set self position and rotation.
-		this.position.set(pose.x, pose.y, pose.z);
-		this.rotation.y = pose.angle;
-	}
+        if (pose) {
+            this.position.copy(pose.position);
+            
+            this.quaternion.copy(pose.quaternion);
+ 
+            this.pos.copy(this.position); 
+        }
+    }
 
 }

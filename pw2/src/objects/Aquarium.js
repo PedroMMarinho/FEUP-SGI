@@ -67,7 +67,7 @@ class Aquarium extends THREE.Object3D {
     }
 
     createWaterTopLayer() {
-        const water = new Water(this.assetManager.getTextureManager().getTexture('water-normal'), this.terrainWidth, 3 * this.terrainHeight / 5, this.terrainWidth, this.envMap);
+        const water = new Water(this.assetManager.getTextureManager().getTexture('water-normal'), this.terrainWidth, 4 * this.terrainHeight / 5 - 5, this.terrainWidth, this.envMap);
         this.addToAquarium(water);
     }
 
@@ -102,7 +102,7 @@ class Aquarium extends THREE.Object3D {
         600, 
         {
             width: this.terrainWidth,
-            height: this.terrainHeight - this.terrainHeight / 4,
+            height: this.terrainHeight - this.terrainHeight / 3,
             depth: this.terrainWidth
         },
         (x, z) => this.seabed.terrain.getHeightAt(x, z),
