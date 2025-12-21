@@ -151,11 +151,13 @@ classDiagram
 
 - **Implementation:**
     - **Terrain Texturing:** Applied high-resolution albedo, normal, and height maps to the seabed. Configured `RepeatWrapping` to tile textures seamlessly across the large plane.
-    - **Video Textures:** Integrated `THREE.VideoTexture` to render dynamic `.mp4` content on the "Sunken TV" object.
+    - **Video Textures:** Integrated `THREE.VideoTexture` to render dynamic `.mp4` content on the "Sunken TV" and "Treasure Chest" object.
     - **Filtering:** Enabled **MIPMAPS** (Trilinear filtering) and **Anisotropic Filtering** on ground textures to eliminate aliasing and blurring at steep camera angles.
+    - **Procedural Fish Skin:** Instead of a static texture, the fish skin is generated procedurally in the fragment shader. We sample a **Perlin Noise** texture at three different scales (low, medium, high frequency) and mix them to create a complex, organic pattern. This noise value then drives a smooth mix between two base colors (e.g., Orange and Yellow), resulting in a natural, non-uniform skin tone.
 
 - **Refinements:**
     - **CPU-Side Displacement:** Standard displacement maps are often visual-only (GPU). We went a step further by sampling the height map's pixel data on the CPU to physically displace the terrain geometry vertices. This allows our physics engine (e.g., Marine Snow landing, camera collision) to interact accurately with the hills and valleys.
+    - **Animated Bio-Luminescence:** The fish skin isn't static. We injected a `uTime` uniform into the shader to shift the noise texture coordinates over time, causing the pattern to "crawl" slowly across the body. Additionally, a sine-wave pulse function modulates the skin's brightness, giving the fish a living, breathing bio-luminescent glow.
 
 #### Week 8: Lighting and Shadows
 ![Week 8 Demo](screenshots/week8_demo.gif)
@@ -205,13 +207,60 @@ classDiagram
 
 
 ### Extras
-- Refer extra work done in the project.
+
+#### Blender Integration
+![Blender Shark Demo](screenshots/shark_blender.gif)
+> *Fig 10. The handmade Shark: Mesh, Armature, and Animation workflow in Blender.*
+
+To achieve a higher degree of visual fidelity, we integrated a pipeline for importing complex `.glb` assets from Blender.
+
+- **Environment Assets:** We curated a collection of high-quality models from external sources to populate the scene, including detailed shells and ancient ruins, which add narrative depth to the seabed.
+
+- **The Custom Shark:**
+    Distinct from the downloaded assets, the **Shark** was created entirely from scratch by the team.
+    - **Modeling:** Sculpted and retopologized manually.
+    - **Rigging:** Rigged with a custom armature to support dynamic swimming deformation.
+    - **Animation:** Features hand-crafted animations for swimming, exported and controlled via our `AnimationMixer` logic in Three.js.
+
+
+
+#### Realistic Lighting (HDRI)
+![HDRI Environment](screenshots/hdri_environment.jpg)
+> *Fig 11. The "Hall of Finfish" HDRI environment map acting as the aquarium store background.*
+
+To enhance the atmosphere, we implemented a custom `HDRIManager` to load High Dynamic Range environments.
+- **Scenario:** We used the "Hall of Finfish" HDRI, which represents the interior of an aquarium store.
+- **Function:** This environment acts as a "skybox" enveloping our entire tank, effectively placing our simulated aquarium inside a larger, realistic room.
+- **Visuals:** Beyond just being a background, this map provides the lighting data for the scene, allowing the submarine's metal and glass to reflect the store's lights and windows, grounding our project in a believable physical space.
+
+#### Dynamic Water Surface
+![Dynamic Water and HDRI](screenshots/water_hdri.gif)
+> *Fig 12. Dynamic water surface reflections and the surrounding aquarium store environment.*
+
+To complete the aquarium illusion, we added a realistic water surface at the top of the tank.
+- **Vertex Displacement:** We hooked into the `onBeforeCompile` stage of a `MeshStandardMaterial`. A height map texture is sampled in the vertex shader to physically displace the water plane's vertices.
+- **Wave Animation:** By scrolling the texture coordinates with a `time` uniform, we create rolling waves that ripple across the surface.
+- **Complex Motion:** We combine the Red, Green, and Blue channels of the height map with different multipliers (`offsetR`, `offsetG`, `offsetB`) to create chaotic, non-repetitive wave patterns that look organic rather than mechanical.
+- **Integration:** The surface uses the global `envMap` to reflect the "aquarium store" ceiling, seamlessly blending the water with the outside world.
+
+#### Procedural Seabed Placement
+![Seabed Distribution](screenshots/seabed_distribution.gif)
+> *Fig 13. Debug view showing the bounding circles and non-overlapping distribution of rocks and corals.*
+
+We implemented a robust "Circle Packing" algorithm to distribute hundreds of items (rocks, corals, shells, chests) naturally across the seabed without overlap.
+- **Bounding Circle Logic:** Every object type (from small shells to the large sunken ship) automatically calculates its own `baseRadius` by measuring its bounding box at runtime.
+- **Collision Padding:** When attempting to place an object, the `Seabed` class assigns it a randomized "Personal Space" (padding). It then checks this candidate circle against the circles of all previously placed objects.
+- **Height Awareness:** Once a valid 2D (X, Z) spot is found, the system queries the terrain's height map to drop the object perfectly onto the sand, ensuring it doesn't float or clip.
+- **Result:** This creates a natural, non-uniform distribution where clusters of life can form, but objects never intersect physically.
 
 ----
 ### Issues/Problems
 
-- (items describing unimplemented features, bugs, problems, etc.)
+- **Dynamic Entity Clipping:** Although we handle collision detection for moving entities (like the submarine and fish), there are occasional instances where they may clip into static objects or the terrain. The system handles most interactions correctly, but it is not 100% fail-proof during complex maneuvers.
+- **Post-Processing Lighting Artifacts:** We observed a noticeable shift in scene lighting and color tone when toggling between the **Depth of Field (Bokeh)** effect and the standard render. This suggests a discrepancy in how the `EffectComposer` pipeline handles gamma correction or tone mapping compared to the default `WebGLRenderer` path, which we haven't yet fully resolved.
 
 ### Future Work/Improvements
 
-- Say what future work we would want to have in our project.
+- **Robust Collision Physics:** Implement a more advanced physics engine to completely eliminate submarine clipping with static geometry.
+- **Expanded Ecosystem:** Introduce more diverse marine life, such as **Manta Rays**, Jellyfish, or Crabs, along with a wider variety of static ruins and flora to enrich the environment.
+- **Optimization Strategy:** As the scene complexity grows, we would look into more aggressive optimization techniques (like GPU instancing for rocks or occlusion culling) to ensure the project maintains stable FPS even with thousands of entities.
