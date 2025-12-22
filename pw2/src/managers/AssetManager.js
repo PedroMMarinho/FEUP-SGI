@@ -95,6 +95,10 @@ export class AssetManager {
             'sand-normal': 'sand/sandwavesNormal.png',
             'sand-noise': 'sand/sandNoise.png',
             'rift-map': 'sand/riftMap.png',
+            'rift-rock': 'sand/riftRock.jpg',
+            'rift-rock-normal':  'sand/riftRockNormal.png',
+            'magma': 'sand/magma.jpg',
+            'magma-normal': 'sand/magmaNormal.png',
             // TV Screen Video Texture
             'tv-screen': 'tv/marinho_i_need_this.mp4',
             'tv-screen2': 'tv/bro_dance.mp4',
