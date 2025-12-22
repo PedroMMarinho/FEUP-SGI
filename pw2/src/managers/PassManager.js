@@ -31,8 +31,13 @@ const MANAGED_PASSES = ['tint', 'scratches', 'hud', 'coords', 'clip'];
  * PassManager handles all post-processing passes and effects
  */
 class PassManager {
+
+    static renderer = null;
+
     constructor(renderer, scene) {
-        this.renderer = renderer;
+        
+        PassManager.renderer = renderer;
+        console.log("renderer:", PassManager.renderer)
         this.scene = scene;
         this.textureManager = TextureManager.getInstance();
         
@@ -99,7 +104,7 @@ class PassManager {
      */
     init(activeCamera, aquarium) {
         // Create composer
-        this.composer = new EffectComposer(this.renderer);
+        this.composer = new EffectComposer(PassManager.renderer);
         this.aquarium = aquarium;
         
         // Setup base render pass
@@ -442,6 +447,14 @@ setHUDText(
      */
     getPass(name) {
         return this.passes[name] || null;
+    }
+    
+    static getRenderer() {
+        if (!PassManager.renderer) {
+            console.warn("PassManager renderer not initialized yet");
+        }
+        console.log(PassManager.renderer)
+        return PassManager.renderer;
     }
 }
 
