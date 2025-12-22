@@ -113,6 +113,8 @@ export class AssetManager {
             'treasure-gold' : 'treasure_chest/gold.mp4',
             // Particle Textures
             'sand-particle': 'particle/sand-particle.png',
+            'coral' : 'coral/coral.jpeg',
+            'coral-normal': 'coral/coralNormal.png'
         };
         return textureMap;
     }
