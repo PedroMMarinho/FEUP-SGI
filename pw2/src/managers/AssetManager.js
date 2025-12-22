@@ -22,6 +22,7 @@ export class AssetManager {
 
     initBlenderModels() {
         const modelList = [
+            // Sharks
             { key: 'shark1', url: 'sharks/shark-high.glb', lod: 0 },
             { key: 'shark1', url: 'sharks/shark-medium.glb', lod: 1 },
             { key: 'shark1', url: 'sharks/shark-low.glb', lod: 2 },
@@ -39,7 +40,10 @@ export class AssetManager {
             { key: 'granite', url: 'rocks/granite-high.glb', lod: 0 },
             { key: 'granite', url: 'rocks/granite-medium.glb', lod: 1 },
             { key: 'granite', url: 'rocks/granite-low.glb', lod: 2 },
-
+            
+            { key: 'dark-stone', url: 'rocks/dark-stone-high.glb', lod: 0 },
+            { key: 'dark-stone', url: 'rocks/dark-stone-medium.glb', lod: 1 },
+            { key: 'dark-stone', url: 'rocks/dark-stone-low.glb', lod: 2 },
 
             // Shells
             { key: 'whelk', url: 'shells/whelk-high.glb', lod: 0 },
@@ -60,6 +64,7 @@ export class AssetManager {
             { key: 'treasure-chest', url: 'treasure_chest/treasure-chest-high.glb', lod: 0 },
             { key: 'treasure-chest', url: 'treasure_chest/treasure-chest-medium.glb', lod: 1 },
             { key: 'treasure-chest', url: 'treasure_chest/treasure-chest-low.glb', lod: 2 },
+
         ];
         return modelList;
     }
@@ -113,6 +118,8 @@ export class AssetManager {
             'treasure-gold' : 'treasure_chest/gold.mp4',
             // bubble texture
             'bubble-particle': 'bubbles/bubble.png',
+            // Particle Textures
+            'sand-particle': 'particle/sand-particle.png',
         };
         return textureMap;
     }

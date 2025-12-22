@@ -13,19 +13,19 @@ import { TintShader,
         MAX_CHARS,
         CHAR_MAP
 } from '../hud/PeriscopeHUD.js';
+import { RenderType } from '../enums/RenderType.js';
 
 
 const HUD_STATE_CONFIG = {
-    [PeriscopeHUDType.VIEW]:      [],
-    [PeriscopeHUDType.DOF]:       ['bokeh'],
-    [PeriscopeHUDType.TINT]:      ['bokeh', 'tint'],
-    [PeriscopeHUDType.SCRATCHES]: ['bokeh', 'tint', 'scratches'],
-    [PeriscopeHUDType.HUD]:       ['bokeh', 'tint', 'scratches', 'hud'],
-    [PeriscopeHUDType.COORDS]:   ['bokeh', 'tint', 'scratches', 'hud', 'coords'],
-    [PeriscopeHUDType.CLIP]:      ['bokeh', 'tint', 'scratches', 'hud', 'coords', 'clip'],
+    [PeriscopeHUDType.NONE]:      [],
+    [PeriscopeHUDType.TINT]:      ['tint'],
+    [PeriscopeHUDType.SCRATCHES]: ['tint', 'scratches'],
+    [PeriscopeHUDType.HUD]:       ['tint', 'scratches', 'hud'],
+    [PeriscopeHUDType.COORDS]:   ['tint', 'scratches', 'hud', 'coords'],
+    [PeriscopeHUDType.CLIP]:      ['tint', 'scratches', 'hud', 'coords', 'clip'],
 };
 
-const MANAGED_PASSES = ['bokeh', 'tint', 'scratches', 'hud', 'coords', 'clip'];
+const MANAGED_PASSES = ['tint', 'scratches', 'hud', 'coords', 'clip'];
 
 /**
  * PassManager handles all post-processing passes and effects
@@ -94,6 +94,8 @@ class PassManager {
             }
         };
         this.currentPeriscopeHUD = PeriscopeHUDType.CLIP;
+        this.currentRenderType = RenderType.DOF;
+
     }
 
 
@@ -312,15 +314,15 @@ setHUDText(
     togglePass(passName, enabled) {
         const pass = this.getPass(passName);
         if (pass) {
-            if (passName === 'bokeh' && this.scenarioManager) {
-                if (enabled) {
-                    this.scenarioManager.changeToBokehLighting();
-                } else {
-                    this.scenarioManager.changeToNormalLighting();
-                }
-            }
             pass.enabled = enabled;
         }
+    }
+    
+    // Change render type (e.g., View, DOF)
+    setRenderType(type) {
+        this.currentRenderType = type;
+        
+        this.togglePass('bokeh', type === RenderType.DOF);
     }
 
     setHUDType(type, cameraName) {
@@ -330,11 +332,13 @@ setHUDText(
         if (cameraName !== 'Submarine View') return;
 
         const activePasses = HUD_STATE_CONFIG[type] || [];
+        this.setRenderType(this.currentRenderType);
 
         MANAGED_PASSES.forEach(passName => {
             const shouldEnable = activePasses.includes(passName);
             this.togglePass(passName, shouldEnable);
         });
+
     }
     
 
@@ -400,6 +404,12 @@ setHUDText(
                 this.passes.clip.uniforms['aspectRatio'].value = width / height;
             }
         }
+    }
+    
+    resetHUD() {
+        MANAGED_PASSES.forEach(passName => {
+            this.togglePass(passName, false);
+        });
     }
 
     /**

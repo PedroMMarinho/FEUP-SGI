@@ -3,33 +3,45 @@ import { SeaweedLOD } from "./SeaweedLOD.js";
 import { TimeManager } from '../../managers/TimeManager.js';
 
 class SeaweedGroup extends THREE.Object3D {
-    constructor(positions = []) {
+    /**
+     * @param {Array} data - Array of { position, rotation, scale }
+     */
+    constructor(data = []) {
         super();
 
-        if (positions.length === 0) {
-            console.warn("SeaweedGroup: positions array must not be empty");
-            return;
-        }
-
+        this.data = data;
         this.type = "Group";
         this.seaweeds = [];
-
-    	this.positions = positions;
-		this.corals = [];
-        this.material = this.createMaterial();
         this.timeManager = TimeManager.getInstance();
+        
+        this.material = this.createMaterial();
 
         this.init();
     }
 
     init() {
+        if (!this.data || this.data.length === 0) {
+            console.warn("SeaweedGroup: No data provided");
+            return;
+        }
+
         const seaweedTemplate = new SeaweedLOD(this.material);
 
-        for (const position of this.positions) {
+        for (const item of this.data) {
+            // 1. Clone
             const seaweed = seaweedTemplate.clone(true);
-            seaweed.position.copy(position);
+            
+            // 2. Apply properties decided by Seabed
+            seaweed.position.copy(item.position);
+            seaweed.rotation.copy(item.rotation);
+            seaweed.scale.set(item.scale, item.scale, item.scale);
+
+            // 3. Add
             this.add(seaweed);
-            this.seaweeds.push({ position, object: seaweed });
+            this.seaweeds.push({ 
+                position: item.position, 
+                object: seaweed 
+            });
         }
     }
 
@@ -74,37 +86,24 @@ class SeaweedGroup extends THREE.Object3D {
                     `vec4 mvPosition = vec4( transformed, 1.0 );
 
                     #ifdef USE_BATCHING
-
                         mvPosition = batchingMatrix * mvPosition;
-
                     #endif
 
                     #ifdef USE_INSTANCING
-
                         mvPosition = instanceMatrix * mvPosition;
-
                     #endif
 
-                    // Quantize the seaweed's base position to ensure stable per-object randomness
                     vec3 objectIdSeed = mod(modelMatrix[3].xyz, 5.0);
-                    float phase = hash(objectIdSeed) * 6.2831853; // 2*PI
+                    float phase = hash(objectIdSeed) * 6.2831853; 
 
-                    // Apply waving effect
                     float wave = sin( phase + uFrequency * uTime + mvPosition.y * 0.3) * uAmplitude;
-
-                    // Displace vertices along the X axis based on their Y position
-                    mvPosition.x += wave * pow(mvPosition.y / 5.0, 2.0); // Adjust divisor for height influence
-
-                    // Standard transformations 
+                    mvPosition.x += wave * pow(mvPosition.y / 5.0, 2.0); 
 
                     mvPosition = modelViewMatrix * mvPosition;
-
                     gl_Position = projectionMatrix * mvPosition;
-`
+                    `
                 );
 
-
-                // Keep shader reference for external updates
                 material.userData.shader = shader;
             }
         });

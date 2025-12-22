@@ -11,7 +11,7 @@ export class SharkBehaviour {
     // Movement parameters
     this.baseSpeed = options.speed || 2;
     this.currentSpeed = this.baseSpeed;
-    this.maxSpeed = this.baseSpeed * 3.2;
+    this.maxSpeed = this.baseSpeed * 3.5;
 
     this.acceleration = options.acceleration || 0.3;
     this.baseAcceleration = this.acceleration;
@@ -34,8 +34,8 @@ export class SharkBehaviour {
     // Navigation
     this.targetTolerance = options.targetTolerance ?? 5.0;
     this.lastPathChange = 0;
-    this.pathChangeIntervalMin = options.pathChangeIntervalMin ?? 6;
-    this.pathChangeIntervalMax = options.pathChangeIntervalMax ?? 15;
+    this.pathChangeIntervalMin = options.pathChangeIntervalMin ?? 15;
+    this.pathChangeIntervalMax = options.pathChangeIntervalMax ?? 20;
     this.pathChangeInterval = this.getRandomInterval();
 
     // Movement smoothing

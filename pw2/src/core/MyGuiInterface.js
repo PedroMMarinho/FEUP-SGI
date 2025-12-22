@@ -3,6 +3,7 @@ import * as THREE from 'three';
 import { MyApp } from './MyApp.js';
 import { MyContents } from './MyContents.js';
 import { PeriscopeHUDType } from '../enums/PeriscopeHUDType.js';
+import { RenderType } from '../enums/RenderType.js';
 /**
  * Custom GUI interface for the app
  */
@@ -29,13 +30,13 @@ class MyGuiInterface {
      */
     init() {
         // --- Axis controls ---
-        const axisFolder = this.datgui.addFolder('Axis');
-        axisFolder
-            .add(this.contents, 'showAxis')
-            .name('Show Axis')
-            .onChange((value) => {
-                this.contents.enableAxis(value);
-            });
+        //const axisFolder = this.datgui.addFolder('Axis');
+        //axisFolder
+        //    .add(this.contents.axis, 'visible')
+        //    .name('Show Axis')
+        //    .onChange((value) => {
+        //        this.contents.enableAxis(value);
+        //    });
 
         // --- Camera controls ---
         const cameraFolder = this.datgui.addFolder('Camera');
@@ -50,18 +51,30 @@ class MyGuiInterface {
         });
 
         cameraFolder.open();
+        const hudFolder = this.datgui.addFolder('HUD');
 
-        if (cameraFolder) {
+        if (hudFolder) {
 
-            const hudNames = Object.values(PeriscopeHUDType);;
-            const hudController = cameraFolder
-                .add(this.app.passManager, 'currentPeriscopeHUD', hudNames)
+            const hudNamesPeriscope = Object.values(PeriscopeHUDType);;
+            const hudController = hudFolder
+                .add(this.app.passManager, 'currentPeriscopeHUD', hudNamesPeriscope)
                 .name('Periscope HUD Type');
 
             hudController.onChange((type) => {
                 this.app.passManager.setHUDType(type, this.app.cameraManager.activeCameraName);
             });
+
+            const hudRender = Object.values(RenderType);
+            const renderController = hudFolder
+                .add(this.app.passManager, 'currentRenderType', hudRender)
+                .name('Render Type');
+            
+            renderController.onChange((type) => {
+                this.app.passManager.setRenderType(type);
+            });
         }
+
+
 
         // --- Render mode controls (wireframe / fill) ---
         const renderFolder = this.datgui.addFolder('Render Mode');
@@ -193,6 +206,23 @@ class MyGuiInterface {
         .onChange(() => submarine.applyShieldControls())
         .name("Shield p Param");
             shieldFolder.open();
+        }
+        // Scenario controls
+        const scenarioFolder = this.datgui.addFolder('Scenario');
+        const scenario = this.contents.scenarioManager;
+        if (scenario) {
+            const intensities = scenario.originalLightsIntensity;
+            scenarioFolder
+                .add(intensities,'directional' , 0, 1, 0.01).name('Directional Light')
+                .onChange((value) => {
+                    scenario.updateDirectionalLight(value);
+                });
+            scenarioFolder.add(intensities, 'ambient', 0, 1, 0.01).name('Ambient Light').onChange((value) => {
+                scenario.updateAmbientLight(value);
+            });
+            scenarioFolder.add(scenario, 'originalFogIntensity', 0, 0.1, 0.001).name('Fog Density').onChange((value) => {
+                scenario.updateFogIntensity(value);
+            });
         }
 
 
