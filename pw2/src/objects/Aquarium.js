@@ -1,11 +1,11 @@
 import * as THREE from 'three';
-import { BubbleGroup } from './bubble/BubbleGroup.js';
 import { FishGroup } from './fish/FishGroup.js';
 import { SharkLOD } from './shark/SharkLOD.js';
 import { SubmarineLOD } from './submarine/SubmarineLOD.js';
 import { GlassTank } from './glassTank/GlassTank.js';
 import { Seabed } from './seabed/Seabed.js';
 import { Water } from './water/Water.js';
+import { BubbleColumns } from './bubble/BubbleColumns.js';
 import { MarineSnow } from './particles/MarineSnow.js';
 
 /**
@@ -79,8 +79,7 @@ class Aquarium extends THREE.Object3D {
         this.createGlassTank();
         // Create water top layer
         this.createWaterTopLayer();
-        // Create bubbles
-        this.createBubbles();
+
         // create fishes
         this.createFishes();
         // create shark
@@ -113,9 +112,9 @@ class Aquarium extends THREE.Object3D {
             driftSpeed: [0.04, 0.01],      // Horizontal drift speed
             swayFrequency: [0.5, 2.0],   // Faster swaying
             swayAmplitude: 0.2,          // More pronounced sway
-            gravity: 0.4,                // Reduced gravity effect
-            bounce: 1.4,      // Less bounce
-            fadeSpeed: 1,              // Fades fast 
+            gravity: 0.1,                // Reduced gravity effect
+            bounce: 0.9,      // Less bounce
+            fadeSpeed: 0.8,              // Fades fast 
         },
     );
     this.addToAquarium(marineSnow);
@@ -149,10 +148,11 @@ class Aquarium extends THREE.Object3D {
         const seaweedCount = 35;
         const shipCount = 1;
         const tvCount = 1;
-        const tvreasureChestCount = 1;
+        const bubbleColumnsCount = 20;
+        const treasureChestCount = 1;
 
 
-        this.seabed = new Seabed(this.terrainWidth, rockCount, coralCount, shellCount, seaweedCount, shipCount, tvCount, tvreasureChestCount, rockModels, shellModels, shipModels, tvModels, treasureChestModel);
+        this.seabed = new Seabed(this.terrainWidth, rockCount, coralCount, shellCount, seaweedCount, shipCount, tvCount, bubbleColumnsCount ,treasureChestCount, rockModels, shellModels, shipModels, tvModels, treasureChestModel);
         this.cameraManager.setTargetTV(this.seabed.getTV());
         this.cameraManager.setTargetShip(this.seabed.sunkenShip);
         this.cameraManager.setTreasureChest(this.seabed.treasureChest);
@@ -186,10 +186,6 @@ class Aquarium extends THREE.Object3D {
 
     }
 
-    createBubbles() {
-        const bubbleGroup = new BubbleGroup(10);
-        this.addToAquarium(bubbleGroup);
-    }
 
     createFishes() {
         /*this.fishGroups = [

@@ -6,6 +6,8 @@ import { ShellGroup } from '../shell/ShellGroup.js';
 import { SeaweedGroup } from '../seaweed/SeaweedGroup.js';
 import { ShipGroup } from '../ship/ShipGroup.js';
 import { TVGroup } from '../tv/TVGroup.js';
+import { BubbleColumns } from "../bubble/BubbleColumns.js";
+
 import { CoralLOD } from '../coral/CoralLOD.js';
 import { SeaweedLOD } from '../seaweed/SeaweedLOD.js';
 import { TreasureChestGroup } from '../treasure/TreasureChestGroup.js';
@@ -19,6 +21,7 @@ class Seabed extends THREE.Object3D {
         seaweedCount = 20,
 		shipCount = 1,
 		tvCount = 1,
+		bubbleColumnsCount = 5,
 		treasureChestCount = 1,
 		rockModels = [],
         shellModels = [],
@@ -37,6 +40,7 @@ class Seabed extends THREE.Object3D {
 		this.seaweedCount = seaweedCount;
 		this.shipCount = shipCount;
 		this.tvCount = tvCount;
+		this.bubbleColumnsCount = bubbleColumnsCount;
 		this.treasureChestCount = treasureChestCount;
 
         // Models
@@ -121,6 +125,7 @@ class Seabed extends THREE.Object3D {
 		this.createCoralGroup();
         this.createShellGroup();
 		this.createSeaweedGroup();
+		this.createBubbleColumns();
 	}
 
 	createTreasureChest() {
@@ -407,7 +412,6 @@ class Seabed extends THREE.Object3D {
             if (positions.length > 0) {
                 const pos = positions[0];
                 
-
                 const rotation = new THREE.Euler(
                     0, 
                     THREE.MathUtils.randFloat(0, Math.PI * 2), 
@@ -425,6 +429,58 @@ class Seabed extends THREE.Object3D {
         this.seaweedGroup = new SeaweedGroup(seaweedData);
         this.add(this.seaweedGroup);
     }
+
+	createBubbleColumns() {
+		// Number of rift vents
+		const riftPositions = this.computeRiftPositions(this.bubbleColumnsCount);
+		console.log('Rift positions for bubble columns:', riftPositions);
+		if (riftPositions.length === 0) return;
+
+		this.bubbleColumns = new BubbleColumns(
+			riftPositions,
+			15,     // max bubble height
+			600    // total particles
+		);
+
+		this.add(this.bubbleColumns);
+	}
+
+	computeRiftPositions(count, maxTries = 50) {
+		const positions = [];
+
+		const effectiveSize = this.terrainSize * this.marginFactor;
+		const minX = -effectiveSize / 2 * 4 / 5;
+		const maxX =  effectiveSize / 2 ;
+		const minZ = 0;
+		const maxZ =  effectiveSize / 2 ;
+
+		for (let i = 0; i < count; i++) {
+			let pos, tries = 0;
+
+			do {
+				const x = THREE.MathUtils.randFloat(minX, maxX);
+				const z = THREE.MathUtils.randFloat(minZ, maxZ);
+
+				const { height, inRiftZone } = this.terrain.getHeightAt(x, z);
+
+				// Accept only rift zones
+				if (!inRiftZone) {
+					console.warn('Rejected position outside rift zone');
+					tries++;
+					continue;
+				}
+
+				pos = new THREE.Vector3(x, height, z);
+				tries++;
+			} while ((!pos) && tries < maxTries);
+
+			if (pos && tries < maxTries) {
+				positions.push(pos);
+			}
+		}
+		
+		return positions;
+	}
 
 	// Helper to visualize the collision radius
     addDebugVisual(position, radius, collisionRadius) {
@@ -507,9 +563,15 @@ class Seabed extends THREE.Object3D {
                 const x = THREE.MathUtils.randFloat(-halfSize, halfSize);
                 const z = THREE.MathUtils.randFloat(-halfSize, halfSize);
                 
-                const y = this.terrain ? this.terrain.getHeightAt(x, z) : 0; 
+                const { height, inRiftZone } = this.terrain.getHeightAt(x, z);
+
+				// Reject rift zones for regular objects
+				if (inRiftZone) {
+					tries++;
+					continue;
+				}
                 
-                pos = new THREE.Vector3(x, y, z);
+                pos = new THREE.Vector3(x, height, z);
                 
                 // CHECK COLLISION using the padded size
                 if (this.isLocationFree(pos, collisionRadius)) {
