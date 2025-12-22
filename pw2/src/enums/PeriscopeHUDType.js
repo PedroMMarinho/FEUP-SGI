@@ -1,6 +1,5 @@
 const PeriscopeHUDType = Object.freeze({
-    VIEW: 'View',
-    DOF: 'DOF',
+    NONE: 'None',
     TINT: 'Tint',
     SCRATCHES: 'Scratches',
     HUD: 'HUD',

@@ -47,9 +47,9 @@ export class BubbleColumns extends THREE.Object3D {
         p.ages[i] = 0;
         p.lifetimes[i] = 2 + Math.random() * 20;
 
-        p.colors[i] = 1.0;
-        p.colors[i+1] = 1.0;
-        p.colors[i+2] = 1.0;
+        p.colors[i3] = 1.0;
+        p.colors[i3+1] = 1.0;
+        p.colors[i3+2] = 1.0;
     }
 
     updateState() {

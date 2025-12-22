@@ -13,9 +13,9 @@ class TerrainSegment extends THREE.Object3D {
     this.displacementScale = 3.0;
     this.displacementRepeat = 4.0;
 
-    this.riftScale = 10.0;
+    this.riftScale = 5.0;
     this.riftRepeat = 1.0;
-    this.riftThreshold = 0.55;
+    this.riftThreshold = 0.8;
 
     // Geometry
     const geometry = new THREE.PlaneGeometry(width, height, widthSegments, heightSegments);
@@ -75,7 +75,7 @@ material.onBeforeCompile = (shader) => {
   shader.uniforms.riftFloorTexture = { value: magmaTexture }; 
   shader.uniforms.riftFloorNormal = { value: magmaNormal }; 
   shader.uniforms.riftThreshold = { value: this.riftThreshold };
-  shader.uniforms.floorHeightThreshold = { value: -7.0 }; // Height where floor texture starts
+  shader.uniforms.floorHeightThreshold = { value: -4.0 }; // Height where floor texture starts
   shader.uniforms.floorBlendHeight = { value: 2.0 }; // Blend range for floor
 
   // Add varying for interpolated height in vertex shader
