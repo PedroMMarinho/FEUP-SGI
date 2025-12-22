@@ -9,6 +9,7 @@ class BVHManager {
         this.scene = scene;
         this.keyManager = keyManager;
         this.cameraManager = cameraManager;
+		this.sandSystem = null;
         this.useBVH = false;
         this.selected = null;
         this.originalMaterials = new Map();
@@ -172,16 +173,24 @@ class BVHManager {
 				return;
 			}
 			const root = this.findAncestorWithFlag(picked, 'rootObject');	
-            if (root.bvhSelectable) this.selectObject(root);
+            if (root != null && root.bvhSelectable) this.selectObject(root);
         } else {
             this.selectObject(null);
         }
     }
 
 	spawnSandPuff(pt, normal) {
-		console.log("Sand here!!")
-		console.log(pt);
-		console.log(normal);
+		if (this.sandSystem != null) {
+			console.log("emitting sand puff!!")
+			this.sandSystem.emitPuff({
+				position: pt,
+				normal: normal
+			});
+		}
+	}
+
+	attachSandSystem(sandsystem) {
+		this.sandSystem = sandsystem;
 	}
 
     selectObject(object) {
