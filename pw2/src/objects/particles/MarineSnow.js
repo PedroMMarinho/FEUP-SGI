@@ -163,40 +163,95 @@ export class MarineSnow extends THREE.Group {
             //    }
             //}
 
-            // --- 3. FLOOR COLLISION & GRAVITY ---
-            let floorY = -1000;
-            if (this.heightAt) floorY = this.heightAt(px, pz);
+           // --- FLOOR COLLISION & GRAVITY ---
+            let floorY = -100;
+            let inRift = false;
 
-            if (py <= floorY && !p.isDying) {
-                py = floorY; 
-                p.velocity.y = Math.abs(p.velocity.y) * this.settings.bounceRestitution;
-                p.isDying = true;
-            } 
-            else if (py > floorY) {
-                if(p.isDying) {
-                    p.velocity.y -= this.settings.gravity * dt;
+            if (this.heightAt) {
+                const terrainInfo = this.heightAt(px, pz);
+                floorY = terrainInfo.height;
+                inRift = terrainInfo.inRiftZone;
+            }
+
+            const distToFloor = py - floorY;
+            const heatThreshold = 4; // The height at which it starts turning orange
+
+            // Proximity Gradient (Heat up over time)
+            if (!p.isDying) {
+                if (inRift && distToFloor < heatThreshold && distToFloor > 0) {
+                    
+                    const heatFactor = 1.0 - (distToFloor / heatThreshold);
+
+                    colors[i3]     = 1.0;                           
+                    colors[i3 + 1] = 1.0 - (0.5 * heatFactor);       
+                    colors[i3 + 2] = 1.0 - (1.0 * heatFactor);       
+
                 } else {
-                    p.velocity.y = -p.baseFallSpeed; 
+                    colors[i3] = 1; colors[i3+1] = 1; colors[i3+2] = 1;
                 }
             }
 
-            // --- 4. FADING & RESPAWN ---
-            if (p.isDying) {
-                p.life -= this.settings.fadeSpeed * dt;
+            // Check Collision
+            if (py <= floorY && !p.isDying) {
                 
-                const displayLife = Math.max(0, p.life);
-                colors[i3] = displayLife;
-                colors[i3 + 1] = displayLife;
-                colors[i3 + 2] = displayLife;
+                py = floorY;
 
+                if (inRift) {
+                    // --- RIFT BOUNCE LOGIC ---
+                    p.isScorched = true; 
+
+                    colors[i3] = 1.0; colors[i3+1] = 0.5; colors[i3+2] = 0.0;
+
+                    p.velocity.y = Math.abs(p.velocity.y) * this.settings.bounceRestitution;
+                    
+                    p.isDying = true;
+                    p.life -= 0.35; 
+
+                } else {
+                    // --- NORMAL BOUNCE LOGIC ---
+                    p.velocity.y = Math.abs(p.velocity.y) * this.settings.bounceRestitution;
+                    p.isDying = true;
+                }
+
+            } else if (py > floorY) {
+                if (p.isDying) {
+                    p.velocity.y -= this.settings.gravity * dt;
+                } else {
+                    p.velocity.y = -p.baseFallSpeed;
+                }
+            }
+
+            // --- FADING & RESPAWN ---
+            if (p.isDying) {
+                const fadeRate = this.settings.fadeSpeed;
+                p.life -= fadeRate * dt;
+
+                const displayLife = Math.max(0, p.life);
+                
+                if (p.isScorched) {
+                    colors[i3]     = 1.0 * displayLife; 
+                    colors[i3 + 1] = 0.5 * displayLife; 
+                    colors[i3 + 2] = 0.0 * displayLife; 
+                } else {
+                    colors[i3]     = displayLife;
+                    colors[i3 + 1] = displayLife;
+                    colors[i3 + 2] = displayLife;
+                }
+
+                // Respawn
                 if (p.life <= 0) {
                     const newData = this.createParticleData(i3);
-                    Object.assign(p, newData); 
+                    Object.assign(p, newData);
+
+                    // RESET flags
+                    p.isScorched = false; 
+                    p.isDying = false;
 
                     px = (Math.random() - 0.5) * this.bounds.width;
                     py = this.bounds.height;
                     pz = (Math.random() - 0.5) * this.bounds.depth;
-                    
+
+                    // Reset to White
                     colors[i3] = 1; colors[i3 + 1] = 1; colors[i3 + 2] = 1;
                 }
             }

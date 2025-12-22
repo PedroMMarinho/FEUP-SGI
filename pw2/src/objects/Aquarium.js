@@ -112,9 +112,9 @@ class Aquarium extends THREE.Object3D {
             driftSpeed: [0.04, 0.01],      // Horizontal drift speed
             swayFrequency: [0.5, 2.0],   // Faster swaying
             swayAmplitude: 0.2,          // More pronounced sway
-            gravity: 0.4,                // Reduced gravity effect
-            bounce: 1.4,      // Less bounce
-            fadeSpeed: 1,              // Fades fast 
+            gravity: 0.1,                // Reduced gravity effect
+            bounce: 0.9,      // Less bounce
+            fadeSpeed: 0.8,              // Fades fast 
         },
     );
     this.addToAquarium(marineSnow);
