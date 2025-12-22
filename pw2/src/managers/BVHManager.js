@@ -70,15 +70,16 @@ class BVHManager {
             object.children.forEach(child => this.setupBVH(child));
         }
     }
-
-    // Find the root parent of an object by checking rootObject property
-    findRoot(object) {
-        let current = object;
-        while (current.parent && !current.rootObject) {
-            current = current.parent;
-        }
-        return current;
-    }
+	
+	// Find the parent of an object with a certain flag: useful for finding root objects or seabeds
+	findAncestorWithFlag(object, flag) {
+		let current = object;
+		while (current) {
+			if (current[flag]) return current;
+			current = current.parent;
+		}
+		return null;
+	}
 
     // Store original materials recursively
     storeOriginalMaterials(object) {
@@ -158,13 +159,30 @@ class BVHManager {
         const intersects = raycaster.intersectObjects(this.meshes, true);
 
         if (intersects.length > 0) {
-            const picked = intersects[0].object;
-            const root = this.findRoot(picked);
+			const hit = intersects[0];
+            const picked = hit.object;
+			const seabed = this.findAncestorWithFlag(picked, 'isSeabed');
+
+			if (seabed) {
+				const normal = hit.face.normal
+					.clone()
+					.transformDirection(picked.matrixWorld);
+
+				this.spawnSandPuff(hit.point, normal);
+				return;
+			}
+			const root = this.findAncestorWithFlag(picked, 'rootObject');	
             if (root.bvhSelectable) this.selectObject(root);
         } else {
             this.selectObject(null);
         }
     }
+
+	spawnSandPuff(pt, normal) {
+		console.log("Sand here!!")
+		console.log(pt);
+		console.log(normal);
+	}
 
     selectObject(object) {
         // If clicking same object or null, deselect
@@ -240,7 +258,7 @@ class BVHManager {
 
             if (intersects.length > 0) {
                 const hit = intersects[0];
-                const root = this.findRoot(hit.object);
+                const root = this.findAncestorWithFlag(hit.object, 'rootObject');
                 
                 objectsHit.add(root);
                 

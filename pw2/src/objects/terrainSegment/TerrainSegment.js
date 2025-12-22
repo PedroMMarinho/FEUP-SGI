@@ -16,6 +16,7 @@ class TerrainSegment extends THREE.Object3D {
     this.riftScale = 5.0;
     this.riftRepeat = 1.0;
     this.riftThreshold = 0.8;
+	this.isSeabed = true;
 
     // Geometry
     const geometry = new THREE.PlaneGeometry(width, height, widthSegments, heightSegments);
