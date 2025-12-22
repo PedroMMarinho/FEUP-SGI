@@ -173,14 +173,17 @@ class BVHManager {
 			const hit = intersects[0];
             const picked = hit.object;
 			const seabed = this.findAncestorWithFlag(picked, 'isSeabed');
-
-			if (seabed) {
-				const normal = hit.face.normal
+			if (seabed ) {
+                const { _ , inRiftZone }= seabed.getHeightAt(hit.point.x, hit.point.z);
+                if (!inRiftZone){
+                    const normal = hit.face.normal
 					.clone()
 					.transformDirection(picked.matrixWorld);
 
 				this.spawnSandPuff(hit.point, normal);
 				return;
+                }
+
 			}
 			const root = this.findRoot(picked);	
             if (root.bvhSelectable) this.selectObject(root);
