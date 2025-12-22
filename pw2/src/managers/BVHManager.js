@@ -182,7 +182,7 @@ class BVHManager {
 				this.spawnSandPuff(hit.point, normal);
 				return;
 			}
-			const root = this.findRoot(picked, 'rootObject');	
+			const root = this.findRoot(picked);	
             if (root.bvhSelectable) this.selectObject(root);
         } else {
             this.selectObject(null);
