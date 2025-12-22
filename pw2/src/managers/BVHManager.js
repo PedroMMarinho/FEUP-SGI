@@ -71,8 +71,18 @@ class BVHManager {
             object.children.forEach(child => this.setupBVH(child));
         }
     }
-	
-	// Find the parent of an object with a certain flag: useful for finding root objects or seabeds
+
+	// Find the root parent of an object by checking rootObject property
+    findRoot(object) {
+        let current = object;
+        while (current.parent && !current.rootObject) {
+            current = current.parent;
+        }
+        return current;
+    }
+
+	// Find the parent of an object with a certain flag
+	// WARNING: may return null!
 	findAncestorWithFlag(object, flag) {
 		let current = object;
 		while (current) {
@@ -172,8 +182,8 @@ class BVHManager {
 				this.spawnSandPuff(hit.point, normal);
 				return;
 			}
-			const root = this.findAncestorWithFlag(picked, 'rootObject');	
-            if (root != null && root.bvhSelectable) this.selectObject(root);
+			const root = this.findRoot(picked, 'rootObject');	
+            if (root.bvhSelectable) this.selectObject(root);
         } else {
             this.selectObject(null);
         }
@@ -267,10 +277,9 @@ class BVHManager {
 
             if (intersects.length > 0) {
                 const hit = intersects[0];
-                const root = this.findAncestorWithFlag(hit.object, 'rootObject');
-                
-                objectsHit.add(root);
-                
+                const root = this.findRoot(hit.object);
+				objectsHit.add(root);
+                 
                 // Optional: Color the hit ray red in debug mode
                 if (this.isDebugEnabled && this.arrowHelpers[i]) {
                     this.arrowHelpers[i].setColor(0xff0000); 
