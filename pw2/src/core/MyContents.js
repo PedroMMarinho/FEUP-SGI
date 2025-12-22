@@ -6,6 +6,7 @@ import { CollisionManager } from '../managers/CollisionManager.js';
 import { TimeManager } from '../managers/TimeManager.js';
 import { BVHManager } from '../managers/BVHManager.js';
 import { ScenarioManager } from '../managers/ScenarioManager.js';
+import { SandSystem } from '../objects/particles/SandSystem.js';
 
 /**
  *  This class contains the contents of out application
@@ -49,6 +50,9 @@ class MyContents {
 
         this.passManager.init(this.cameraManager.getActiveCamera(),this.aquarium);
 
+		this.sandSystem = new SandSystem();
+		this.sandSystem.addToScene(this.app.scene);
+		this.bvhManager.attachSandSystem(this.sandSystem);
     }
 
     enableAxis(value){
@@ -75,6 +79,7 @@ class MyContents {
     update() {
         this.bvhManager.raycastSelect();
         if (this.aquarium) this.aquarium.update();
+		this.sandSystem.update();
         this.keyManager.endOfFrame();
     }
 
