@@ -23,10 +23,7 @@ class GlassTank extends THREE.Object3D {
 
         const wallGeoX = new THREE.PlaneGeometry(depth, height); 
         const wallGeoZ = new THREE.PlaneGeometry(width, height); 
-        const bottomGeo = new THREE.PlaneGeometry(width, depth);
 
-        const bottom = new THREE.Mesh(bottomGeo, glassMaterial);
-        bottom.rotation.x = -Math.PI / 2;
 
         const backWall = new THREE.Mesh(wallGeoZ, glassMaterial);
         backWall.position.y = height / 2; 
@@ -50,7 +47,6 @@ class GlassTank extends THREE.Object3D {
         this.add(frontWall);
         this.add(leftWall);
         this.add(rightWall);
-        this.add(bottom);
         this.position.copy(position);
     }
 }
