@@ -10,7 +10,7 @@ class TerrainSegment extends THREE.Object3D {
     this.widthSegments = widthSegments;
     this.heightSegments = heightSegments;
 
-    this.displacementScale = 3.0;
+    this.displacementScale = 2.0;
     this.displacementRepeat = 4.0;
 
     this.riftScale = 5.0;
