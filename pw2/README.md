@@ -200,7 +200,11 @@ classDiagram
 
 - **Implementation:**
     - **Marine Snow:** Created a custom particle system (`THREE.Points`) to simulate organic debris falling through the water column.
-    - **TODO:** Implement Rising Bubbles and Sand Puff interaction (click-to-spawn).
+    - **Rising Bubbles:** Following the logic of the marine snow, a bubble particle system was implemented. These particles originate from a newly added **Rift** terrain feature and rise toward the surface.
+    - **Rift Terrain:** The rift was created by applying a secondary, sharper displacement pass on top of the standard terrain segments. To distinguish it visually, a custom shader was used to blend and apply multiple textures specifically within the rift's interior.
+    - **Sand Puffs:** This feature reuses the core marine snow particle visuals. Using the Raycasting method developed in Week 6, the system detects the exact point where a user clicks the seabed. If the intersection occurs on a "sand" texture (and not within the rift), a cluster of particles is spawned at that point and launched outwards to simulate a cloud of disturbed sediment.
+    - **Distance-Based** Simulation: As a performance measure to reduce unnecessary CPU overhead, a `simulateDistance` parameter was added to the particle objects. If the distance between the camera and a particle exceeds this threshold, the particle’s physics and updates are skipped, ensuring the engine only processes active elements in the user's immediate vicinity.
+
 
 - **Refinements:**
     - **Physics Interaction:** The snow doesn't ignore the environment. Each particle queries the terrain's exact height (using the CPU-side displacement data from Week 7) to physically land, bounce slightly, and settle on the seabed before fading out.
