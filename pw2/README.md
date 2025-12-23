@@ -62,8 +62,8 @@ classDiagram
 ### Weekly Assignments
 
 #### Week 1: Cameras, Primitives, and Scene Graph
-![Week 1 Demo](screenshots/week1_demo.gif)
-> *Fig 1. Demonstration of camera switching and wireframe mode.*
+![Week 1 Demo](screenshots/week1-demo.gif)
+> *Fig 1. Demonstration of camera switching, wireframe mode and placeholder objects.*
 
 - **Implementation:**
     - **Scene Graph:** Established the `Aquarium` class as the root node of the scene. Populated it with `Object3D` subclasses using basic placeholder geometries (cubes, spheres, cylinders) to represent entities like terrain, fish, and corals.
@@ -80,8 +80,8 @@ classDiagram
 
 
 #### Week 2: BufferGeometry, LOD, and L-Systems
-![Week 2 Demo](screenshots/week2_demo.gif)
-> *Fig 2. Parametric fish generation and L-System coral growth.*
+![Week 2 Demo](screenshots/week2-demo.gif)
+> *Fig 2. Parametric fish generation, L-System corals, LOD implementation and Shark model and animation.*
 
 - **Implementation:**
     - **BufferGeometry (Fish):** Replaced placeholder primitives with custom `THREE.BufferGeometry`. The `Fish` class manually defines vertices and indices to build the body, tail, and fins.
@@ -99,8 +99,12 @@ classDiagram
 
 
 #### Week 3: Animation
-![Week 3 Demo](screenshots/week3_demo.gif)
-> *Fig 3. Skinned fish animation and vertex-shader based sway.*
+![Week 3 Demo](screenshots/week3-demo.gif)
+> *Fig 3. Skinned fish animation, vertex-shader based sway.*
+![Week 3 High LOD fish](screenshots/high-LOD-fish.png)
+> *Fig 4. High LOD fish.*
+![Week 3 Low LOD fish](screenshots/low-LOD-fish.png)
+> *Fig 5. Low LOD fish*
 
 - **Implementation:**
     - **Skeletal Animation (Skinning):** Rigged the fish `BufferGeometry` with a simple bone structure (Head, Body, Tail). Vertices are weighted to these bones, allowing the fish to swim naturally by rotating the skeleton.
@@ -117,8 +121,10 @@ classDiagram
 
 
 #### Weeks 4 & 5: Interaction and Physics
-![Weeks 4 & 5 Demo](screenshots/week45_demo.gif)
-> *Fig 4. Submarine piloting and flocking boids behavior.*
+![Weeks 4 & 5 Demo](screenshots/week4-5-demo.gif)
+> *Fig 6. Submarine piloting.*
+![Week 4? Keyframe animation](screenshots/keyframed-fish-demo.gif)
+> *Fig 7. Keyframe fish animation (as implemented in the final delivery)*
 
 - **Implementation:**
     - **Submarine Controls:** Implemented a playable submarine piloted via keyboard.
@@ -140,9 +146,15 @@ classDiagram
 
 
 #### Week 6: Acceleration (BVH & Picking)
-![Week 6 Demo](screenshots/week6_demo.gif)
+![Week 6 boids](screenshots/week6-demo.gif)
+> *Fig 8. Flocking System*
+![Week 6 Coral](screenshots/coral-demo.gif)
+> *Fig 9. Coral Sway.*
+![Week 6 seaweed](screenshots/seaweed-demo.gif)
+> *Fig 10. Seaweed Sway.*
+![Week 6 Tv](screenshots/tv-demo.gif)
+> *Fig 11. TV with video texture.*
 
-> *Fig 5. Debug view of BVH rays and object selection.*
 
 - **Implementation:**
     - **Bounding Volume Hierarchy (BVH):** Integrated `three-mesh-bvh` to generate spatial bounds for complex geometry (rocks, terrain, submarine). This replaces standard expensive geometry checks with rapid tree traversal.
@@ -160,8 +172,16 @@ classDiagram
 
 
 #### Week 7: Advanced Textures
-![Week 7 Demo](screenshots/week7_demo.gif)
-> *Fig 6. Terrain displacement and video texture playback.*
+![Week 7 Demo](screenshots/week7-perlin-noise-demo.gif)
+> *Fig 12. Procederally generated fish skin.*
+![Week 7 collision](screenshots/collision-boxes-demo.png)
+> *Fig 13. BVH Collision boxes.*
+![Week 7 bvh](screenshots/week7-bvh-demo.gif)
+> *Fig 14. Highlighting objects using raycating.*
+![Week 7 Fish Raycasting](screenshots/bvh-demo.png)
+> *Fig 15. Representation of rays cast by fish*
+
+
 
 - **Implementation:**
     - **Terrain Texturing:** Applied high-resolution albedo, normal, and height maps to the seabed. Configured `RepeatWrapping` to tile textures seamlessly across the large plane.
@@ -176,8 +196,8 @@ classDiagram
 - **Postponed Work:** The implementation of the treasure chest was postponed to week 10.
 
 #### Week 8: Lighting and Shadows
-![Week 8 Demo](screenshots/week8_demo.gif)
-> *Fig 7. Dynamic spotlights and underwater fog.*
+![Week 8 Demo](screenshots/week8-demo.gif)
+> *Fig 16. Changing the parameters of the submarine lights.*
 
 - **Implementation:**
     - **Global Illumination:** Configured a `DirectionalLight` to simulate sunlight, complemented by an `AmbientLight` to soften harsh shadows.
@@ -191,8 +211,8 @@ classDiagram
 
 
 #### Week 9: Shaders and HUD
-![Week 9 Demo](screenshots/week9_demo.gif)
-> *Fig 8. Periscope HUD with post-processing stack.*
+![Week 9 Demo](screenshots/week9-demo.gif)
+> *Fig 17. Periscope HUD with post-processing stack.*
 
 - **Implementation:**
     - **Post-Processing Stack:** Leveraged `EffectComposer` to chain multiple visual effects.
@@ -210,8 +230,14 @@ classDiagram
     - **Aspect Ratio Correctness:** All screen-space effects (circular clips, crosshairs) dynamically update their `aspectRatio` uniform on window resize, guaranteeing that circles remain perfect circles on any display resolution.
 
 #### Week 10: Particle Systems
-![Week 10 Demo](screenshots/week10_demo.gif)
-> *Fig 9. Marine snow with physics collision.*
+![Week 10 Demo](screenshots/week10-bubbles-demo.gif)
+> *Fig 18. Bubble collumns.*
+![Week 10 Marine Snow](screenshots/week10-marine-snow-demo.gif)
+> *Fig 19. Marine snow with physics collision.*
+![Week 10 Sand Puff](screenshots/week10-sand-puff-demo.gif)
+> *Fig 20. Sand puffs.*
+![Week 10 Treasure Chest](screenshots/treasure-chest.gif)
+> *Fig 21. Treasure chest with animated gold.*
 
 - **Implementation:**
     - **Marine Snow:** Created a custom particle system (`THREE.Points`) to simulate organic debris falling through the water column. The system handles thousands of particles with individual physics (gravity, drift, sway).
@@ -227,8 +253,8 @@ classDiagram
 ### Extras
 
 #### Blender Integration
-![Blender Shark Demo](screenshots/shark_blender.gif)
-> *Fig 10. The handmade Shark: Mesh, Armature, and Animation workflow in Blender.*
+![Blender Shark Demo](screenshots/shark-blender-demo.gif)
+> *Fig 22. The handmade Shark: Mesh, Armature, and Animation workflow in Blender.*
 
 To achieve a higher degree of visual fidelity, we integrated a pipeline for importing complex `.glb` assets from Blender.
 
@@ -243,8 +269,8 @@ To achieve a higher degree of visual fidelity, we integrated a pipeline for impo
 
 
 #### Realistic Lighting (HDRI)
-![HDRI Environment](screenshots/hdri_environment.jpg)
-> *Fig 11. The "Hall of Finfish" HDRI environment map acting as the aquarium store background.*
+![HDRI Environment](screenshots/hdri-demo.gif)
+> *Fig 23. The "Hall of Finfish" HDRI environment map acting as the aquarium store background.*
 
 To enhance the atmosphere, we implemented a custom `HDRIManager` to load High Dynamic Range environments.
 - **Scenario:** We used the "Hall of Finfish" HDRI, which represents the interior of an aquarium store.
@@ -252,8 +278,8 @@ To enhance the atmosphere, we implemented a custom `HDRIManager` to load High Dy
 - **Visuals:** Beyond just being a background, this map provides the lighting data for the scene, allowing the submarine's metal and glass to reflect the store's lights and windows, grounding our project in a believable physical space.
 
 #### Dynamic Water Surface
-![Dynamic Water and HDRI](screenshots/water_hdri.gif)
-> *Fig 12. Dynamic water surface reflections and the surrounding aquarium store environment.*
+![Dynamic Water and HDRI](screenshots/water-demo.gif)
+> *Fig 24. Dynamic water surface reflections and the surrounding aquarium store environment.*
 
 To complete the aquarium illusion, we added a realistic water surface at the top of the tank.
 - **Vertex Displacement:** We hooked into the `onBeforeCompile` stage of a `MeshStandardMaterial`. A height map texture is sampled in the vertex shader to physically displace the water plane's vertices.
@@ -262,8 +288,8 @@ To complete the aquarium illusion, we added a realistic water surface at the top
 - **Integration:** The surface uses the global `envMap` to reflect the "aquarium store" ceiling, seamlessly blending the water with the outside world.
 
 #### Procedural Seabed Placement
-![Seabed Distribution](screenshots/seabed_distribution.gif)
-> *Fig 13. Debug view showing the bounding circles and non-overlapping distribution of rocks and corals.*
+![Seabed Distribution](screenshots/seabed-collisions-demo.png)
+> *Fig 25. Debug view showing the bounding circles and non-overlapping distribution of rocks and corals.*
 
 We implemented a robust "Circle Packing" algorithm to distribute hundreds of items (rocks, corals, shells, chests) naturally across the seabed without overlap.
 - **Bounding Circle Logic:** Every object type (from small shells to the large sunken ship) automatically calculates its own `baseRadius` by measuring its bounding box at runtime.
@@ -273,8 +299,8 @@ We implemented a robust "Circle Packing" algorithm to distribute hundreds of ite
     
     
 #### Rift Terrain 
-![Rift Detail](screenshots/rift_detail.gif)
-> *Fig 14. The procedural rift with magma floor and blended rock walls.*
+![Rift Detail](screenshots/rift-demo.gif)
+> *Fig 26. The procedural rift with magma floor and blended rock walls.*
 
 The rift is a major terrain feature created by stacking displacement maps.
 - **Dual Displacement:** We apply a secondary "Rift Map" (`rift-map`) on top of the standard Perlin noise height map. This map subtracts height values significantly in specific areas, carving out deep trenches in the seabed.
