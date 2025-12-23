@@ -152,14 +152,17 @@ classDiagram
 ![Week 6 boids](screenshots/week6-demo.gif)
 > *Fig 8. Flocking System*
 
+![Week 6 boid Cam](screenshots/boid-demo.gif)
+>*Fig 9. Fish Cam*
+
 ![Week 6 Coral](screenshots/coral-demo.gif)
-> *Fig 9. Coral Sway.*
+> *Fig 10. Coral Sway.*
 
 ![Week 6 seaweed](screenshots/seaweed-demo.gif)
-> *Fig 10. Seaweed Sway.*
+> *Fig 11. Seaweed Sway.*
 
 ![Week 6 Tv](screenshots/tv-demo.gif)
-> *Fig 11. TV with video texture.*
+> *Fig 12. TV with video texture.*
 
 
 - **Implementation:**
@@ -179,16 +182,16 @@ classDiagram
 
 #### Week 7: Advanced Textures
 ![Week 7 Demo](screenshots/week7-perlin-noise-demo.gif)
-> *Fig 12. Procederally generated fish skin.*
+> *Fig 13. Procederally generated fish skin.*
 
 ![Week 7 collision](screenshots/collision-boxes-demo.png)
-> *Fig 13. BVH Collision boxes.*
+> *Fig 14. BVH Collision boxes.*
 
 ![Week 7 bvh](screenshots/week7-bvh-demo.gif)
-> *Fig 14. Highlighting objects using raycating.*
+> *Fig 15. Highlighting objects using raycating.*
 
 ![Week 7 Fish Raycasting](screenshots/bvh-demo.png)
-> *Fig 15. Representation of rays cast by fish*
+> *Fig 16. Representation of rays cast by fish*
 
 
 
@@ -206,7 +209,7 @@ classDiagram
 
 #### Week 8: Lighting and Shadows
 ![Week 8 Demo](screenshots/week8-demo.gif)
-> *Fig 16. Changing the parameters of the submarine lights.*
+> *Fig 17. Changing the parameters of the submarine lights.*
 
 - **Implementation:**
     - **Global Illumination:** Configured a `DirectionalLight` to simulate sunlight, complemented by an `AmbientLight` to soften harsh shadows.
@@ -221,7 +224,7 @@ classDiagram
 
 #### Week 9: Shaders and HUD
 ![Week 9 Demo](screenshots/week9-demo.gif)
-> *Fig 17. Periscope HUD with post-processing stack.*
+> *Fig 18. Periscope HUD with post-processing stack.*
 
 - **Implementation:**
     - **Post-Processing Stack:** Leveraged `EffectComposer` to chain multiple visual effects.
@@ -240,16 +243,16 @@ classDiagram
 
 #### Week 10: Particle Systems
 ![Week 10 Demo](screenshots/week10-bubbles-demo.gif)
-> *Fig 18. Bubble collumns.*
+> *Fig 19. Bubble collumns.*
 
 ![Week 10 Marine Snow](screenshots/week10-marine-snow-demo.gif)
-> *Fig 19. Marine snow with physics collision.*
+> *Fig 20. Marine snow with physics collision.*
 
 ![Week 10 Sand Puff](screenshots/week10-sand-puff-demo.gif)
-> *Fig 20. Sand puffs.*
+> *Fig 21. Sand puffs.*
 
 ![Week 10 Treasure Chest](screenshots/treasure-chest.gif)
-> *Fig 21. Treasure chest with animated gold.*
+> *Fig 22. Treasure chest with animated gold.*
 
 - **Implementation:**
     - **Marine Snow:** Created a custom particle system (`THREE.Points`) to simulate organic debris falling through the water column. The system handles thousands of particles with individual physics (gravity, drift, sway).
@@ -262,11 +265,12 @@ classDiagram
     - **Efficient Recycling:** All particle systems utilize object pooling (recycling). Instead of creating/destroying `THREE.Points` every frame (which would cause garbage collection stutters), particles are simply reset and repositioned when they die or exit the view volume.
 
 
+
 ### Extras
 
 #### Blender Integration
 ![Blender Shark Demo](screenshots/shark-blender-demo.gif)
-> *Fig 22. The handmade Shark: Mesh, Armature, and Animation workflow in Blender.*
+> *Fig 23. The handmade Shark: Mesh, Armature, and Animation workflow in Blender.*
 
 To achieve a higher degree of visual fidelity, we integrated a pipeline for importing complex `.glb` assets from Blender.
 
@@ -282,7 +286,7 @@ To achieve a higher degree of visual fidelity, we integrated a pipeline for impo
 
 #### Realistic Lighting (HDRI)
 ![HDRI Environment](screenshots/hdri-demo.gif)
-> *Fig 23. The "Hall of Finfish" HDRI environment map acting as the aquarium store background.*
+> *Fig 24. The "Hall of Finfish" HDRI environment map acting as the aquarium store background.*
 
 To enhance the atmosphere, we implemented a custom `HDRIManager` to load High Dynamic Range environments.
 - **Scenario:** We used the "Hall of Finfish" HDRI, which represents the interior of an aquarium store.
@@ -291,7 +295,7 @@ To enhance the atmosphere, we implemented a custom `HDRIManager` to load High Dy
 
 #### Dynamic Water Surface
 ![Dynamic Water and HDRI](screenshots/water-demo.gif)
-> *Fig 24. Dynamic water surface reflections and the surrounding aquarium store environment.*
+> *Fig 25. Dynamic water surface reflections and the surrounding aquarium store environment.*
 
 To complete the aquarium illusion, we added a realistic water surface at the top of the tank.
 - **Vertex Displacement:** We hooked into the `onBeforeCompile` stage of a `MeshStandardMaterial`. A height map texture is sampled in the vertex shader to physically displace the water plane's vertices.
@@ -301,7 +305,7 @@ To complete the aquarium illusion, we added a realistic water surface at the top
 
 #### Procedural Seabed Placement
 ![Seabed Distribution](screenshots/seabed-collisions-demo.png)
-> *Fig 25. Debug view showing the bounding circles and non-overlapping distribution of rocks and corals.*
+> *Fig 26. Debug view showing the bounding circles and non-overlapping distribution of rocks and corals.*
 
 We implemented a robust "Circle Packing" algorithm to distribute hundreds of items (rocks, corals, shells, chests) naturally across the seabed without overlap.
 - **Bounding Circle Logic:** Every object type (from small shells to the large sunken ship) automatically calculates its own `baseRadius` by measuring its bounding box at runtime.
@@ -312,7 +316,7 @@ We implemented a robust "Circle Packing" algorithm to distribute hundreds of ite
     
 #### Rift Terrain 
 ![Rift Detail](screenshots/rift-demo.gif)
-> *Fig 26. The procedural rift with magma floor and blended rock walls.*
+> *Fig 27. The procedural rift with magma floor and blended rock walls.*
 
 The rift is a major terrain feature created by stacking displacement maps.
 - **Dual Displacement:** We apply a secondary "Rift Map" (`rift-map`) on top of the standard Perlin noise height map. This map subtracts height values significantly in specific areas, carving out deep trenches in the seabed.
