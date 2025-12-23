@@ -257,18 +257,19 @@ class FishGroup extends THREE.Object3D {
             highResClone.isSkinned = true;
             lowResClone.isSkinned = false;
 
+			const scale = THREE.MathUtils.randFloat(0.8, 1.8);
+
 			const fishLOD = new FishLOD(
                 lodPrototypes,
                 this.sparseness,
                 this.baseHeight, 
                 this.maxHeight, 
                 this.boidProps,
-                1.0 // default bodyLenRatio
+                scale // default bodyLenRatio
             );
 
 
 			fishLOD.rotation.y = THREE.MathUtils.randFloat(0, Math.PI * 2);
-			const scale = THREE.MathUtils.randFloat(0.8, 1.8);
 			fishLOD.scale.set(scale, scale, scale);
 
 			this.add(fishLOD);
