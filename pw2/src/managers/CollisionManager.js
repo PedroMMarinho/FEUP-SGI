@@ -18,8 +18,9 @@ class CollisionManager {
         this.bvhManager = bvhManager;
 
         // Spatial grid for optimization
-        this.gridCellSize = 40;
+        this.gridCellSize = 25;
         this.spatialGrid = new Map();
+        this._tempCenter = new THREE.Vector3();
         
         // Visualization toggle
         this.showBoxes = false;
@@ -106,6 +107,16 @@ class CollisionManager {
             for (const entity of cellEntities) {
                 const entityPos = entity.pos || entity.position;
                 const distSq = position.distanceToSquared(entityPos);
+
+                // Change awareness radius based on entity type
+                if (entity.type === EntityType.STATIC_OBSTACLE) {
+                    const entityRadius = this.getEntityRadius(entity) || 0;
+                    const adjustedRadiusSq = (radius + entityRadius) * (radius + entityRadius);
+                    if (distSq <= adjustedRadiusSq) {
+                        nearby.push(entity);
+                    }
+                    continue;
+                }
 
                 if (distSq <= radiusSq) {
                     nearby.push(entity);
@@ -231,6 +242,24 @@ class CollisionManager {
             collisionBox: collisionBox,
             localCenterOffset: localCenterOffset 
         });
+    }
+
+    getEntityCenter(entity) {
+        if (entity.type === EntityType.FISH) {
+            return entity.pos || entity.position;
+        }
+
+        // 2. For complex objects (Shark, Sub, Obstacles), get the calculated center
+        const boxData = this.awarenessBoxes.get(entity);
+        if (boxData && boxData.localCenterOffset) {
+            this._tempCenter.copy(boxData.localCenterOffset);
+            this._tempCenter.applyQuaternion(entity.quaternion);
+            this._tempCenter.add(entity.position);
+            
+            return this._tempCenter;
+        }
+
+        return entity.position;
     }
 
     getGridKey(position) {

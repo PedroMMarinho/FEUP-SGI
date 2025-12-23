@@ -38,7 +38,7 @@ export class BlenderManager {
     const lodArray = this.models.get(key);
     lodArray[lodLevel] = gltf;
 
-    console.log(`✅ Loaded ${key} (LOD ${lodLevel}): ${url}`);
+    //console.log(`✅ Loaded ${key} (LOD ${lodLevel}): ${url}`);
     return gltf;
   }
 

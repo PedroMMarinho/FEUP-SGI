@@ -71,14 +71,14 @@ export class AssetManager {
 
     async loadBlenderModels() {
 
-        console.log('🌀 Loading Blender models...');
+        //console.log('🌀 Loading Blender models...');
         const modelList = this.initBlenderModels();
 
         for (const model of modelList) {
             await this.blenderManager.loadModel(model.key, model.url, model.lod);
         }
 
-        console.log('✅ All Blender models loaded.');
+        //console.log('✅ All Blender models loaded.');
     }
 
     initTextures() {
@@ -125,12 +125,12 @@ export class AssetManager {
     }
 
     loadTextures() {
-        console.log('🌀 Loading textures...');
+        //console.log('🌀 Loading textures...');
 
         const textureMap = this.initTextures();
         this.textureManager.preload(textureMap);
 
-        console.log('✅ All textures loaded.');
+        //console.log('✅ All textures loaded.');
     }
 
     initHDRIs() {
@@ -141,12 +141,12 @@ export class AssetManager {
     }
 
     async loadHDRIs() {
-        console.log('🌀 Loading HDRIs...')
+        //console.log('🌀 Loading HDRIs...')
         const hdriList = this.initHDRIs()
         for (const hdri of hdriList) {
             await this.hdriManager.loadHDRI(hdri.key, hdri.url);
         }
-        console.log('✅ All HDRIs loaded.');
+        //console.log('✅ All HDRIs loaded.');
     }
 
     async preloadAll() {
@@ -182,7 +182,7 @@ export class AssetManager {
      * Clears all loaded assets (useful for scene reloads).
      */
     clear() {
-        console.log('🧹 Clearing all loaded assets...');
+        //console.log('🧹 Clearing all loaded assets...');
         this.textureManager.clear();
         this.blenderManager.clear();
         this.hdriManager.clear();

@@ -201,11 +201,11 @@ class Aquarium extends THREE.Object3D {
         }*/
 
         this.boidProps = {
-            cohesion: 2,
-            separation: 2.7,
-            alignment: 1.4,
+            cohesion: 3.8,
+            separation: 3.8,
+            alignment: 1.1,
             moveSpeed: 3.6,
-            awareness: 8
+            awareness: 4
         };
 
         this.fishGroups = [

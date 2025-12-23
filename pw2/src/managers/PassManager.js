@@ -38,7 +38,7 @@ class PassManager {
     constructor(renderer, scene) {
         
         PassManager.renderer = renderer;
-        console.log("renderer:", PassManager.renderer)
+        //console.log("renderer:", PassManager.renderer)
         this.scene = scene;
         this.textureManager = TextureManager.getInstance();
         
@@ -150,7 +150,7 @@ class PassManager {
         this.passes.scratches.enabled = false;
         this.composer.addPass(this.passes.scratches);
         const tex = this.textureManager.getTexture(this.config.scratches.tScratches)
-        console.log(tex)
+        //console.log(tex)
         this.passes.scratches.uniforms['tScratches'].value = tex;
         this.passes.scratches.uniforms['intensity'].value = this.config.scratches.intensity;
         this.passes.scratches.uniforms['aspectRatio'].value  = window.innerWidth / window.innerHeight;
@@ -184,7 +184,7 @@ class PassManager {
         const tex = this.textureManager.getTexture(this.config.coords.fontMap)
         tex.magFilter = THREE.NearestFilter;
         tex.minFilter = THREE.NearestFilter;
-        console.log(tex)
+        //console.log(tex)
         this.passes.coords.uniforms['fontMap'].value = this.textureManager.getTexture(this.config.coords.fontMap);
         this.passes.coords.uniforms['intensity'].value = this.config.coords.intensity;
         this.passes.coords.uniforms['glyphSize'].value = this.config.coords.glyphSize.value;
@@ -199,7 +199,7 @@ class PassManager {
         });
 
         const coordsText = this.formatCoordsText(initialCoords);
-        console.log(coordsText);
+        //console.log(coordsText);
         this.setHUDText(
             coordsText,
             this.passes.coords,
@@ -336,7 +336,7 @@ setHUDText(
     }
 
     setHUDType(type, cameraName) {
-        console.log(`Setting HUD Type to ${type} for camera ${cameraName}`);
+        //console.log(`Setting HUD Type to ${type} for camera ${cameraName}`);
 
         // Guard Clause
         if (cameraName !== 'Submarine View') return;
@@ -463,7 +463,7 @@ setHUDText(
         if (!PassManager.renderer) {
             console.warn("PassManager renderer not initialized yet");
         }
-        console.log(PassManager.renderer)
+        //console.log(PassManager.renderer)
         return PassManager.renderer;
     }
 }

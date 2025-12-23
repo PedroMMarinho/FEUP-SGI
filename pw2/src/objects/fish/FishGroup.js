@@ -223,7 +223,6 @@ class FishGroup extends THREE.Object3D {
     }
 
    applyScaling(mesh, isHighRes) {
-        // 1. Get Geometry Data
         const tempFish = new Fish(isHighRes ? 0 : 1); 
         tempFish.bodyGeometry.computeBoundingBox();
         
@@ -231,11 +230,16 @@ class FishGroup extends THREE.Object3D {
         const size = new THREE.Vector3();
         tempFish.bodyGeometry.boundingBox.getCenter(center);
         tempFish.bodyGeometry.boundingBox.getSize(size);
-        const min = tempFish.bodyGeometry.boundingBox.min;
         
         const scaleFact = this.fishSize / size.length();
         
-        const tra = new THREE.Matrix4().makeTranslation(-center.x, -center.y, -min.z);
+    
+        const tra = new THREE.Matrix4().makeTranslation(
+            -center.x, 
+            -center.y, 
+            -center.z 
+        );
+        
         const sca = new THREE.Matrix4().makeScale(scaleFact, scaleFact, scaleFact);
         
         mesh.applyMatrix4(tra);
@@ -257,7 +261,7 @@ class FishGroup extends THREE.Object3D {
             highResClone.isSkinned = true;
             lowResClone.isSkinned = false;
 
-			const scale = THREE.MathUtils.randFloat(0.8, 1.8);
+			const scale = THREE.MathUtils.randFloat(0.8, 1.2);
 
 			const fishLOD = new FishLOD(
                 lodPrototypes,

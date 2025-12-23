@@ -44,7 +44,7 @@ export class HDRIManager {
 
     this.hdrTextures.set(key, hdri);
 
-    console.log(`Loaded HDRI "${key}": ${url}`);
+    //console.log(`Loaded HDRI "${key}": ${url}`);
     return hdri;
   }
 
@@ -68,6 +68,6 @@ export class HDRIManager {
     this.hdrTextures.forEach((texture) => texture.dispose());
     this.hdrTextures.clear();
     this.pmremGenerator.dispose();
-    console.log('HDRIManager: cleared all textures');
+    //console.log('HDRIManager: cleared all textures');
   }
 }
