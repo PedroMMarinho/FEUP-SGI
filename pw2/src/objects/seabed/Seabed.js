@@ -239,7 +239,7 @@ class Seabed extends THREE.Object3D {
     }
 
 	createTerrain() {
-		const terrain = new TerrainSegment(this.terrainSize, this.terrainSize);
+		const terrain = new TerrainSegment(this.terrainSize, this.terrainSize, 128, 128);
 		this.terrain = terrain;
 		this.add(terrain);
 	}

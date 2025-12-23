@@ -1,14 +1,20 @@
 import * as THREE from "three";
 import { BubbleParticle } from "./BubbleParticle.js";
 import { TimeManager } from "../../managers/TimeManager.js";
+import { CameraManager } from "../../managers/CameraManager.js";
 
 export class BubbleColumns extends THREE.Object3D {
-    constructor(columns = [], maxHeight = 6, particleCount = 200) {
+    constructor(columns = [], maxHeight = 6, particleCount = 200, simulateDistance = 50) {
         super();
         this.timeManager = TimeManager.getInstance();
         this.columns = columns;
         this.maxHeight = maxHeight;
+
+        this.isUsingLOD = false;
+        this.simulateDistance = simulateDistance; 
         this.lastTime = this.timeManager.getElapsedTime();
+
+        this.cameraManager = CameraManager.getInstance();
 
         this.particles = new BubbleParticle(particleCount);
         this.add(this.particles.mesh);
@@ -62,6 +68,14 @@ export class BubbleColumns extends THREE.Object3D {
 
         for (let i = 0; i < p.count; i++) {
             const i3 = i * 3;
+
+            const cameraPosition = this.cameraManager.getActiveCamera().position;
+            const dx = p.positions[i3] - cameraPosition.x;
+            const dz = p.positions[i3 + 2] - cameraPosition.z; 
+            const horizontalDistance = Math.sqrt(dx*dx + dz*dz);
+            if(this.isUsingLOD && (horizontalDistance > this.simulateDistance)){
+                continue;
+            }
 
             p.positions[i3 + 1] += p.velocities[i] * delta;
             p.ages[i] += delta;
