@@ -315,7 +315,7 @@ We implemented a robust "Circle Packing" algorithm to distribute hundreds of ite
     
     
 #### Rift Terrain 
-![Rift Detail](screenshots/rift-demo.gif)
+![Rift Detail](screenshots/rift-demo.png)
 > *Fig 27. The procedural rift with magma floor and blended rock walls.*
 
 The rift is a major terrain feature created by stacking displacement maps.
