@@ -80,7 +80,6 @@ class Aquarium extends THREE.Object3D {
         this.createGlassTank();
         // Create water top layer
         this.createWaterTopLayer();
-
         // create fishes
         this.createFishes();
         // create shark
@@ -229,14 +228,14 @@ class Aquarium extends THREE.Object3D {
         const sharkGLTF1 = this.assetManager.getBlenderManager().getAllLODs('shark1');
         const sharkGLTF2 = this.assetManager.getBlenderManager().getAllLODs('shark2');
         // Blue Shark
-        const position1 = new THREE.Vector3(-5, 8, 0);
+        const position1 = new THREE.Vector3(-this.terrainWidth / 4, this.terrainHeight / 3, this.terrainWidth / 4);
         const blueSharkTex = this.assetManager.getTextureManager().getTexture('shark-blue');
         const shark1 = new SharkLOD(sharkGLTF1, position1, blueSharkTex, aiOptions);
         shark1.scale.set(0.5, 0.5, 0.5);
         this.addToAquarium(shark1);
 
         // Grey Shark
-        const position2 = new THREE.Vector3(5, 10, -15);
+        const position2 = new THREE.Vector3(this.terrainWidth / 8, this.terrainHeight / 3, -this.terrainWidth / 4);
         const shark2 = new SharkLOD(sharkGLTF2, position2, null, aiOptions);
         shark2.scale.set(0.45, 0.45, 0.45);
 
