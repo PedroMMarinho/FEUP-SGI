@@ -2,6 +2,7 @@ import * as THREE from "three";
 import { TimeManager } from "../../managers/TimeManager.js";
 import { SandParticle } from "./SandParticle.js";
 import { CollisionManager } from "../../managers/CollisionManager.js";
+import { CameraManager } from "../../managers/CameraManager.js";
 
 export class MarineSnow extends THREE.Group {
     constructor(
@@ -34,8 +35,10 @@ export class MarineSnow extends THREE.Group {
             
             // Life & Fading
             fadeSpeed: config.fadeSpeed,    
+            // simulate distance
+            simulateDistance: config.simulateDistance,
         };
-
+        this.cameraManager = CameraManager.getInstance();
         this.collisionManager = CollisionManager.getInstance();
         this.obstacles = []
 
@@ -124,6 +127,18 @@ export class MarineSnow extends THREE.Group {
             let px = positions[i3];
             let py = positions[i3 + 1];
             let pz = positions[i3 + 2];
+
+            const cameraPosition = this.cameraManager.getActiveCamera().position;
+
+            const xDist = px - cameraPosition.x;
+            const zDist = pz - cameraPosition.z;
+            const horizontalDist = Math.sqrt(xDist*xDist + zDist*zDist);
+            
+            if (horizontalDist > this.settings.simulateDistance) {
+                continue; 
+            }
+
+            
 
             //const prevX = px;
             //const prevY = py;

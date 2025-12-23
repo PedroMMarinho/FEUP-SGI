@@ -5,7 +5,13 @@ import { PeriscopeHUDType } from '../enums/PeriscopeHUDType.js';
 import { RenderType } from '../enums/RenderType.js';
 
 class CameraManager {
+    static instance = null;
+
     constructor(aspect, keyManager, frustumSize = 20, passManager) {
+        if (CameraManager.instance) {
+            return CameraManager.instance;
+        }
+
         this.keyManager = keyManager;
         this.aspect = aspect;
         this.frustumSize = frustumSize;
@@ -42,6 +48,22 @@ class CameraManager {
         this.aquariumWidth = null;
         this.sunkenShip = null;
         this.treasureChest = null;
+
+        CameraManager.instance = this;
+    }
+
+    static getInstance() {
+        if (!CameraManager.instance) {
+            throw new Error('CameraManager must be initialized before calling getInstance()');
+        }
+        return CameraManager.instance;
+    }
+
+    static initialize(aspect, keyManager, frustumSize = 20, passManager) {
+        if (!CameraManager.instance) {
+            CameraManager.instance = new CameraManager(aspect, keyManager, frustumSize, passManager);
+        }
+        return CameraManager.instance;
     }
 
     setAquariumHeight(height){
@@ -62,7 +84,6 @@ class CameraManager {
     setTreasureChest(treasureChest){
         this.treasureChest = treasureChest;
     }
-
 
     init() {
         const perspective = new THREE.PerspectiveCamera(75, this.aspect, 0.1, 1000);
@@ -132,8 +153,6 @@ class CameraManager {
         const deltaTime = this.timeManager.getElapsedTime() - this.globalTime;
         this.globalTime += deltaTime;
 
-
-       
         this.updateOrbitViews(renderer);
         if (this.activeCameraName === 'Free Fly') this.updateFreeFly(deltaTime);
         if (this.activeCameraName === 'Submarine View') this.updateSubmarineView(submarine);
@@ -155,7 +174,6 @@ class CameraManager {
 
         camera.lookAt(fish.position);
     }
-
 
     updateOrbitViews(renderer) {
         const orbitCameras = ['Ship View', 'Treasure View'];
@@ -189,9 +207,7 @@ class CameraManager {
                 this.controls = null;
             }
         }
-
     }
-
 
     updateBoidView() {
         if (!this.targetBoid) return;
@@ -200,15 +216,11 @@ class CameraManager {
         const boid = this.targetBoid;
 
         camera.position.copy(boid.position);
-        
         camera.quaternion.copy(boid.quaternion);
-
         camera.rotateY(Math.PI);
- 
         camera.translateZ(1.5); 
         camera.translateY(1.0);
         camera.translateX(0.2);
-
         camera.rotateX(-0.2); 
     }
 
@@ -221,7 +233,6 @@ class CameraManager {
         const orientation = submarine.getSubmarineOrientation();    
         const lookAt = new THREE.Vector3().addVectors(position, orientation.forward);
         camera.lookAt(lookAt);
-
     }
 
     updateTVView() {
@@ -237,7 +248,6 @@ class CameraManager {
 
         camera.lookAt(tv.position);
     }
-
 
     onResize(renderer) {
         if (!this.activeCamera) return;
@@ -288,7 +298,6 @@ class CameraManager {
         else {
             this.passManager.setHUDType(PeriscopeHUDType.NONE, 'Submarine View');
         }
-
     }
 
     updateFreeFly(deltaTime) {
@@ -336,7 +345,6 @@ class CameraManager {
             canvas.requestPointerLock();
         }
     }
-    
 }
 
 export { CameraManager };

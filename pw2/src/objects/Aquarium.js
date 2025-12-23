@@ -115,6 +115,7 @@ class Aquarium extends THREE.Object3D {
             gravity: 0.1,                // Reduced gravity effect
             bounce: 0.9,      // Less bounce
             fadeSpeed: 0.8,              // Fades fast 
+            simulateDistance: 50,
         },
     );
     this.addToAquarium(marineSnow);
