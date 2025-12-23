@@ -484,8 +484,8 @@ class Seabed extends THREE.Object3D {
 
 	// Helper to visualize the collision radius
     addDebugVisual(position, radius, collisionRadius) {
-        const geometry = new THREE.RingGeometry(collisionRadius * 0.95, collisionRadius, 32);
-		const geometryInner = new THREE.RingGeometry(radius * 0.95, radius, 32);
+        const geometry = new THREE.RingGeometry(collisionRadius * 0.98, collisionRadius, 32);
+		const geometryInner = new THREE.RingGeometry(radius * 0.98, radius, 32);
         
         const material = new THREE.MeshBasicMaterial({ 
             color: 0xff0000, 
@@ -503,16 +503,14 @@ class Seabed extends THREE.Object3D {
         
         const mesh = new THREE.Mesh(geometry, material);
         mesh.position.copy(position);
-		const meshInner = new THREE.Mesh(geometryInner, materialInner);
-		meshInner.position.copy(position);
-        
         mesh.rotation.x = -Math.PI / 2;
-		meshInner.rotation.x = -Math.PI / 2;
-
         mesh.position.y += 0.2; 
-		meshInner.position.y += 0.2; 
         this.add(mesh);
-		this.add(meshInner);
+		//const meshInner = new THREE.Mesh(geometryInner, materialInner);
+		//meshInner.position.copy(position);
+		//meshInner.rotation.x = -Math.PI / 2;
+		//this.add(meshInner);
+		//meshInner.position.y += 0.2; 
     }
 
 	calculateRadius(modelsOrModel) {
