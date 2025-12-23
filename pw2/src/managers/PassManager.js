@@ -14,6 +14,7 @@ import { TintShader,
         CHAR_MAP
 } from '../hud/PeriscopeHUD.js';
 import { RenderType } from '../enums/RenderType.js';
+import { GammaCorrectionShader } from '/lib/jsm/shaders/GammaCorrectionShader.js';
 
 
 const HUD_STATE_CONFIG = {
@@ -49,7 +50,8 @@ class PassManager {
             scratches: null,
             hud: null,
             coords: null,
-            clip: null
+            clip: null,
+            //gamma: null,
         };
         
         // Effect composer
@@ -113,7 +115,15 @@ class PassManager {
         // Setup post-processing passes
         this.setupBokehPass(activeCamera);
         this.setupShaderPasses(aquarium);
+        //this.setupGammaPass();
     }
+
+    //setupGammaPass() {
+    //    this.passes.gamma = new ShaderPass(GammaCorrectionShader);
+    //    this.passes.gamma.renderToScreen = true;
+    //    this.passes.gamma.enabled = true; 
+    //    this.composer.addPass(this.passes.gamma);
+    //}
 
     setupShaderPasses() {
         this.setupTintPass();
