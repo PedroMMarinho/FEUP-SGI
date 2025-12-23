@@ -114,7 +114,9 @@ export class AssetManager {
             // Particle Textures
             'sand-particle': 'particle/sand-particle.png',
             'coral' : 'coral/coral.jpeg',
-            'coral-normal': 'coral/coralNormal.png'
+            'coral-normal': 'coral/coralNormal.png',
+            'seaweed': 'seaweed/seaweed.jpg',
+            'seaweed-normal': 'seaweed/seaweedNormal.png'
         };
         return textureMap;
     }

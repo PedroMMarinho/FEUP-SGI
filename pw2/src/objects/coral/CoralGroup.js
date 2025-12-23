@@ -44,11 +44,16 @@ class CoralGroup extends THREE.Object3D {
 
     createMaterial() {
         this.coralTexture = this.textureManager.getTexture('coral');
+        this.coralNormalMap = this.textureManager.getTexture('coral-normal');
         
         // Ensure texture wrapping
         if (this.coralTexture) {
             this.coralTexture.wrapS = THREE.RepeatWrapping;
             this.coralTexture.wrapT = THREE.RepeatWrapping;
+        }
+
+        if(this.coralNormalMap){
+            this.coralNormalMap.wrapS = this.coralTexture.wrapT = THREE.RepeatWrapping;
         }
 
         const material = new THREE.MeshPhongMaterial({
