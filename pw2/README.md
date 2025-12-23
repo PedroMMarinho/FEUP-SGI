@@ -101,8 +101,10 @@ classDiagram
 #### Week 3: Animation
 ![Week 3 Demo](screenshots/week3-demo.gif)
 > *Fig 3. Skinned fish animation, vertex-shader based sway.*
+
 ![Week 3 High LOD fish](screenshots/high-LOD-fish.png)
 > *Fig 4. High LOD fish.*
+
 ![Week 3 Low LOD fish](screenshots/low-LOD-fish.png)
 > *Fig 5. Low LOD fish*
 
@@ -123,6 +125,7 @@ classDiagram
 #### Weeks 4 & 5: Interaction and Physics
 ![Weeks 4 & 5 Demo](screenshots/week4-5-demo.gif)
 > *Fig 6. Submarine piloting.*
+
 ![Week 4? Keyframe animation](screenshots/keyframed-fish-demo.gif)
 > *Fig 7. Keyframe fish animation (as implemented in the final delivery)*
 
@@ -148,10 +151,13 @@ classDiagram
 #### Week 6: Acceleration (BVH & Picking)
 ![Week 6 boids](screenshots/week6-demo.gif)
 > *Fig 8. Flocking System*
+
 ![Week 6 Coral](screenshots/coral-demo.gif)
 > *Fig 9. Coral Sway.*
+
 ![Week 6 seaweed](screenshots/seaweed-demo.gif)
 > *Fig 10. Seaweed Sway.*
+
 ![Week 6 Tv](screenshots/tv-demo.gif)
 > *Fig 11. TV with video texture.*
 
@@ -174,10 +180,13 @@ classDiagram
 #### Week 7: Advanced Textures
 ![Week 7 Demo](screenshots/week7-perlin-noise-demo.gif)
 > *Fig 12. Procederally generated fish skin.*
+
 ![Week 7 collision](screenshots/collision-boxes-demo.png)
 > *Fig 13. BVH Collision boxes.*
+
 ![Week 7 bvh](screenshots/week7-bvh-demo.gif)
 > *Fig 14. Highlighting objects using raycating.*
+
 ![Week 7 Fish Raycasting](screenshots/bvh-demo.png)
 > *Fig 15. Representation of rays cast by fish*
 
@@ -232,10 +241,13 @@ classDiagram
 #### Week 10: Particle Systems
 ![Week 10 Demo](screenshots/week10-bubbles-demo.gif)
 > *Fig 18. Bubble collumns.*
+
 ![Week 10 Marine Snow](screenshots/week10-marine-snow-demo.gif)
 > *Fig 19. Marine snow with physics collision.*
+
 ![Week 10 Sand Puff](screenshots/week10-sand-puff-demo.gif)
 > *Fig 20. Sand puffs.*
+
 ![Week 10 Treasure Chest](screenshots/treasure-chest.gif)
 > *Fig 21. Treasure chest with animated gold.*
 
@@ -317,7 +329,7 @@ The rift is a major terrain feature created by stacking displacement maps.
 ### Issues/Problems
 
 - **Dynamic Entity Clipping:** Although we handle collision detection for moving entities (like the submarine and fish), there are occasional instances where they may clip into static objects or the terrain. The system handles most interactions correctly, but it is not 100% fail-proof during complex maneuvers.
-- **Post-Processing Lighting Artifacts:** We observed a noticeable shift in scene lighting and color tone when toggling between the **Depth of Field (Bokeh)** effect and the standard render. This suggests a discrepancy in how the `EffectComposer` pipeline handles gamma correction or tone mapping compared to the default `WebGLRenderer` path, which we haven't yet fully resolved.
+- **Post-Processing Lighting Artifacts:** We observed a noticeable shift in scene lighting and color tone when toggling between the **Depth of Field (Bokeh)** effect and the standard render. This suggests a discrepancy in how the `EffectComposer` pipeline handles gamma correction or tone mapping compared to the default `WebGLRenderer` path. We found that adding a `GammaCorrectionPass` resolves the issue; however, we intentionally avoid it because we prefer the visual appearance of the scene without that correction.
 
 ### Future Work/Improvements
 

@@ -37,5 +37,35 @@ Our project aims to develop a **THREE.js** scene inspired by a **vintage casino 
 
 -----
 
-### [PW2 - ...](pw2)
-- (items briefly describing main strong points)
+### [PW2 - Aquatic Scenary](pw2)
+
+#### Tutorial
+
+The tutorial of our class can be found here:
+
+[Guide PDF](pw2/docs/SGI%20-%20PW2%20full%20description.pdf)
+
+
+
+
+#### Project Overview
+
+
+A real-time **THREE.js aquarium simulation** featuring animated marine life, procedural terrain, advanced shaders, lighting, post-processing, and interactive physics.
+
+**Highlights**:
+
+- Modular scene architecture with multiple managers
+
+- Procedural fish, corals, and terrain
+
+- Flocking (boids), collision systems, and BVH acceleration
+
+- Custom shaders, HDR lighting, and post-processing HUD
+
+- Particle systems (marine snow, bubbles, sand puffs)
+
+
+<p align="center"> <img src="./pw2/screenshots/week10-bubbles-demo.gif">  <p align="center">Figure 2: PW2 – Interactive aquatic environment</p> </p>
+
+**More in depth information on pw2 can be found in [pw2's README](pw2/README.md)**
