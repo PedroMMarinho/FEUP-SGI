@@ -305,7 +305,7 @@ class Seabed extends THREE.Object3D {
         dummyCoral.clear(); 
         tempMat.dispose();
 
-        console.log("Calculated Coral Base Radius:", baseRadius);
+        //console.log("Calculated Coral Base Radius:", baseRadius);
 
         for (let i = 0; i < this.coralCount; i++) {
             // A. SCALE
@@ -433,7 +433,7 @@ class Seabed extends THREE.Object3D {
 	createBubbleColumns() {
 		// Number of rift vents
 		const riftPositions = this.computeRiftPositions(this.bubbleColumnsCount);
-		console.log('Rift positions for bubble columns:', riftPositions);
+		//console.log('Rift positions for bubble columns:', riftPositions);
 		if (riftPositions.length === 0) return;
 
 		this.bubbleColumns = new BubbleColumns(
@@ -465,7 +465,7 @@ class Seabed extends THREE.Object3D {
 
 				// Accept only rift zones
 				if (!inRiftZone) {
-					console.warn('Rejected position outside rift zone');
+					//console.warn('Rejected position outside rift zone');
 					tries++;
 					continue;
 				}

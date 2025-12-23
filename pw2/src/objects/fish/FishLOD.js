@@ -54,6 +54,20 @@ export class FishLOD extends THREE.LOD {
 		this.rootObject = true;
 		this.bvhSelectable = true;
 
+        // --- 2. ADD DEBUG MESH ---
+        // Creates a red wireframe sphere matching the collision radius
+        //if (this.boidProperties !== null) {
+        //         console.log("Fish collision radius:", this.radius);
+        //const debugGeo = new THREE.SphereGeometry(this.radius, 8, 8);
+        //const debugMat = new THREE.MeshBasicMaterial({ 
+        //    color: 0xff0000, 
+        //    wireframe: true,
+        //});
+        //this.debugMesh = new THREE.Mesh(debugGeo, debugMat);
+        //this.add(this.debugMesh);
+        //}
+   
+
 		this.init();
 	}
 
@@ -93,7 +107,7 @@ export class FishLOD extends THREE.LOD {
         for (let other of nearbyEntities) {
             if (other === this) continue;
 
-            const otherPos = other.pos || other.position;
+            const otherPos = this.collisionManager.getEntityCenter(other);
             const distToCenter = this.pos.distanceTo(otherPos);
 
             if (distToCenter === 0) continue;
@@ -135,8 +149,8 @@ export class FishLOD extends THREE.LOD {
                     const proximityFactor = 1.0 - (distToCenter / detectionRange);
                     
                     // Mix forces: 
-                    // 30% "Push Away" (to ensure they don't clip the model)
-                    // 70% "Go Around" (to create the flow effect)
+                    // "Push Away" (to ensure they don't clip the model)
+                    // "Go Around" (to create the flow effect)
                     avoidance.addScaledVector(awayDir, proximityFactor * 1.5); 
                     avoidance.addScaledVector(tangent, proximityFactor * 4.0); 
                 }
@@ -153,15 +167,15 @@ export class FishLOD extends THREE.LOD {
                     const tangent = new THREE.Vector3().crossVectors(avoidDir, new THREE.Vector3(0, 1, 0));
                     if (tangent.dot(this.velocity) < 0) tangent.negate();
 
+
                     const distToSurface = distToCenter - objectRadius;
-                    
                     const safeDist = Math.max(distToSurface, 0.01);
 
                     // 1. Repulsion:
-                    const repulsionStrength = 6.0 / safeDist; 
+                    const repulsionStrength = 1.1 / safeDist; 
 
                     // 2. Flow:
-                    const flowStrength = this.boidProperties.moveSpeed * 2.0;
+                    const flowStrength = this.boidProperties.moveSpeed * 4.0;
 
                     avoidance.addScaledVector(avoidDir, repulsionStrength);
                     avoidance.addScaledVector(tangent, flowStrength);
@@ -208,10 +222,13 @@ export class FishLOD extends THREE.LOD {
 		this.globalTime += delta;
 		
 		// lod
-		const visibleLOD = this.levels.find(level => level.object.visible);
+        const currentLevel = this.getCurrentLevel();
+        if (currentLevel === this.levels.length - 1) return;
+        const visibleLOD = this.levels[currentLevel].object;
+
 		if (!visibleLOD) return;
 
-		const fishGroup = visibleLOD.object;
+		const fishGroup = visibleLOD;
 		const swimFreq = 4.0 * this.speed;
 
 		const time = this.globalTime * swimFreq + this.animationOffset;

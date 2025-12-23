@@ -194,7 +194,7 @@ class BVHManager {
 
 	spawnSandPuff(pt, normal) {
 		if (this.sandSystem != null) {
-			console.log("emitting sand puff!!")
+			//console.log("emitting sand puff!!")
 			this.sandSystem.emitPuff({
 				position: pt,
 				normal: normal

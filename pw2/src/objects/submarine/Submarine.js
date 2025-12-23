@@ -561,7 +561,7 @@ export class Submarine extends THREE.Object3D {
 	}
 
 	createWarningLights() {
-		console.log(this.lightControls.warningLightIntensity);
+		//console.log(this.lightControls.warningLightIntensity);
 		this.warningLight = new THREE.PointLight(0xff0000, this.lightControls.warningLightIntensity, 2.5);
 		this.warningLight.position.set(0, 1.28 , - 3.61); 
 		this.upperBodyGroup.add(this.warningLight);
