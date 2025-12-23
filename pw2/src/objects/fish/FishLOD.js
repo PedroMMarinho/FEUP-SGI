@@ -126,7 +126,7 @@ export class FishLOD extends THREE.LOD {
                 
                 // Inverse Square Law: Force = Constant / Distance^2
                 const safeDist = Math.max(distToCenter, 1.0);
-                const repulsionStrength = 350.0; 
+                const repulsionStrength = 320.0; 
                 const forceMagnitude = repulsionStrength / (safeDist * safeDist);
 
                 avoidance.addScaledVector(pushDir, forceMagnitude);

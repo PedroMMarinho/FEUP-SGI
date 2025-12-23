@@ -209,7 +209,7 @@ class Aquarium extends THREE.Object3D {
         };
 
         this.fishGroups = [
-            new FishGroup(400, this.terrainWidth / 2 - 5, this.terrainHeight / 2, this.boidProps),
+            new FishGroup(300, this.terrainWidth / 2 - 5, this.terrainHeight / 2, this.boidProps),
         ];
         this.fishGroups[0].position.set(0, 0, 0);
         this.cameraManager.setTargetBoid(this.fishGroups[0].getCameraTarget());
