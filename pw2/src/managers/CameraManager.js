@@ -1,0 +1,350 @@
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { TimeManager } from './TimeManager.js';
+import { PeriscopeHUDType } from '../enums/PeriscopeHUDType.js';
+import { RenderType } from '../enums/RenderType.js';
+
+class CameraManager {
+    static instance = null;
+
+    constructor(aspect, keyManager, frustumSize = 20, passManager) {
+        if (CameraManager.instance) {
+            return CameraManager.instance;
+        }
+
+        this.keyManager = keyManager;
+        this.aspect = aspect;
+        this.frustumSize = frustumSize;
+        this.cameras = {};
+        this.activeCameraName = null;
+        this.lastCameraName = null;
+        this.cameraSelection = "Free Fly";
+        this.controls = null;
+        this.passManager = passManager;
+
+        this.moveSpeed = 6; 
+        this.lookSpeed = 0.5; 
+
+        this.yaw = 0;
+        this.pitch = 0;
+
+        this.timeManager = TimeManager.getInstance();
+        this.globalTime = this.timeManager.getElapsedTime();
+
+        // Orthographic parameters
+        this.left = -frustumSize / 2 * aspect;
+        this.right = frustumSize / 2 * aspect;
+        this.top = frustumSize / 2;
+        this.bottom = -frustumSize / 2;
+        this.near = -frustumSize / 2;
+        this.far = frustumSize;
+        this.canvasDiv = document.getElementById('canvas');    
+
+        // Special Cameras
+        this.targetBoid = null;
+        this.targetJumpingFish = null;
+        this.targetTelevision = null;
+        this.aquariumHeight = null;
+        this.aquariumWidth = null;
+        this.sunkenShip = null;
+        this.treasureChest = null;
+
+        CameraManager.instance = this;
+    }
+
+    static getInstance() {
+        if (!CameraManager.instance) {
+            throw new Error('CameraManager must be initialized before calling getInstance()');
+        }
+        return CameraManager.instance;
+    }
+
+    static initialize(aspect, keyManager, frustumSize = 20, passManager) {
+        if (!CameraManager.instance) {
+            CameraManager.instance = new CameraManager(aspect, keyManager, frustumSize, passManager);
+        }
+        return CameraManager.instance;
+    }
+
+    setAquariumHeight(height){
+        this.aquariumHeight = height;
+    }
+    setAquariumWidth(width){
+        this.aquariumWidth = width;
+    }
+
+    setTargetShip(shipObject) {
+        this.sunkenShip = shipObject;
+    }
+
+    setTargetTV(tv){
+        this.targetTelevision = tv;
+    }
+
+    setTreasureChest(treasureChest){
+        this.treasureChest = treasureChest;
+    }
+
+    init() {
+        const perspective = new THREE.PerspectiveCamera(75, this.aspect, 0.1, 1000);
+        perspective.position.set(10, 10, 3);
+        this.cameras['Free Fly'] = perspective;
+
+        const aquariumCam = new THREE.PerspectiveCamera(60, this.aspect, 0.1, 2000);
+        this.cameras['Aquarium View'] = aquariumCam;
+
+        const UnderwaterCam = new THREE.PerspectiveCamera(75, this.aspect, 0.1, 1000);
+        UnderwaterCam.position.set(0, 2, 5);
+        this.cameras['Ship View'] = UnderwaterCam;
+
+        const submarineCam = new THREE.PerspectiveCamera(100, this.aspect, 0.1, 1000);
+        this.cameras['Submarine View'] = submarineCam;
+
+        const boidCam = new THREE.PerspectiveCamera(90, this.aspect, 0.1, 1000);
+        this.cameras['Boid View'] = boidCam;
+
+        const treasureCam = new THREE.PerspectiveCamera(50, this.aspect, 0.1, 1000);
+        this.cameras['Treasure View'] = treasureCam;
+
+        const jumpFishCam = new THREE.PerspectiveCamera(80, this.aspect, 0.1, 1000);
+        this.cameras['Jumping Fish View'] = jumpFishCam;
+
+        const tvSize = 5;
+        const tvCam = new THREE.OrthographicCamera(
+            -tvSize * this.aspect / 2,  
+             tvSize * this.aspect / 2,  
+             tvSize / 2,               
+            -tvSize / 2,                
+             0.01,                       
+             50                         
+        );
+        this.cameras['TV View'] = tvCam;
+
+        this.setActiveCamera('Free Fly');
+    }
+
+    setTargetBoid(boidObject) {
+        this.targetBoid = boidObject;
+    }
+
+    setTargetJumpingFish(fishObject) {
+        this.targetJumpingFish = fishObject;
+    }
+
+    setActiveCamera(name) {
+        if (this.activeCameraName === name) return;
+        const previous = this.activeCameraName;
+        this.lastCameraName = previous;
+        this.activeCameraName = name;
+        this.activeCamera = this.cameras[name];
+        this.passManager.updateCamera(this.activeCamera);
+        this.changeCamera(previous, name);
+    }
+
+    getActiveCamera() {
+        return this.activeCamera;
+    }
+
+    getCameraByName(cameraName){
+        return this.cameras[cameraName];
+    }
+
+    update(renderer, submarine) {
+        const deltaTime = this.timeManager.getElapsedTime() - this.globalTime;
+        this.globalTime += deltaTime;
+
+        this.updateOrbitViews(renderer);
+        if (this.activeCameraName === 'Free Fly') this.updateFreeFly(deltaTime);
+        if (this.activeCameraName === 'Submarine View') this.updateSubmarineView(submarine);
+        if (this.activeCameraName === 'Boid View') this.updateBoidView();
+        if (this.activeCameraName === 'TV View') this.updateTVView();
+        if (this.activeCameraName === 'Jumping Fish View') this.updateJumpFishView();
+    }
+
+    updateJumpFishView() {
+        if (!this.targetJumpingFish) return;
+        
+        const camera = this.cameras['Jumping Fish View'];
+        const fish = this.targetJumpingFish;
+        camera.position.copy(fish.position);
+        camera.quaternion.copy(fish.quaternion);
+        camera.translateY(1.0);
+        camera.translateZ(-1.4);
+        camera.translateX(-0.25);
+
+        camera.lookAt(fish.position);
+    }
+
+    updateOrbitViews(renderer) {
+        const orbitCameras = ['Ship View', 'Treasure View'];
+        const isOrbitCamera = orbitCameras.includes(this.activeCameraName);
+
+        if (this.controls && this.controls.object !== this.activeCamera) {
+            this.controls.dispose();
+            this.controls = null;
+        }
+
+        if (isOrbitCamera) {
+            if (!this.controls) {
+                this.controls = new OrbitControls(this.activeCamera, renderer.domElement);
+                this.controls.enableZoom = true;
+                this.controls.enablePan = false;
+
+                if (this.activeCameraName === 'Ship View' && this.sunkenShip) {
+                    this.controls.target.copy(this.sunkenShip.position);
+                } 
+                else if (this.activeCameraName === 'Treasure View' && this.treasureChest) {
+                    this.controls.target.copy(this.treasureChest.position);
+                } else {
+                    this.controls.target.set(0, 0, 0);
+                }
+            }
+            this.controls.update();
+        } 
+        else {
+            if (this.controls) {
+                this.controls.dispose();
+                this.controls = null;
+            }
+        }
+    }
+
+    updateBoidView() {
+        if (!this.targetBoid) return;
+
+        const camera = this.cameras['Boid View'];
+        const boid = this.targetBoid;
+
+        camera.position.copy(boid.position);
+        camera.quaternion.copy(boid.quaternion);
+        camera.rotateY(Math.PI);
+        camera.translateZ(1.5); 
+        camera.translateY(1.0);
+        camera.translateX(0.2);
+        camera.rotateX(-0.2); 
+    }
+
+    updateSubmarineView(submarine) {
+        const camera = this.cameras['Submarine View'];
+
+        const position = submarine.getSubmarineCameraPosition();
+        camera.position.copy(position);
+
+        const orientation = submarine.getSubmarineOrientation();    
+        const lookAt = new THREE.Vector3().addVectors(position, orientation.forward);
+        camera.lookAt(lookAt);
+    }
+
+    updateTVView() {
+        if (!this.targetTelevision) return;
+
+        const camera = this.cameras['TV View'];
+        const tv = this.targetTelevision;
+        camera.position.copy(tv.position);
+        
+        camera.quaternion.copy(tv.quaternion);
+        camera.translateY(1.2);
+        camera.translateZ(-1);
+
+        camera.lookAt(tv.position);
+    }
+
+    onResize(renderer) {
+        if (!this.activeCamera) return;
+        const width = window.innerWidth;
+        const height = window.innerHeight;
+
+        if (this.activeCamera.isPerspectiveCamera) {
+            this.activeCamera.aspect = width / height;
+        } else if (this.activeCamera.isOrthographicCamera) {
+            const aspect = width / height;
+            this.activeCamera.left = -this.frustumSize / 2 * aspect;
+            this.activeCamera.right = this.frustumSize / 2 * aspect;
+            this.activeCamera.top = this.frustumSize / 2;
+            this.activeCamera.bottom = -this.frustumSize / 2;
+        }
+
+        this.activeCamera.updateProjectionMatrix();
+        renderer.setSize(width, height);
+    }
+
+    changeCamera(oldName, newName) {
+        if (newName === 'Aquarium View') {
+            const cam = this.cameras['Aquarium View'];
+            cam.position.set(-this.aquariumWidth/2, this.aquariumHeight + 4, -this.aquariumWidth/2);
+            cam.lookAt(this.aquariumWidth/2, 0, this.aquariumWidth/2);
+        }
+
+        if (newName === 'Ship View' && this.sunkenShip) {
+            const cam = this.cameras['Ship View'];
+            cam.position.copy(this.sunkenShip.position);
+            cam.position.y += 12; 
+            cam.position.z += 7;  
+            cam.lookAt(this.sunkenShip.position);
+        }
+        if (newName === 'Treasure View' && this.treasureChest) {
+            const cam = this.cameras['Treasure View'];
+            cam.position.copy(this.treasureChest.position);
+            cam.position.y += 5; 
+            cam.position.z += 10;  
+            cam.lookAt(this.treasureChest.position);
+        }
+
+        this.passManager.setRenderType(this.passManager.currentRenderType);
+
+        if (newName === 'Submarine View') {
+            this.passManager.setHUDType(this.passManager.currentPeriscopeHUD, newName);
+        } 
+        else {
+            this.passManager.setHUDType(PeriscopeHUDType.NONE, 'Submarine View');
+        }
+    }
+
+    updateFreeFly(deltaTime) {
+        const keyManager = this.keyManager;
+        const camera = this.activeCamera;
+        const moveSpeed = this.moveSpeed * deltaTime; 
+
+        const { x: deltaX, y: deltaY } = keyManager.getDelta();
+
+        this.yaw = camera.rotation.y;
+        this.pitch = camera.rotation.x;
+
+        if (keyManager.isMouseHeld()) {
+            this.yaw -= deltaX * this.lookSpeed * deltaTime;
+            this.pitch -= deltaY * this.lookSpeed * deltaTime;
+        }
+
+        const limit = Math.PI / 2 - 0.01;
+        this.pitch = Math.max(-limit, Math.min(limit, this.pitch));
+
+        camera.rotation.order = 'YXZ';
+        camera.rotation.y = this.yaw;
+        camera.rotation.x = this.pitch;
+
+        const forward = new THREE.Vector3();
+        const right = new THREE.Vector3();
+
+        camera.getWorldDirection(forward);
+        forward.normalize();
+        right.crossVectors(forward, camera.up).normalize();
+
+        if (keyManager.isKeyPressed('KeyW')) camera.position.addScaledVector(forward, moveSpeed);
+        if (keyManager.isKeyPressed('KeyS')) camera.position.addScaledVector(forward, -moveSpeed);
+        if (keyManager.isKeyPressed('KeyA')) camera.position.addScaledVector(right, -moveSpeed);
+        if (keyManager.isKeyPressed('KeyD')) camera.position.addScaledVector(right, moveSpeed);
+        if (keyManager.isKeyPressed('Space')) camera.position.y += moveSpeed;
+        if (keyManager.isKeyPressed('ShiftLeft')) camera.position.y -= moveSpeed;
+    }
+
+    togglePointerLock() {
+        const canvas = document.getElementById('canvas');
+        if (document.pointerLockElement === canvas) {
+            document.exitPointerLock();
+        } else {
+            canvas.requestPointerLock();
+        }
+    }
+}
+
+export { CameraManager };
