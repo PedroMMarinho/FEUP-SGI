@@ -181,7 +181,7 @@ class MyGuiInterface {
         // 5. DEBUG & PERFORMANCE (BVH, Collisions)
         // ====================================================================
         const debugFolder = this.datgui.addFolder('Debug & Performance');
-        debugFolder.close(); // Keep closed by default to reduce clutter
+        debugFolder.close(); 
 
         // --- BVH ---
         const bvhParams = this.contents.bvhManager;
