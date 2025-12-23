@@ -117,6 +117,24 @@ class CollisionManager {
                     }
                     continue;
                 }
+                if (entity.type === EntityType.SUBMARINE) {
+                    const entityRadius = this.getEntityRadius(entity) || 0;
+                    const adjustedRadiusSq = (radius + entityRadius) * (radius + entityRadius);
+                    if (distSq <= adjustedRadiusSq) {
+                        nearby.push(entity);
+                    }
+                    continue;
+                }
+                if (entity.type === EntityType.SHARK) {
+                    const entityRadius = this.getEntityRadius(entity) || 0;
+                    const adjustedRadiusSq = (radius + entityRadius) * (radius + entityRadius);
+                    if (distSq <= adjustedRadiusSq) {
+                        nearby.push(entity);
+                    }
+                    continue;
+                }
+
+
 
                 if (distSq <= radiusSq) {
                     nearby.push(entity);
