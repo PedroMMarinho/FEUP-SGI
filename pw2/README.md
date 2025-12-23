@@ -93,6 +93,10 @@ classDiagram
     - **Stochastic Variation:** The L-System parser supports weighted probabilities. A rule like `'X'` can evolve into two different strings based on a random roll (e.g., 70% vs 30%), ensuring no two corals look exactly the same.
     - **Hybrid Mesh Optimization:** The `Fish` class intelligently switches types. High-detail LODs use `SkinnedMesh` (prepared for bone animation), while low-detail LODs degrade to static `Mesh` groups or even invisible objects at extreme distances to save draw calls.
 
+- **Extra Progress:** During this week, the shark model was fully modeled, rigged, animated, and successfully integrated into the project.
+
+- **Postponed Work:**  While the LOD system was implemented this week, fine-tuning of fish-specific LOD thresholds and transitions was finalized in Week 3.
+
 
 #### Week 3: Animation
 ![Week 3 Demo](screenshots/week3_demo.gif)
@@ -101,12 +105,15 @@ classDiagram
 - **Implementation:**
     - **Skeletal Animation (Skinning):** Rigged the fish `BufferGeometry` with a simple bone structure (Head, Body, Tail). Vertices are weighted to these bones, allowing the fish to swim naturally by rotating the skeleton.
     - **Keyframe System:** Developed a `KeyframedAnimation` class that interpolates an object's position and rotation over time based on a sequence of defined poses (waypoints).
+    - **Procedural Seaweed (L-Systems):** :A new L-System object was introduced specifically for seaweed, distinct from corals.
     - **Vertex Displacement:** Animated stationary life (seaweed, corals) using sine-wave deformation to simulate underwater currents.
 
 - **Refinements:**
     - **Instanced Shader Magic:** To maintain high performance, seaweed and corals use `InstancedMesh`. This presented a challenge: standard shaders don't animate instances individually. We solved this by injecting custom GLSL into the vertex shader that manually decodes the `instanceMatrix`, allowing us to apply world-space swaying to thousands of static instances in a single draw call.
     - **Organic De-Synchronization:** To prevent the "robotic" look of everything moving in unison, every fish and seaweed strand is assigned a random time offset (phase). This ensures that while they share the same animation logic, every entity moves independently, creating a natural, chaotic underwater feel.
     - **Robust Interpolation Engine:** The `KeyframedAnimation` class was built as a scalable system. It supports **Linear, Quadratic, and Cubic** interpolation, allowing us to define complex, smooth paths for any object.
+
+- **Postponed work:** The keyframe animation system was entirely postponed to the next checkpoint and the shader-based animation for corals and seaweed was done in week 6. 
 
 
 #### Weeks 4 & 5: Interaction and Physics
@@ -129,9 +136,12 @@ classDiagram
     - **Spatial Hashing (Grid):** Flocking is notoriously expensive ($O(N^2)$). We implemented a **Spatial Grid** system (Spatial Hashing) that buckets entities into 3D cells. This allows each boid to query only its immediate neighbors for separation/alignment, enabling us to simulate hundreds of fish at around 60 FPS without brute-force checks.
     - **Procedural Modeling:** The submarine is not a loaded asset; it is constructed entirely from code using hierarchical `THREE.Group`s and primitives (`CapsuleGeometry`, `LatheGeometry`, `ExtrudeGeometry`), demonstrating mastery of the Scene Graph.
 
+- **Postponed work:** The implemention of the flocking system was postponed to next week.
+
 
 #### Week 6: Acceleration (BVH & Picking)
 ![Week 6 Demo](screenshots/week6_demo.gif)
+
 > *Fig 5. Debug view of BVH rays and object selection.*
 
 - **Implementation:**
@@ -143,6 +153,10 @@ classDiagram
     - **Performance Analysis (BVH vs. Grid):** Contrary to initial expectations, the BVH approach proved *less* performant for dynamic flocking than the Spatial Grid. The overhead of casting thousands of rays for fish-to-fish proximity outweighed the benefits. As a result, we prioritized the **Spatial Grid** for the simulation loop, reserving BVH for raycasting.
     - **Ray-Cone Proximity:** For static obstacle avoidance (where precise geometry matters), we utilized the BVH to cast a "Ray Cone" (center + periphery). This allows fish to detect complex terrain shapes ahead of them that a simple bounding sphere would miss.
     - **Hierarchy-Aware Picking:** The picking system is smart; it traverses up the scene graph. Clicking a single propeller blade selects the entire `Submarine` group, and the highlight effect is recursively applied to all child meshes while preserving their original material properties.
+
+
+- **Postponed work:** All Week 6 features were postponed to the following checkpoint due to unresolved requirements from earlier weeks. During this period, initial work on Week 7 features was started.
+
 
 
 #### Week 7: Advanced Textures
@@ -158,6 +172,8 @@ classDiagram
 - **Refinements:**
     - **CPU-Side Displacement:** Standard displacement maps are often visual-only (GPU). We went a step further by sampling the height map's pixel data on the CPU to physically displace the terrain geometry vertices. This allows our physics engine (e.g., Marine Snow landing, camera collision) to interact accurately with the hills and valleys.
     - **Animated Bio-Luminescence:** The fish skin isn't static. We injected a `uTime` uniform into the shader to shift the noise texture coordinates over time, causing the pattern to "crawl" slowly across the body. Additionally, a sine-wave pulse function modulates the skin's brightness, giving the fish a living, breathing bio-luminescent glow.
+
+- **Postponed Work:** The implementation of the treasure chest was postponed to week 10.
 
 #### Week 8: Lighting and Shadows
 ![Week 8 Demo](screenshots/week8_demo.gif)
