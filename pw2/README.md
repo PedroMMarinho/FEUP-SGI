@@ -194,20 +194,18 @@ classDiagram
     - **Aspect Ratio Correctness:** All screen-space effects (circular clips, crosshairs) dynamically update their `aspectRatio` uniform on window resize, guaranteeing that circles remain perfect circles on any display resolution.
 
 #### Week 10: Particle Systems
-***TODO***
 ![Week 10 Demo](screenshots/week10_demo.gif)
 > *Fig 9. Marine snow with physics collision.*
 
 - **Implementation:**
-    - **Marine Snow:** Created a custom particle system (`THREE.Points`) to simulate organic debris falling through the water column.
-    - **Rising Bubbles:** Following the logic of the marine snow, a bubble particle system was implemented. These particles originate from a newly added **Rift** terrain feature and rise toward the surface.
-    - **Rift Terrain:** The rift was created by applying a secondary, sharper displacement pass on top of the standard terrain segments. To distinguish it visually, a custom shader was used to blend and apply multiple textures specifically within the rift's interior.
-    - **Sand Puffs:** This feature reuses the core marine snow particle visuals. Using the Raycasting method developed in Week 6, the system detects the exact point where a user clicks the seabed. If the intersection occurs on a "sand" texture (and not within the rift), a cluster of particles is spawned at that point and launched outwards to simulate a cloud of disturbed sediment.
-    - **Distance-Based** Simulation: As a performance measure to reduce unnecessary CPU overhead, a `simulateDistance` parameter was added to the particle objects. If the distance between the camera and a particle exceeds this threshold, the particle’s physics and updates are skipped, ensuring the engine only processes active elements in the user's immediate vicinity.
-
+    - **Marine Snow:** Created a custom particle system (`THREE.Points`) to simulate organic debris falling through the water column. The system handles thousands of particles with individual physics (gravity, drift, sway).
+    - **Rising Bubbles (Rift Vents):** Implemented a specialized bubble system (`BubbleColumns`) that spawns rising particles exclusively from the deep terrain rifts. These particles have randomized lifetimes and rise towards the surface before resetting.
+    - **Sand Puffs:** Interactive particle effect. When the user clicks on the sandy seabed (using the raycasting system), a burst of sand particles (`SandSystem`) is emitted. These particles follow a parabolic trajectory (hemisphere distribution) and settle back onto the terrain.
 
 - **Refinements:**
-    - **Physics Interaction:** The snow doesn't ignore the environment. Each particle queries the terrain's exact height (using the CPU-side displacement data from Week 7) to physically land, bounce slightly, and settle on the seabed before fading out.
+    - **Physics Interaction:** The marine snow interacts with the terrain. Particles query the CPU-side height map to detect collisions with the seabed. Upon landing, they perform a small bounce based on a restitution coefficient before settling and fading out.
+    - **Thermal Vents:** Particles near the rift zone react to the "heat". If marine snow drifts close to a rift vent, it changes color (glowing orange/red) and is pushed upward or destroyed, simulating the thermal currents.
+    - **Efficient Recycling:** All particle systems utilize object pooling (recycling). Instead of creating/destroying `THREE.Points` every frame (which would cause garbage collection stutters), particles are simply reset and repositioned when they die or exit the view volume.
 
 
 ### Extras
@@ -256,6 +254,22 @@ We implemented a robust "Circle Packing" algorithm to distribute hundreds of ite
 - **Collision Padding:** When attempting to place an object, the `Seabed` class assigns it a randomized "Personal Space" (padding). It then checks this candidate circle against the circles of all previously placed objects.
 - **Height Awareness:** Once a valid 2D (X, Z) spot is found, the system queries the terrain's height map to drop the object perfectly onto the sand, ensuring it doesn't float or clip.
 - **Result:** This creates a natural, non-uniform distribution where clusters of life can form, but objects never intersect physically.
+    
+    
+#### Rift Terrain 
+![Rift Detail](screenshots/rift_detail.gif)
+> *Fig 14. The procedural rift with magma floor and blended rock walls.*
+
+The rift is a major terrain feature created by stacking displacement maps.
+- **Dual Displacement:** We apply a secondary "Rift Map" (`rift-map`) on top of the standard Perlin noise height map. This map subtracts height values significantly in specific areas, carving out deep trenches in the seabed.
+- **Custom Shader Blending:** To make the rift look distinct from the sandy floor, we hooked into the `onBeforeCompile` stage of the `MeshStandardMaterial`.
+    - **Tri-Planar Logic:** The shader uses the `riftMap` value and the absolute world height (`vHeight`) to create masks.
+    - **Texture Mixing:** It seamlessly blends three different texture sets:
+        1. **Sand:** The default seabed.
+        2. **Rift Wall:** Applied to the steep vertical slopes of the trench (using `rift-rock` textures).
+        3. **Magma Floor:** Applied to the deepest parts of the trench (using `magma` textures) to simulate a volcanic vent.
+- **Physics Integration:** Crucially, this displacement happens on both the **GPU** (for rendering) and the **CPU** (for physics). The `TerrainSegment` class samples the height map pixel data to update the actual geometry vertices, allowing the particle systems and camera to physically collide with the rift walls and floor.
+
 
 ----
 ### Issues/Problems
@@ -265,6 +279,7 @@ We implemented a robust "Circle Packing" algorithm to distribute hundreds of ite
 
 ### Future Work/Improvements
 
+- **Advanced Particle Physics:** Currently, particles like marine snow only collide with the seabed. Future improvements would include collision detection against dynamic objects (Submarine) and static props (Rocks, Corals).
 - **Robust Collision Physics:** Implement a more advanced physics engine to completely eliminate submarine clipping with static geometry.
 - **Expanded Ecosystem:** Introduce more diverse marine life, such as **Manta Rays**, Jellyfish, or Crabs, along with a wider variety of static ruins and flora to enrich the environment.
 - **Optimization Strategy:** As the scene complexity grows, we would look into more aggressive optimization techniques (like GPU instancing for rocks or occlusion culling) to ensure the project maintains stable FPS even with thousands of entities.
