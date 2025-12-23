@@ -29,203 +29,176 @@ class MyGuiInterface {
      * Initialize the GUI interface
      */
     init() {
-        // --- Axis controls ---
-        //const axisFolder = this.datgui.addFolder('Axis');
-        //axisFolder
-        //    .add(this.contents.axis, 'visible')
-        //    .name('Show Axis')
-        //    .onChange((value) => {
-        //        this.contents.enableAxis(value);
-        //    });
-
-        // --- Camera controls ---
-        const cameraFolder = this.datgui.addFolder('Camera');
+        // ====================================================================
+        // 1. CAMERA & VIEW (Camera selection, HUD, Post-Processing)
+        // ====================================================================
+        const viewFolder = this.datgui.addFolder('Camera & View');
+        
+        // --- Camera Selection ---
         const cameraNames = Object.keys(this.app.cameraManager.cameras);
+        viewFolder.add(this.app.cameraManager, 'cameraSelection', cameraNames)
+            .name('Active Camera')
+            .onChange((name) => {
+                this.app.cameraManager.setActiveCamera(name);
+            });
 
-        const cameraController = cameraFolder
-            .add(this.app.cameraManager, 'cameraSelection', cameraNames)
-            .name('Active Camera');
+        // --- Render Mode (Fill/Wireframe) ---
+        const renderOptions = { mode: 'Fill' };
+        viewFolder.add(renderOptions, 'mode', ['Fill', 'Wireframe'])
+            .name('Polygon Mode')
+            .onChange((value) => {
+                this.contents.setWireframeMode(value === 'Wireframe');
+            });
 
-        cameraController.onChange((name) => {
-            this.app.cameraManager.setActiveCamera(name);
-        });
-
-        cameraFolder.open();
-        const hudFolder = this.datgui.addFolder('HUD');
-
-        if (hudFolder) {
-
-            const hudNamesPeriscope = Object.values(PeriscopeHUDType);;
-            const hudController = hudFolder
-                .add(this.app.passManager, 'currentPeriscopeHUD', hudNamesPeriscope)
-                .name('Periscope HUD Type');
-
-            hudController.onChange((type) => {
+        // --- HUD & Post-Processing ---
+        const hudNamesPeriscope = Object.values(PeriscopeHUDType);
+        viewFolder.add(this.app.passManager, 'currentPeriscopeHUD', hudNamesPeriscope)
+            .name('Periscope HUD')
+            .onChange((type) => {
                 this.app.passManager.setHUDType(type, this.app.cameraManager.activeCameraName);
             });
 
-            const hudRender = Object.values(RenderType);
-            const renderController = hudFolder
-                .add(this.app.passManager, 'currentRenderType', hudRender)
-                .name('Render Type');
-            
-            renderController.onChange((type) => {
+        const hudRender = Object.values(RenderType);
+        viewFolder.add(this.app.passManager, 'currentRenderType', hudRender)
+            .name('Render Type')
+            .onChange((type) => {
                 this.app.passManager.setRenderType(type);
             });
+
+
+        // ====================================================================
+        // 2. ENVIRONMENT (Lighting, Shadows, Fog)
+        // ====================================================================
+        const envFolder = this.datgui.addFolder('Environment');
+        const scenario = this.contents.scenarioManager;
+
+        if (scenario) {
+            const intensities = scenario.originalLightsIntensity;
+            envFolder.add(intensities, 'directional', 0, 1, 0.01)
+                .name('Sun Intensity')
+                .onChange((value) => scenario.updateDirectionalLight(value));
+            
+            envFolder.add(intensities, 'ambient', 0, 1, 0.01)
+                .name('Ambient Intensity')
+                .onChange((value) => scenario.updateAmbientLight(value));
+            
+            envFolder.add(scenario, 'originalFogIntensity', 0, 0.1, 0.001)
+                .name('Fog Density')
+                .onChange((value) => scenario.updateFogIntensity(value));
         }
 
-
-
-        // --- Render mode controls (wireframe / fill) ---
-        const renderFolder = this.datgui.addFolder('Render Mode');
-        const renderOptions = { mode: 'Fill' };
-
-        renderFolder.add(renderOptions, 'mode', ['Fill', 'Wireframe']).name('Polygon Mode').onChange((value) => {
-            const wireframe = value === 'Wireframe';
-            this.contents.setWireframeMode(wireframe);
-        });
-
-        renderFolder.open();
-
-        // --- BVH Acceleration controls ---
-        const bvhParams = this.contents.bvhManager;
-        if (bvhParams) {
-            const accelerationFolder = this.datgui.addFolder('Acceleration');
-
-            accelerationFolder
-                .add(bvhParams, 'useBVH')
-                .name('Use BVH')
-                .onChange((enabled) => {
-                    bvhParams.toggleBVH(enabled);
-                });
-
-            accelerationFolder.open();
-        }
-        // --- Collision Box Visualization ---
-        const collisionManager = this.contents.collisionManager;
-        if (collisionManager) {
-            const collisionFolder = this.datgui.addFolder('Collision Boxes');
-
-            const collisionParams = {
-                showBoxes: false
-            };
-
-            collisionFolder
-                .add(collisionParams, 'showBoxes')
-                .name('Show Collision Boxes')
-                .onChange((enabled) => {
-                    collisionManager.toggleBoxVisualization(enabled);
-                });
-
-            collisionFolder.open();
-        }
-
-        // Boid behavior controls
-        const boidProperties = this.contents.aquarium.boidProps;
-        if (boidProperties) {
-            const boidFolder = this.datgui.addFolder('Boid Behavior');
-
-            boidFolder
-                .add(boidProperties, 'cohesion', 0, 5, 0.1)
-                .name('Cohesion Strength');
-            boidFolder
-                .add(boidProperties, 'separation', 0, 5, 0.1)
-                .name('Separation Strength');
-            boidFolder
-                .add(boidProperties, 'alignment', 0, 5, 0.1)
-                .name('Alignment Strength');
-            boidFolder
-                .add(boidProperties, 'moveSpeed', 0, 10, 0.1)
-                .name('Movement Speed');
-            boidFolder
-                .add(boidProperties, 'awareness', 1, 20, 1)
-                .name('Awareness Radius');
-
-            boidFolder.open();
-        }
-        // Enable disable shadows
-        
-        const shadowFolder = this.datgui.addFolder('Shadows');
-
-        shadowFolder
-            .add(this.contents.aquarium, 'shadowsEnabled')
+        // --- Shadows ---
+        envFolder.add(this.contents.aquarium, 'shadowsEnabled')
             .name('Enable Shadows')
             .onChange((enabled) => {
                 this.contents.aquarium.setupShadows(enabled);
             });
 
-        
-        const submarineFolder = this.datgui.addFolder('Submarine Controls');
-        // Submarine light controls
+
+        // ====================================================================
+        // 3. SUBMARINE (Lights, Shield)
+        // ====================================================================
+        const subFolder = this.datgui.addFolder('Submarine');
         const submarine = this.contents.aquarium.submarine;
-        if (submarine && submarine.lightControls) {
-            // Chain folders
 
-            const lightFolder = submarineFolder.addFolder('Submarine Lights');
+        if (submarine) {
+            // --- Lights ---
+            if (submarine.lightControls) {
+                const lightFolder = subFolder.addFolder('Lights System');
+                
+                lightFolder.addColor(submarine.lightControls, "frontLightColor")
+                    .name("Front Light Color")
+                    .onChange(() => submarine.applyLightControls());
 
-                    lightFolder.addColor(submarine.lightControls, "frontLightColor")
-        .onChange(() => submarine.applyLightControls())
-        .name("Front Light Color");
+                lightFolder.add(submarine.lightControls, "frontLightIntensity", 0, 500)
+                    .name("Front Intensity")
+                    .onChange(() => submarine.applyLightControls());
+                
+                lightFolder.add(submarine.lightControls, "frontLightDistance", 0.1, 100)
+                    .name("Front Distance")
+                    .onChange(() => submarine.applyLightControls());
 
-        lightFolder.add(submarine.lightControls, "frontLightIntensity", 0, 500)
-        .onChange(() => submarine.applyLightControls())
-        .name("Front Light Intensity");
-        
-        lightFolder.add(submarine.lightControls, "frontLightDistance", 0.1, 100)
-        .onChange(() => submarine.applyLightControls())
-        .name("Front Light Distance");
+                lightFolder.add(submarine.lightControls, "warningFlashFrequency", 0, 5)
+                    .name("Warning Flash Freq")
+                    .onChange(() => submarine.applyLightControls());
 
+                lightFolder.add(submarine.lightControls, "warningLightIntensity", 0, 100)
+                    .name("Warning Intensity")
+                    .onChange(() => submarine.applyLightControls());
+            }
 
-        lightFolder.add(submarine.lightControls, "warningFlashFrequency", 0, 5)
-        .onChange(() => submarine.applyLightControls())
-        .name("Warning Flash Freq");
+            // --- Shield ---
+            if (submarine.shieldControls) {
+                const shieldFolder = subFolder.addFolder('Shield System');
+                
+                shieldFolder.add(submarine.shieldControls, "isActive")
+                    .name("Activate Shield")
+                    .onChange(() => submarine.applyShieldControls());
+                
+                shieldFolder.addColor(submarine.shieldControls, "shieldGlowColor")
+                    .name("Glow Color")
+                    .onChange(() => submarine.applyShieldControls());
+                
+                shieldFolder.add(submarine.shieldControls, "c", 1, 5)
+                    .name("Intensity (c)")
+                    .onChange(() => submarine.applyShieldControls());
 
-        lightFolder.add(submarine.lightControls, "warningLightIntensity", 0, 100)
-        .onChange(() => submarine.applyLightControls())
-        .name("Warning Light Intensity");
-            lightFolder.open();
+                shieldFolder.add(submarine.shieldControls, "p", 1, 5)
+                    .name("Falloff (p)")
+                    .onChange(() => submarine.applyShieldControls());
+            }
         }
 
-        // submarine shield controls
-        if (submarine && submarine.shieldControls) {
-            const shieldFolder = submarineFolder.addFolder('Submarine Shield');
-            shieldFolder.add(submarine.shieldControls, "isActive")
-        .name("Activate Shield")
-        .onChange(() => submarine.applyShieldControls());
 
+        // ====================================================================
+        // 4. ECOSYSTEM (Boids, Particles)
+        // ====================================================================
+        const ecoFolder = this.datgui.addFolder('Ecosystem');
+
+        // --- Fish / Boids ---
+        const boidProperties = this.contents.aquarium.boidProps;
+        if (boidProperties) {
+            const fishFolder = ecoFolder.addFolder('Fish Behavior');
             
-            shieldFolder.addColor(submarine.shieldControls, "shieldGlowColor")
-        .onChange(() => submarine.applyShieldControls())
-        .name("Shield Glow Color");
-        
-            shieldFolder.add(submarine.shieldControls, "c", 1, 5)
-        .onChange(() => submarine.applyShieldControls())
-        .name("Shield c Param");
-
-            shieldFolder.add(submarine.shieldControls, "p", 1, 5)
-        .onChange(() => submarine.applyShieldControls())
-        .name("Shield p Param");
-            shieldFolder.open();
-        }
-        // Scenario controls
-        const scenarioFolder = this.datgui.addFolder('Scenario');
-        const scenario = this.contents.scenarioManager;
-        if (scenario) {
-            const intensities = scenario.originalLightsIntensity;
-            scenarioFolder
-                .add(intensities,'directional' , 0, 1, 0.01).name('Directional Light')
-                .onChange((value) => {
-                    scenario.updateDirectionalLight(value);
-                });
-            scenarioFolder.add(intensities, 'ambient', 0, 1, 0.01).name('Ambient Light').onChange((value) => {
-                scenario.updateAmbientLight(value);
-            });
-            scenarioFolder.add(scenario, 'originalFogIntensity', 0, 0.1, 0.001).name('Fog Density').onChange((value) => {
-                scenario.updateFogIntensity(value);
-            });
+            fishFolder.add(boidProperties, 'cohesion', 0, 5, 0.1).name('Cohesion');
+            fishFolder.add(boidProperties, 'separation', 0, 5, 0.1).name('Separation');
+            fishFolder.add(boidProperties, 'alignment', 0, 5, 0.1).name('Alignment');
+            fishFolder.add(boidProperties, 'moveSpeed', 0, 10, 0.1).name('Speed');
+            fishFolder.add(boidProperties, 'awareness', 1, 20, 1).name('Awareness');
         }
 
+        // --- Particles ---
+        const particleFolder = ecoFolder.addFolder('Particles');
+        particleFolder.add(this.contents.aquarium, 'particlesUseLOD')
+            .name('Use Distance LOD')
+            .onChange((enabled) => {
+                this.contents.aquarium.marineSnow.isUsingLOD = enabled;
+                this.contents.aquarium.seabed.bubbleColumns.isUsingLOD = enabled;
+            });
 
+
+        // ====================================================================
+        // 5. DEBUG & PERFORMANCE (BVH, Collisions)
+        // ====================================================================
+        const debugFolder = this.datgui.addFolder('Debug & Performance');
+        debugFolder.close(); 
+
+        // --- BVH ---
+        const bvhParams = this.contents.bvhManager;
+        if (bvhParams) {
+            debugFolder.add(bvhParams, 'useBVH')
+                .name('Use BVH Acceleration')
+                .onChange((enabled) => bvhParams.toggleBVH(enabled));
+        }
+
+        // --- Collision Boxes ---
+        const collisionManager = this.contents.collisionManager;
+        if (collisionManager) {
+            const collisionParams = { showBoxes: false };
+            debugFolder.add(collisionParams, 'showBoxes')
+                .name('Show Collision Boxes')
+                .onChange((enabled) => collisionManager.toggleBoxVisualization(enabled));
+        }
     }
 }
 

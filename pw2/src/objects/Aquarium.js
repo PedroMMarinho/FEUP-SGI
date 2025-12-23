@@ -33,6 +33,7 @@ class Aquarium extends THREE.Object3D {
         this.cameraManager.setAquariumWidth(this.terrainWidth);
 
         this.shadowsEnabled = true;
+        this.particlesUseLOD = false;
 
         this.objects = [];
         this.envMap = null;
@@ -97,7 +98,7 @@ class Aquarium extends THREE.Object3D {
     }
 
     addMarineSnow() {
-    const marineSnow = new MarineSnow(
+    this.marineSnow = new MarineSnow(
         600, 
         {
             width: this.terrainWidth,
@@ -115,9 +116,10 @@ class Aquarium extends THREE.Object3D {
             gravity: 0.1,                // Reduced gravity effect
             bounce: 0.9,      // Less bounce
             fadeSpeed: 0.8,              // Fades fast 
+            simulateDistance: 50,
         },
     );
-    this.addToAquarium(marineSnow);
+    this.addToAquarium(this.marineSnow);
     }
 
     setupBVH() {
