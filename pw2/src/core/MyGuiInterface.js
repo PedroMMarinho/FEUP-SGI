@@ -169,12 +169,28 @@ class MyGuiInterface {
 
         // --- Particles ---
         const particleFolder = ecoFolder.addFolder('Particles');
-        particleFolder.add(this.contents.aquarium, 'particlesUseLOD')
-            .name('Use Distance LOD')
-            .onChange((enabled) => {
-                this.contents.aquarium.marineSnow.isUsingLOD = enabled;
-                this.contents.aquarium.seabed.bubbleColumns.isUsingLOD = enabled;
-            });
+
+        // Helper object to translate boolean status to text
+        const lodMonitor = {
+            get snowLOD() { 
+                return this.context.aquarium.marineSnow.isUsingLOD ? 'ON' : 'OFF'; 
+            },
+            get bubblesLOD() { 
+                return this.context.aquarium.seabed.bubbleColumns.isUsingLOD ? 'ON' : 'OFF'; 
+            },
+            context: this.contents 
+        };
+
+        // Add monitors
+        particleFolder.add(lodMonitor, 'snowLOD')
+            .name('Snow LOD Active')
+            .listen()   
+            .disable(); 
+
+        particleFolder.add(lodMonitor, 'bubblesLOD')
+            .name('Bubbles LOD Active')
+            .listen()
+            .disable();
 
 
         // ====================================================================
