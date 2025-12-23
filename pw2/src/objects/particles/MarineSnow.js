@@ -38,6 +38,7 @@ export class MarineSnow extends THREE.Group {
             // simulate distance
             simulateDistance: config.simulateDistance,
         };
+        this.isUsingLOD = false;
         this.cameraManager = CameraManager.getInstance();
         this.collisionManager = CollisionManager.getInstance();
         this.obstacles = []
@@ -134,7 +135,7 @@ export class MarineSnow extends THREE.Group {
             const zDist = pz - cameraPosition.z;
             const horizontalDist = Math.sqrt(xDist*xDist + zDist*zDist);
             
-            if (horizontalDist > this.settings.simulateDistance) {
+            if (this.isUsingLOD && (horizontalDist > this.settings.simulateDistance)) {
                 continue; 
             }
 

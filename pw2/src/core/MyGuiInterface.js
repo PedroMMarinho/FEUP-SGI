@@ -208,7 +208,7 @@ class MyGuiInterface {
             shieldFolder.open();
         }
         // Scenario controls
-        const scenarioFolder = this.datgui.addFolder('Scenario');
+        const scenarioFolder = this.datgui.addFolder('Scenario Lighting');
         const scenario = this.contents.scenarioManager;
         if (scenario) {
             const intensities = scenario.originalLightsIntensity;
@@ -224,6 +224,17 @@ class MyGuiInterface {
                 scenario.updateFogIntensity(value);
             });
         }
+
+        const particlesFolder = this.datgui.addFolder('Particles LOD');
+        particlesFolder
+            .add(this.contents.aquarium, 'particlesUseLOD')
+            .name('Enable Particles LOD')
+            .onChange((enabled) => {
+                this.contents.aquarium.marineSnow.isUsingLOD = enabled;
+                this.contents.aquarium.seabed.bubbleColumns.isUsingLOD = enabled;
+            });
+        particlesFolder.open();
+
 
 
     }
