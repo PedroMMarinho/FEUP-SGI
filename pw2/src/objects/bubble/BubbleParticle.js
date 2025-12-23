@@ -38,7 +38,7 @@ export class BubbleParticle {
         });
 
         this.mesh = new THREE.Points(this.geometry, this.material);
-        this.mesh.frustumCulled = false;
+        this.mesh.frustumCulled = true;
     }
 
     flagUpdates() {
