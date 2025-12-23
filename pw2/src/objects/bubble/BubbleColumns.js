@@ -65,7 +65,7 @@ export class BubbleColumns extends THREE.Object3D {
         let delta = currentTime - this.lastTime;
         this.lastTime = currentTime;
 
-
+        this.isUsingLOD = false;
         for (let i = 0; i < p.count; i++) {
             const i3 = i * 3;
 
@@ -73,7 +73,8 @@ export class BubbleColumns extends THREE.Object3D {
             const dx = p.positions[i3] - cameraPosition.x;
             const dz = p.positions[i3 + 2] - cameraPosition.z; 
             const horizontalDistance = Math.sqrt(dx*dx + dz*dz);
-            if(this.isUsingLOD && (horizontalDistance > this.simulateDistance)){
+            if(horizontalDistance > this.simulateDistance){
+                this.isUsingLOD = true;
                 continue;
             }
 

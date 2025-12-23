@@ -119,6 +119,8 @@ export class MarineSnow extends THREE.Group {
         const colors = this.renderData.colors;
         const halfW = this.bounds.width / 2;
         const halfD = this.bounds.depth / 2;
+        
+        this.isUsingLOD = false;
 
         for (let i = 0; i < this.particles.length; i++) {
             const p = this.particles[i];
@@ -135,7 +137,8 @@ export class MarineSnow extends THREE.Group {
             const zDist = pz - cameraPosition.z;
             const horizontalDist = Math.sqrt(xDist*xDist + zDist*zDist);
             
-            if (this.isUsingLOD && (horizontalDist > this.settings.simulateDistance)) {
+            if (horizontalDist > this.settings.simulateDistance) {
+                this.isUsingLOD = true;
                 continue; 
             }
 
