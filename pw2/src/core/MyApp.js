@@ -57,7 +57,7 @@ class MyApp {
         // Initialize pass manager
         
         this.passManager = new PassManager(this.renderer, this.scene);
-        this.cameraManager = new CameraManager(this.aspect,this.keyManager, this.frustumSize, this.passManager);
+        this.cameraManager = CameraManager.initialize(this.aspect,this.keyManager, this.frustumSize, this.passManager);
 
         this.cameraManager.init();
 
