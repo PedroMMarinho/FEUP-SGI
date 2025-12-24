@@ -102,7 +102,7 @@ export class AssetManager {
             'rift-map': 'sand/riftMap.png',
             'rift-rock': 'sand/riftRock.jpg',
             'rift-rock-normal':  'sand/riftRockNormal.png',
-            'magma': 'sand/magma.jpg',
+            'magma': 'sand/magma.png',
             'magma-normal': 'sand/magmaNormal.png',
             // TV Screen Video Texture
             'tv-screen3': 'tv/spongebob.mp4',
