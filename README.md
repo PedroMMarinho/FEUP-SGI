@@ -65,11 +65,9 @@ A real-time **THREE.js aquarium simulation** featuring animated marine life, pro
 
 - Particle systems (marine snow, bubbles, sand puffs)
 
-
 <p align="center">
-  <video src="./pw2/screenshots/sgi-demo.mp4" controls="controls" muted="muted" playsinline="playsinline">
-  </video>
+![Figure 2: PW2 – Interactive aquatic environment](/uploads/498f290163fcb0153675de972c8a50db/sgi_demo.mp4)
 </p>
-<p align="center">Figure 2: PW2 – Interactive aquatic environment</p>
+
 
 **More in depth information on pw2 can be found in [pw2's README](pw2/README.md)**
